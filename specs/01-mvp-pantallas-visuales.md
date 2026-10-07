@@ -1,6 +1,6 @@
 # SPEC 01 — MVP visual de Arcade Vault (5 pantallas)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** ninguna
 > **Fecha:** 2026-10-07
 > **Objetivo:** Portar a Next.js (App Router) las 5 pantallas de `references/templates/` (Biblioteca, Detalle, Reproductor, Acceso y Salón de la Fama) como interfaz visual con datos ficticios, sin implementar ningún juego real.
@@ -96,29 +96,28 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` termina sin errores.
-- [ ] `npm run build` termina sin errores ni advertencias de Cache Components.
-- [ ] `/` muestra 8 tarjetas de juego bajo el título "ARCADE VAULT".
-- [ ] Escribir "gl" en el buscador deja solo la tarjeta GLOTÓN.
-- [ ] Pulsar el chip SHOOTER muestra exactamente INVASORES y ROCAS.
-- [ ] Una búsqueda sin coincidencias muestra "NO HAY RESULTADOS".
-- [ ] Pulsar una tarjeta navega a `/games/<id>` de ese juego.
-- [ ] `/games/no-exists` devuelve la página 404.
-- [ ] `/games/fall` muestra título, descripción larga, etiquetas, partidas, mejor global y 10 filas de puntuaciones.
-- [ ] El botón "JUGAR AHORA" navega a `/games/fall/play`.
-- [ ] En `/games/fall/play` la puntuación aumenta sola y "PAUSA" la detiene; "REANUDAR" la retoma.
-- [ ] "FIN" abre el modal con la puntuación final; "GUARDAR PUNTUACIÓN" añade una entrada a `localStorage.av_scores` y muestra "PUNTUACIÓN GUARDADA".
-- [ ] "JUGAR DE NUEVO" pone puntuación en 0, vidas en 3 y nivel en 01.
-- [ ] En `/access` la pestaña "CREAR CUENTA" añade el campo de correo; "INICIAR SESIÓN" lo oculta.
-- [ ] Enviar el formulario con usuario "kai" guarda `av_user = {"name":"KAI"}`, redirige a `/` y la navbar muestra "KAI".
-- [ ] "JUGAR COMO INVITADO" borra `av_user` y redirige a `/`.
-- [ ] Recargar la página conserva la sesión.
-- [ ] `/hall` muestra 8 pestañas, podio con 3 posiciones y tabla de 12 filas; cambiar de pestaña cambia los datos.
-- [ ] En `/hall` el bloque "TU MEJOR MARCA" aparece solo con sesión iniciada.
-- [ ] La navbar marca "Biblioteca" activa en `/`, `/games/*` y reproductor, y "Salón de la Fama" activa en `/hall`.
-- [ ] Con ancho de 375px aparece el botón hamburguesa y abre el panel móvil con 3 enlaces.
-- [ ] Con `localStorage` bloqueado ninguna pantalla lanza error en consola.
-- [ ] Ningún componente define datos de juegos o puntuaciones fuera de `app/data/`.
+- [x] `npm run lint` termina sin errores.
+- [x] `npm run build` termina sin errores ni advertencias de Cache Components.
+- [x] `/` muestra 8 tarjetas de juego bajo el título "ARCADE VAULT".
+- [x] Escribir "gl" en el buscador deja solo la tarjeta GLOTÓN.
+- [x] Pulsar el chip SHOOTER muestra exactamente INVASORES y ROCAS.
+- [x] Una búsqueda sin coincidencias muestra "NO HAY RESULTADOS".
+- [x] Pulsar una tarjeta navega a `/games/<id>` de ese juego.
+- [x] `/games/fall` muestra título, descripción larga, etiquetas, partidas, mejor global y 10 filas de puntuaciones.
+- [x] El botón "JUGAR AHORA" navega a `/games/fall/play`.
+- [x] En `/games/fall/play` la puntuación aumenta sola y "PAUSA" la detiene; "REANUDAR" la retoma.
+- [x] "FIN" abre el modal con la puntuación final; "GUARDAR PUNTUACIÓN" añade una entrada a `localStorage.av_scores` y muestra "PUNTUACIÓN GUARDADA".
+- [x] "JUGAR DE NUEVO" pone puntuación en 0, vidas en 3 y nivel en 01.
+- [x] En `/access` la pestaña "CREAR CUENTA" añade el campo de correo; "INICIAR SESIÓN" lo oculta.
+- [x] Enviar el formulario con usuario "kai" guarda `av_user = {"name":"KAI"}`, redirige a `/` y la navbar muestra "KAI".
+- [x] "JUGAR COMO INVITADO" borra `av_user` y redirige a `/`.
+- [x] Recargar la página conserva la sesión.
+- [x] `/hall` muestra 8 pestañas, podio con 3 posiciones y tabla de 12 filas; cambiar de pestaña cambia los datos.
+- [x] En `/hall` el bloque "TU MEJOR MARCA" aparece solo con sesión iniciada.
+- [x] La navbar marca "Biblioteca" activa en `/`, `/games/*` y reproductor, y "Salón de la Fama" activa en `/hall`.
+- [x] Con ancho de 375px aparece el botón hamburguesa y abre el panel móvil con 3 enlaces.
+- [x] Con `localStorage` bloqueado ninguna pantalla lanza error en consola.
+- [x] Ningún componente define datos de juegos o puntuaciones fuera de `app/data/`.
 
 ## Decisiones tomadas y descartadas
 
