@@ -82,7 +82,6 @@ Convenciones:
 
 1. Leer `node_modules/next/dist/docs/` (`01-app`) sobre Cache Components, rutas dinámicas, `generateStaticParams` y client components. Sin cambios de código.
 2. Crear `app/data/games.ts` y `app/data/scores.ts` con los datos y tipos de `data.jsx`. Verificar con `npm run build`.
-Crear una carpeta para cada juego. En cada carpeta irán sus respectivos archivos game-[nombre-juego].ts y scores[nombre-juego].ts.
 3. Portar `styles.css` a `app/globals.css`, adaptando las variables de fuente (`--pixel`, `--mono`) a las variables de `next/font`. Eliminar selectores de `#root`. La página actual sigue renderizando.
 4. Crear proveedor de sesión (`app/_components/session-provider.tsx`, cliente) con `user`, `login`, `logout` sobre `av_user`, y montarlo en `app/layout.tsx`. Guardar con try/catch.
 5. Crear `Nav` (con menú móvil) y `Footer` en `app/_components/`, y montarlos en `app/layout.tsx`. Enlace activo según `usePathname`.
