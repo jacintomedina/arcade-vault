@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { GAMES } from "./data/games";
 import {
@@ -12,6 +13,11 @@ import { FeatureIcon } from "./_components/home/feature-icon";
 import { FloatingSilhouettes } from "./_components/home/floating-silhouettes";
 import { MiniCard } from "./_components/home/mini-card";
 import { RevealObserver } from "./_components/home/reveal-observer";
+
+export const metadata: Metadata = {
+  title: { absolute: "Arcade Vault · El arcade clásico está de vuelta" },
+  description: "Juega los mejores clásicos arcade en tu navegador. Sin descargas, gratis, con ranking global.",
+};
 
 const fmt = (n: number) => n.toLocaleString("es-ES");
 
