@@ -103,9 +103,9 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [x] Pulsar el chip SHOOTER muestra exactamente INVASORES y ROCAS.
 - [x] Una búsqueda sin coincidencias muestra "NO HAY RESULTADOS".
 - [x] Pulsar una tarjeta navega a `/games/<id>` de ese juego.
-- [x] `/games/fall` muestra título, descripción larga, etiquetas, partidas, mejor global y 10 filas de puntuaciones.
-- [x] El botón "JUGAR AHORA" navega a `/games/fall/play`.
-- [x] En `/games/fall/play` la puntuación aumenta sola y "PAUSA" la detiene; "REANUDAR" la retoma.
+- [x] `/games/caida` muestra título, descripción larga, etiquetas, partidas, mejor global y 10 filas de puntuaciones.
+- [x] El botón "JUGAR AHORA" navega a `/games/caida/play`.
+- [x] En `/games/caida/play` la puntuación aumenta sola y "PAUSA" la detiene; "REANUDAR" la retoma.
 - [x] "FIN" abre el modal con la puntuación final; "GUARDAR PUNTUACIÓN" añade una entrada a `localStorage.av_scores` y muestra "PUNTUACIÓN GUARDADA".
 - [x] "JUGAR DE NUEVO" pone puntuación en 0, vidas en 3 y nivel en 01.
 - [x] En `/access` la pestaña "CREAR CUENTA" añade el campo de correo; "INICIAR SESIÓN" lo oculta.
