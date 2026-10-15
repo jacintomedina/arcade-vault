@@ -1,5 +1,5 @@
-import { Library } from "./_components/library";
+import { Library } from "../_components/library";
 
-export default function Home() {
+export default function GamesPage() {
   return <Library />;
 }
