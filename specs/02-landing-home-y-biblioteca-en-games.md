@@ -1,6 +1,6 @@
 # SPEC 02 — Landing en `/` y Biblioteca en `/games`
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-10-13
 > **Objetivo:** Portar `references/templates/home-about/home.jsx` como landing en `/`, mover la Biblioteca a `/games` y actualizar Nav y estilos con `nav.jsx` y `styles.css` de esa carpeta, **sin implementar `about.jsx`**.
@@ -71,7 +71,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [ ] "EXPLORAR JUEGOS" y "VER TODOS LOS JUEGOS" navegan a `/games`; "CREAR CUENTA" y "EMPEZAR GRATIS" a `/access`; "VER SALÓN →" a `/hall`.
 - [ ] Pulsar una mini-tarjeta navega a `/games/<id>` de ese juego.
 - [ ] La Nav tiene exactamente 3 enlaces (Inicio, Biblioteca, Salón de la Fama) en barra y en el panel móvil de 375px, y ninguno dice "Acerca de".
-- [ ] "Inicio" está activa en `/`; "Biblioteca" en `/games`, `/games/fall` y `/games/fall/play`; "Salón" en `/hall`.
+- [ ] "Inicio" está activa en `/`; "Biblioteca" en `/games`, `/games/caida` y `/games/caida/play`; "Salón" en `/hall`.
 - [ ] No existe `app/about/` ni ningún enlace a `/about`; `globals.css` no contiene selectores `.about*`.
 - [ ] Las secciones con `.reveal` pasan a visibles al hacer scroll.
 - [ ] Con 375px de ancho no hay scroll horizontal en `/`.
