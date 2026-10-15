@@ -1,6 +1,6 @@
 # SPEC 02 — Landing en `/` y Biblioteca en `/games`
 
-> **Estado:** Draft
+> **Estado:** Aprobado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-10-13
 > **Objetivo:** Portar `references/templates/home-about/home.jsx` como landing en `/`, mover la Biblioteca a `/games` y actualizar Nav y estilos con `nav.jsx` y `styles.css` de esa carpeta, **sin implementar `about.jsx`**.
