@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useLayoutEffect, useState } from "react";
 import { sendContactMessage, type ContactState } from "../../about/actions";
 
 const EMPTY = { name: "", email: "", msg: "" };
@@ -13,6 +13,13 @@ const INITIAL: ContactState = { status: "idle" };
 // La key remonta el formulario y reinicia el estado de la acción.
 export function ContactForm() {
   const [run, setRun] = useState(0);
+
+  // Next conserva la página oculta (Activity) al navegar: al ocultarse,
+  // el cleanup remonta el formulario y limpia errores y borde magenta.
+  useLayoutEffect(() => {
+    return () => setRun((r) => r + 1);
+  }, []);
+
   return <ContactFormInner key={run} onReset={() => setRun(run + 1)} />;
 }
 

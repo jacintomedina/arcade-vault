@@ -25,7 +25,7 @@ export default function AboutPage() {
       {/* ABOUT */}
       <section className="about-hero">
         <div className="kicker pixel neon-yellow">▸ ACERCA DE</div>
-        <h1 className="about-title">ACERCA DE ARCADE VAULT</h1>
+        <h1 className="about-title flicker">MÁS SOBRE ARCADE VAULT</h1>
         <p className="about-mission">
           ARCADE VAULT nació del amor por los videojuegos clásicos. Nuestra misión es preservar y celebrar
           los arcades que definieron una generación, haciéndolos accesibles para todos, en cualquier lugar

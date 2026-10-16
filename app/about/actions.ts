@@ -2,7 +2,7 @@
 
 import { Resend } from "resend";
 
-const CONTACT_TO = "jmedinalba+arcade@gmail.com";
+const CONTACT_TO = "jmedinalba@gmail.com";
 
 const MAX_NAME = 80;
 const MAX_EMAIL = 254;
@@ -65,7 +65,7 @@ export async function sendContactMessage(
       text: `Nombre: ${name}\nCorreo: ${email}\n\n${msg}`,
     });
     if (error) {
-      console.error("sendContactMessage: Resend", error);
+      console.error(`sendContactMessage: Resend ${error.name}: ${error.message}`);
       return { status: "error", error: GENERIC_ERROR };
     }
   } catch (err) {

@@ -5,14 +5,18 @@ export function HighlightIcon({ kind }: { kind: HighlightIconKind }) {
   const C = "currentColor";
   if (kind === "HEART") return (
     <svg className="hl-icon" viewBox="0 0 16 16" aria-hidden="true"><g fill={C}>
-      <rect x="2" y="3" width="4" height="2"/><rect x="10" y="3" width="4" height="2"/>
-      <rect x="1" y="4" width="2" height="4"/><rect x="13" y="4" width="2" height="4"/>
-      <rect x="2" y="8" width="2" height="2"/><rect x="12" y="8" width="2" height="2"/>
-      <rect x="3" y="9" width="10" height="2"/>
-      <rect x="4" y="11" width="8" height="2"/>
-      <rect x="5" y="12" width="6" height="2"/>
-      <rect x="6" y="13" width="4" height="1"/>
-      <rect x="7" y="14" width="2" height="1"/>
+      <rect x="3" y="4" width="4" height="1"/>
+      <rect x="9" y="4" width="4" height="1"/>
+      <rect x="2" y="5" width="12" height="1"/>
+      <rect x="2" y="6" width="12" height="1"/>
+      <rect x="2" y="7" width="12" height="1"/>
+      <rect x="3" y="8" width="10" height="1"/>
+      <rect x="4" y="9" width="8" height="1"/>
+      <rect x="5" y="10" width="6" height="1"/>
+      <rect x="6" y="11" width="4" height="1"/>
+      <rect x="7" y="12" width="2" height="1"/>
+      <rect x="3" y="5" width="2" height="1" fill="#fff" fillOpacity="0.55"/>
+      <rect x="3" y="6" width="1" height="1" fill="#fff" fillOpacity="0.55"/>
     </g></svg>
   );
   if (kind === "BROWSER") return (
