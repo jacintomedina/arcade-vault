@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ContactForm } from "../_components/about/contact-form";
 import {
   HighlightIcon,
   type HighlightIconKind,
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 
 const HIGHLIGHTS: { icon: HighlightIconKind; text: string; color: string }[] = [
   { icon: "HEART", text: "HECHO CON ❤️ PARA JUGADORES", color: "magenta" },
-  { icon: "BROWSER", text: "JUEGOS EN HTML — CORREN EN CUALQUIER NAVEGADOR", color: "cyan" },
+  { icon: "BROWSER", text: "JUEGOS EN HTML — FUNCIONAN EN CUALQUIER NAVEGADOR", color: "cyan" },
   { icon: "PLANT", text: "PROYECTO EN CONSTANTE CRECIMIENTO", color: "green" },
 ];
 
@@ -69,24 +70,7 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Formulario estático; se reemplaza por contact-form.tsx en el paso 5 */}
-          <form className="contact-form">
-            <div className="field">
-              <label htmlFor="name">NOMBRE</label>
-              <input id="name" name="name" placeholder="px_kai" />
-            </div>
-            <div className="field">
-              <label htmlFor="email">CORREO ELECTRÓNICO</label>
-              <input id="email" name="email" type="email" placeholder="jugador@vault.gg" />
-            </div>
-            <div className="field">
-              <label htmlFor="msg">MENSAJE</label>
-              <textarea id="msg" name="msg" rows={5} placeholder="Cuéntanos qué tienes en mente…"></textarea>
-            </div>
-            <button className="btn xl press" type="submit" style={{ width: "100%" }}>
-              ▶  ENVIAR MENSAJE
-            </button>
-          </form>
+          <ContactForm />
         </div>
       </section>
     </div>
