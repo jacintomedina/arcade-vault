@@ -24,7 +24,7 @@ SPEC 02 dejó `about.jsx` fuera de alcance. Esta spec lo recupera: la página, s
 - Honeypot simple anti-spam.
 - Enlace **Acerca de** (`/about`) en Nav (barra y panel móvil), activo en `/about`. Revierte la exclusión de SPEC 02.
 - Variables de entorno `RESEND_API_KEY` y `CONTACT_FROM_EMAIL` en `.env.local`, con `.env.example` documentado.
-- Destinatario fijo: `jmedinalba@gmail.com`, constante en `app/about/actions.ts`.
+- Destinatario fijo: `jmedinalba+arcade@gmail.com`, constante en `app/about/actions.ts`.
 
 **Fuera de alcance (para futuras specs):**
 
@@ -52,7 +52,7 @@ Campos de `FormData`: `name`, `email`, `msg`, `website` (honeypot, debe llegar v
 
 Límites: `name` ≤ 80, `email` ≤ 254, `msg` ≤ 2000 caracteres.
 
-Correo enviado con Resend: `from` = `CONTACT_FROM_EMAIL`, `to` = `jmedinalba@gmail.com`, `replyTo` = correo del visitante, `subject` = `[Arcade Vault] Mensaje de <name>`, cuerpo en texto plano con nombre, correo y mensaje.
+Correo enviado con Resend: `from` = `CONTACT_FROM_EMAIL`, `to` = `jmedinalba+arcade@gmail.com`, `replyTo` = correo del visitante, `subject` = `[Arcade Vault] Mensaje de <name>`, cuerpo en texto plano con nombre, correo y mensaje.
 
 Variables de entorno:
 
@@ -83,7 +83,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [ ] El aspecto de `/about` coincide con `home-about/arcade-vault-standalone.html` en escritorio y 375px.
 - [ ] Enviar el formulario con un campo vacío aplica el shake y no envía correo.
 - [ ] Enviar un correo con formato inválido muestra un error en la UI y no envía correo.
-- [ ] Enviar datos válidos entrega un correo a `jmedinalba@gmail.com` con asunto `[Arcade Vault] Mensaje de <name>` y `replyTo` igual al correo del visitante.
+- [ ] Enviar datos válidos entrega un correo a `jmedinalba+arcade@gmail.com` con asunto `[Arcade Vault] Mensaje de <name>` y `replyTo` igual al correo del visitante.
 - [ ] Tras el envío exitoso se muestra la terminal con "MENSAJE RECIBIDO! GRACIAS, <NOMBRE>".
 - [ ] "ENVIAR OTRO MENSAJE" vuelve al formulario con los campos vacíos.
 - [ ] Con `RESEND_API_KEY` ausente o inválida la UI muestra un mensaje de error y no la terminal de éxito.
@@ -96,7 +96,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 ## Decisiones tomadas y descartadas
 
 - **Sí:** Server Action. Sin API route extra y con `useActionState`. **No:** Route Handler `/api/contact` (más código, fetch manual).
-- **Sí:** destinatario fijo `jmedinalba@gmail.com` en código. Petición explícita del usuario. **No:** variable de entorno (más configuración sin necesidad hoy).
+- **Sí:** destinatario fijo `jmedinalba+arcade@gmail.com` en código. Petición explícita del usuario. **No:** variable de entorno (más configuración sin necesidad hoy).
 - **Sí:** remitente por `CONTACT_FROM_EMAIL`, por defecto `onboarding@resend.dev`. Resend no permite otro remitente sin dominio verificado, y así el cambio futuro no toca código.
 - **Sí:** validación en servidor y error en UI. El template siempre muestra éxito, lo que mentiría si Resend falla. **No:** copiar el éxito simulado.
 - **Sí:** honeypot. Barato y suficiente para esta etapa. **No:** CAPTCHA ni rate limiting (spec propia si hay abuso).
@@ -108,7 +108,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 | Riesgo | Mitigación |
 | ------ | ---------- |
-| `onboarding@resend.dev` solo entrega al correo de la cuenta de Resend | Usar en la cuenta de Resend el correo `jmedinalba@gmail.com`; documentarlo en `.env.example`. |
+| `onboarding@resend.dev` solo entrega al correo de la cuenta de Resend | Registrar la cuenta de Resend con el correo destinatario `jmedinalba+arcade@gmail.com`, o verificar un dominio; documentarlo en `.env.example`. |
 | Cache Components y Server Actions | Leer docs en el paso 1; la acción no usa APIs dinámicas en el render de la página. |
 | CSS de about pisa estilos existentes (`.field`, `.btn`, `.shake`) | Comparar con diff antes de fusionar; revisar las pantallas existentes tras el paso 3. |
 | Secreto expuesto | Variable sin prefijo `NEXT_PUBLIC_`; acción solo en servidor. |
