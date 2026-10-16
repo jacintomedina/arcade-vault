@@ -58,7 +58,7 @@ export default function AboutPage() {
         <div className="contact-grid">
           <div className="contact-intro">
             <div className="kicker pixel neon-cyan">▸ CONTACTO</div>
-            <h2 className="contact-title">CONTÁCTANOS</h2>
+            <h2 className="contact-title">ENVÍANOS UN MENSAJE</h2>
             <p className="contact-sub">
               ¿Tienes alguna sugerencia, quieres proponer un juego, o simplemente quieres saludar?
               Escríbenos.
