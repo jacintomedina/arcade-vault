@@ -20,7 +20,7 @@ SPEC 02 dejó `about.jsx` fuera de alcance. Esta spec lo recupera: la página, s
 - Formulario con tres campos (nombre, correo, mensaje), estado de éxito "terminal" y botón "ENVIAR OTRO MENSAJE", como el template.
 - Envío con Server Action `sendContactMessage` en `app/about/actions.ts` y el paquete `resend`.
 - Validación en servidor: campos no vacíos, formato de correo, longitudes máximas.
-- Estado de error en la UI si Resend falla o la validación falla (el shake del template se mantiene para campos vacíos).
+- Estado de error en la UI si Resend falla o la validación falla (el shake del template se mantiene para campos vacíos o inválidos, y el borde del campo con fallo se ilumina en magenta (`--magenta`)).
 - Honeypot simple anti-spam.
 - Enlace **Acerca de** (`/about`) en Nav (barra y panel móvil), activo en `/about`. Revierte la exclusión de SPEC 02.
 - Variables de entorno `RESEND_API_KEY` y `CONTACT_FROM_EMAIL` en `.env.local`, con `.env.example` documentado.
@@ -84,7 +84,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [ ] Enviar el formulario con un campo vacío aplica el shake y no envía correo.
 - [ ] Enviar un correo con formato inválido muestra un error en la UI y no envía correo.
 - [ ] Enviar datos válidos entrega un correo a `jmedinalba+arcade@gmail.com` con asunto `[Arcade Vault] Mensaje de <name>` y `replyTo` igual al correo del visitante.
-- [ ] Tras el envío exitoso se muestra la terminal con "MENSAJE RECIBIDO! GRACIAS, <NOMBRE>".
+- [ ] Tras el envío exitoso se muestra la terminal con "MENSAJE RECIBIDO. TE RESPONDEREMOS PRONTO. GRACIAS, <NOMBRE>."
 - [ ] "ENVIAR OTRO MENSAJE" vuelve al formulario con los campos vacíos.
 - [ ] Con `RESEND_API_KEY` ausente o inválida la UI muestra un mensaje de error y no la terminal de éxito.
 - [ ] Un envío con el honeypot `website` relleno no envía correo.

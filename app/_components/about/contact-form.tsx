@@ -1,68 +1,111 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { sendContactMessage, type ContactState } from "../../about/actions";
 
 const EMPTY = { name: "", email: "", msg: "" };
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+type FieldName = keyof typeof EMPTY;
+
+const INITIAL: ContactState = { status: "idle" };
+
+// La key remonta el formulario y reinicia el estado de la acción.
 export function ContactForm() {
+  const [run, setRun] = useState(0);
+  return <ContactFormInner key={run} onReset={() => setRun(run + 1)} />;
+}
+
+function ContactFormInner({ onReset }: { onReset: () => void }) {
+  const [state, formAction, pending] = useActionState(sendContactMessage, INITIAL);
   const [form, setForm] = useState(EMPTY);
-  const [sent, setSent] = useState<string | null>(null);
   const [shake, setShake] = useState(false);
+  const [invalid, setInvalid] = useState<FieldName[]>([]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.msg.trim()) {
+    const bad: FieldName[] = [];
+    if (!form.name.trim()) bad.push("name");
+    if (!EMAIL_RE.test(form.email.trim())) bad.push("email");
+    if (!form.msg.trim()) bad.push("msg");
+    if (bad.length) {
+      setInvalid(bad);
       setShake(true);
       setTimeout(() => setShake(false), 400);
-      return;
+      // Cancela la acción del formulario: no se envía nada al servidor.
+      e.preventDefault();
     }
-    // Envío simulado; la acción real se conecta en el paso 7.
-    setSent(form.name.trim());
   };
 
-  const reset = () => {
-    setSent(null);
-    setForm(EMPTY);
+  const update = (key: FieldName, value: string) => {
+    setForm({ ...form, [key]: value });
+    if (invalid.includes(key)) setInvalid(invalid.filter((k) => k !== key));
   };
+
+  const fieldClass = (key: FieldName) => "field" + (invalid.includes(key) ? " invalid" : "");
 
   return (
-    <form className={"contact-form" + (shake ? " shake" : "")} onSubmit={onSubmit} noValidate>
-      {!sent ? (
+    <form
+      className={"contact-form" + (shake ? " shake" : "")}
+      action={formAction}
+      onSubmit={onSubmit}
+      noValidate
+    >
+      {state.status !== "success" ? (
         <>
-          <div className="field">
+          <div className={fieldClass("name")}>
             <label htmlFor="name">NOMBRE</label>
             <input
               id="name"
               name="name"
+              maxLength={80}
               value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              onChange={(e) => update("name", e.target.value)}
+              aria-invalid={invalid.includes("name")}
               placeholder="px_kai"
             />
           </div>
-          <div className="field">
+          <div className={fieldClass("email")}>
             <label htmlFor="email">CORREO ELECTRÓNICO</label>
             <input
               id="email"
               name="email"
+              maxLength={254}
               type="email"
               value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              onChange={(e) => update("email", e.target.value)}
+              aria-invalid={invalid.includes("email")}
               placeholder="jugador@vault.gg"
             />
           </div>
-          <div className="field">
+          <div className={fieldClass("msg")}>
             <label htmlFor="msg">MENSAJE</label>
             <textarea
               id="msg"
               name="msg"
+              maxLength={2000}
               rows={5}
               value={form.msg}
-              onChange={(e) => setForm({ ...form, msg: e.target.value })}
+              onChange={(e) => update("msg", e.target.value)}
+              aria-invalid={invalid.includes("msg")}
               placeholder="Cuéntanos qué tienes en mente…"
             ></textarea>
           </div>
-          <button className="btn xl press" type="submit" style={{ width: "100%" }}>
-            ▶  ENVIAR MENSAJE
+          {/* Honeypot anti-spam: los humanos no lo ven ni lo rellenan. */}
+          <input
+            className="hp-field"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            defaultValue=""
+          />
+          {state.status === "error" && (
+            <p className="form-error" role="alert">
+              {state.error}
+            </p>
+          )}
+          <button className="btn xl press" type="submit" disabled={pending} style={{ width: "100%" }}>
+            {pending ? "ENVIANDO…" : "▶  ENVIAR MENSAJE"}
           </button>
         </>
       ) : (
@@ -81,11 +124,11 @@ export function ContactForm() {
             <div className="line dim">[OK] Validando contenido…</div>
             <div className="line dim">[OK] Transmitiendo paquete…</div>
             <div className="line success">
-              &gt; MENSAJE RECIBIDO. TE RESPONDEREMOS PRONTO. GRACIAS, {sent.toUpperCase()}.
+              &gt; MENSAJE RECIBIDO. TE RESPONDEREMOS PRONTO. GRACIAS, {(state.name ?? "").toUpperCase()}.
               <span className="caret">_</span>
             </div>
             <div style={{ marginTop: 18 }}>
-              <button className="btn ghost" type="button" onClick={reset}>
+              <button className="btn ghost" type="button" onClick={onReset}>
                 ENVIAR OTRO MENSAJE
               </button>
             </div>
