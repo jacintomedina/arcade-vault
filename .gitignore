@@ -45,3 +45,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# MCP config local (contiene project_ref de Supabase). Usar .mcp.json.example
+.mcp.json
