@@ -17,7 +17,7 @@ export function HallOfFame() {
   return (
     <div className="av-hall fade-in">
       <div className="hall-head">
-        <h1>SALÓN DE LA FAMA</h1>
+        <h1 className="flicker">SALÓN DE LA FAMA</h1>
         <p className="pixel" style={{ fontSize: 10 }}>
           LOS NOMBRES QUE NUNCA SE BORRAN DE LA PANTALLA
         </p>
