@@ -68,8 +68,8 @@ La contraseña de base de datos ya existe en `.env.local` y `.env.example`. Esta
 2. Instalar `@supabase/supabase-js` y `@supabase/ssr`. Obtener URL y clave publicable con el MCP, añadirlas a `.env.local` y documentar los nombres en `.env.example` sin secretos.
 3. Crear `app/_lib/supabase/client.ts`. La app sigue arrancando.
 4. Crear `app/_lib/supabase/server.ts` con cookies de `next/headers`.
-5. Crear `app/_lib/supabase/proxy.ts` y `proxy.ts` en la raíz con `matcher` que excluye `_next/static`, `_next/image`, `favicon.ico` e imágenes. El proxy solo refresca la sesión y propaga cookies.
-6. Crear `app/api/health/supabase/route.ts`: usa el cliente de servidor y llama a `auth.getUser()`. El error "Auth session missing" cuenta como éxito (el servidor es alcanzable). Cualquier otro error o excepción devuelve 503 con mensaje genérico, sin filtrar claves.
+5. Crear `app/_lib/supabase/proxy.ts` y `proxy.ts` en la raíz con `matcher` que excluye `_next/static`, `_next/image`, `favicon.ico` e imágenes. El proxy solo refresca la sesión y propaga cookies. Si `updateSession` lanza (p. ej. URL de Supabase inválida), `proxy.ts` captura el error y continúa con `NextResponse.next()` para no romper el resto de rutas.
+6. Crear `app/api/health/supabase/route.ts`: hace `fetch` a `${NEXT_PUBLIC_SUPABASE_URL}/auth/v1/health` con la clave publicable en el header `apikey`, sin caché y con timeout de 5 s. Respuesta OK devuelve 200. Variables ausentes, respuesta no OK, timeout o cualquier excepción devuelve 503 con mensaje genérico, sin filtrar claves. (`auth.getUser()` se descartó: sin sesión no llama a la red y daría falsos 200.)
 7. Crear `supabase/migrations/.gitkeep` y añadir a `README.md` una sección corta: variables de entorno, convención de migraciones y ruta de diagnóstico.
 8. Pulido: `npm run lint` y `npm run build` limpios. Probar con `npm run dev` la ruta de diagnóstico y las rutas de SPEC 01–03.
 
@@ -81,7 +81,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [ ] `npm run build` termina sin errores ni advertencias de Cache Components ni de la convención `proxy`.
 - [ ] `package.json` lista `@supabase/supabase-js` y `@supabase/ssr`.
 - [ ] `GET /api/health/supabase` con las variables correctas devuelve 200 y `{ "ok": true }`.
-- [ ] `GET /api/health/supabase` con la URL de Supabase inválida devuelve 503 y `{ "ok": false, ... }` sin lanzar excepción no controlada.
+- [ ] `GET /api/health/supabase` con la URL de Supabase inválida (malformada o inalcanzable) devuelve 503 y `{ "ok": false, ... }` sin lanzar excepción no controlada, y el resto de rutas siguen respondiendo 200.
 - [ ] La respuesta de error no contiene la clave publicable ni la contraseña de base de datos.
 - [ ] `.env.example` lista los nombres de las variables de Supabase sin valores reales; `.env.local` no está versionado.
 - [ ] La contraseña de base de datos no aparece en el bundle del cliente (grep en `.next/static`).
@@ -99,6 +99,8 @@ Cada paso deja la app arrancando con `npm run dev`.
 - **Sí:** clave publicable (formato nuevo de Supabase). **No:** clave `anon` heredada.
 - **Sí:** spec sin valores, identificadores de proyecto ni claves. Petición del usuario: la spec es legible por cualquiera con acceso al repo. Los valores viven solo en `.env.local`.
 - **Sí:** ruta `/api/health/supabase` permanente. Petición del usuario; sirve de diagnóstico para las specs siguientes. **No:** script desechable.
+- **Sí:** health con `fetch` a `/auth/v1/health`. Prueba alcance real; verificado con URL malformada e inalcanzable. **No:** `auth.getUser()` (sin sesión no toca la red, falso 200).
+- **Sí:** `try/catch` en `proxy.ts`. Una URL inválida lanzaba dentro del proxy y daba 500 en todas las rutas. **No:** excluir `api/health` del matcher (el resto de rutas seguiría rompiéndose).
 - **Sí:** migraciones aplicadas al proyecto remoto por MCP, con archivos en `supabase/migrations/`. **No:** Supabase CLI local con Docker (más setup, sin necesidad hoy).
 - **Sí:** sin tipos generados todavía. Con la base vacía solo producirían un archivo sin contenido. **No:** generar `database.ts` ahora.
 - **Sí:** clientes bajo `app/_lib/supabase/`, mismo patrón que `app/_components/`. **No:** carpeta `lib/` en la raíz (el repo no la usa).
