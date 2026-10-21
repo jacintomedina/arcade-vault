@@ -81,6 +81,17 @@ export const GAMES: Game[] = [
     plays: "15.6K",
   },
   {
+    id: "asteroides",
+    title: "ASTEROIDES",
+    short: "Rota, empuja y dispara entre rocas a la deriva.",
+    long: "Tu nave flota sin fricción: un empujón y no hay quien la frene. Dispara a las rocas para partirlas en fragmentos más pequeños y rápidos, recoge el disparo triple y sobrevive a oleadas cada vez más numerosas.",
+    cat: "SHOOTER",
+    cover: "cover-asteroides",
+    color: "cyan",
+    best: 0,
+    plays: "0",
+  },
+  {
     id: "ranaria",
     title: "RANARIA",
     short: "Cruza la autopista de pixeles.",
