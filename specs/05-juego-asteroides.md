@@ -1,6 +1,6 @@
 # SPEC 05 — Juego Asteroides jugable en la plataforma
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-10-18
 > **Objetivo:** Portar `references/started-games/02-asteroids/` a TypeScript como componente cliente y publicarlo en la plataforma como el juego nuevo `asteroides`, jugable en `/games/asteroides/play` dentro del reproductor existente.
@@ -115,28 +115,28 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` termina sin errores.
-- [ ] `npm run build` termina sin errores ni advertencias de Cache Components.
-- [ ] `/games` muestra la tarjeta ASTEROIDES con su portada `cover-asteroides`, y `rocas` sigue igual.
-- [ ] `/games/asteroides` muestra la ficha y su botón de jugar lleva a `/games/asteroides/play`.
-- [ ] `/games/asteroides/play` muestra un canvas con nave, 4 asteroides grandes y sin HUD ni texto pintado en el canvas.
-- [ ] `←` y `→` rotan la nave, `↑` la propulsa con inercia y `Espacio` dispara con cooldown de 0,2 s.
-- [ ] La nave que sale por un borde reaparece por el opuesto.
-- [ ] Un disparo a un asteroide grande suma 20 puntos y lo parte en 2 medianos; mediano suma 50; pequeño suma 100 y no se parte.
-- [ ] El HUD de la plataforma refleja puntuación, vidas y nivel en tiempo real.
-- [ ] Al chocar con un asteroide la nave explota, se pierde una vida y reaparece tras 2 s con invencibilidad parpadeante.
-- [ ] Al destruir todos los asteroides sube el nivel y aparecen `3 + nivel` asteroides.
-- [ ] El power-up `3x` aparece y, al recogerlo, dispara 3 balas durante 5 s.
-- [ ] PAUSA y la tecla `P` congelan el juego; al reanudar no hay salto de movimiento.
-- [ ] Al perder la tercera vida se abre el modal "FIN DEL JUEGO" con la puntuación final.
-- [ ] Guardar en el modal añade `{ game: "asteroides", score, name, at }` a `localStorage["av_scores"]`.
-- [ ] "JUGAR DE NUEVO" reinicia con 3 vidas, nivel 1 y puntuación 0.
-- [ ] FIN abre el modal con la puntuación actual; SALIR y VOLVER AL VAULT salen sin errores.
-- [ ] Con flechas y `Espacio` la página no hace scroll durante la partida.
-- [ ] Al salir de `/games/asteroides/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad de juego).
-- [ ] A 375px de ancho el canvas ocupa el ancho del marco, sin scroll horizontal, y los botones táctiles de rotar, propulsar y disparar controlan la nave.
-- [ ] Los demás juegos (`/games/caida/play`, etc.) siguen usando el simulador.
-- [ ] Las rutas de SPEC 01 a SPEC 04 siguen funcionando.
+- [x] `npm run lint` termina sin errores.
+- [x] `npm run build` termina sin errores ni advertencias de Cache Components.
+- [x] `/games` muestra la tarjeta ASTEROIDES con su portada `cover-asteroides`, y `rocas` sigue igual.
+- [x] `/games/asteroides` muestra la ficha y su botón de jugar lleva a `/games/asteroides/play`.
+- [x] `/games/asteroides/play` muestra un canvas con nave, 4 asteroides grandes y sin HUD ni texto pintado en el canvas.
+- [x] `←` y `→` rotan la nave, `↑` la propulsa con inercia y `Espacio` dispara con cooldown de 0,2 s.
+- [x] La nave que sale por un borde reaparece por el opuesto.
+- [x] Un disparo a un asteroide grande suma 20 puntos y lo parte en 2 medianos; mediano suma 50; pequeño suma 100 y no se parte.
+- [x] El HUD de la plataforma refleja puntuación, vidas y nivel en tiempo real.
+- [x] Al chocar con un asteroide la nave explota, se pierde una vida y reaparece tras 2 s con invencibilidad parpadeante.
+- [x] Al destruir todos los asteroides sube el nivel y aparecen `3 + nivel` asteroides.
+- [x] El power-up `3x` aparece y, al recogerlo, dispara 3 balas durante 5 s.
+- [x] PAUSA y la tecla `P` congelan el juego; al reanudar no hay salto de movimiento.
+- [x] Al perder la tercera vida se abre el modal "FIN DEL JUEGO" con la puntuación final.
+- [x] Guardar en el modal añade `{ game: "asteroides", score, name, at }` a `localStorage["av_scores"]`.
+- [x] "JUGAR DE NUEVO" reinicia con 3 vidas, nivel 1 y puntuación 0.
+- [x] FIN abre el modal con la puntuación actual; SALIR y VOLVER AL VAULT salen sin errores.
+- [x] Con flechas y `Espacio` la página no hace scroll durante la partida.
+- [x] Al salir de `/games/asteroides/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad de juego).
+- [x] A 375px de ancho el canvas ocupa el ancho del marco, sin scroll horizontal, y los botones táctiles de rotar, propulsar y disparar controlan la nave.
+- [x] Los demás juegos (`/games/caida/play`, etc.) siguen usando el simulador.
+- [x] Las rutas de SPEC 01 a SPEC 04 siguen funcionando.
 
 ## Decisiones tomadas y descartadas
 
