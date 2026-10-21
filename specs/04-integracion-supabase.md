@@ -1,6 +1,6 @@
 # SPEC 04 — Integración de Supabase (base de datos y autenticación)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 03
 > **Fecha:** 2026-10-18
 > **Objetivo:** Conectar la app Next.js al proyecto Supabase existente con `@supabase/ssr` y `@supabase/supabase-js`, dejando clientes de navegador y servidor, refresco de sesión y una ruta de diagnóstico listos para las specs futuras.
