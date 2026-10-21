@@ -8,6 +8,7 @@ import {
   AsteroidesGame,
 } from "./games/asteroides-game";
 import type { GameComponentProps, GameStats } from "./games/types";
+import { HighlightIcon } from "./about/highlight-icon";
 import { useSession } from "./session-provider";
 
 const INITIAL_LIVES = 3;
@@ -131,7 +132,13 @@ export function GamePlayer({ game }: { game: Game }) {
           </div>
           <div className="hud-stat lives">
             <div className="l">Vidas</div>
-            <div className="v">{"♥ ".repeat(lives).trim() || "—"}</div>
+            <div className="v hearts" aria-label={`${lives} vidas`}>
+              {lives > 0
+                ? Array.from({ length: lives }, (_, i) => (
+                    <HighlightIcon key={i} kind="HEART" />
+                  ))
+                : "—"}
+            </div>
           </div>
           <div className="hud-stat level">
             <div className="l">Nivel</div>
