@@ -70,6 +70,36 @@ export function GamePlayer({ game }: { game: Game }) {
     return () => clearInterval(t);
   }, [real, over, paused]);
 
+  useEffect(() => {
+    const GAME_KEYS = [
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "Space",
+    ];
+    const isTyping = (t: EventTarget | null) =>
+      t instanceof HTMLElement &&
+      (t.tagName === "INPUT" ||
+        t.tagName === "TEXTAREA" ||
+        t.isContentEditable);
+
+    const onKey = (e: KeyboardEvent) => {
+      if (over || isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey)
+        return;
+      if (real && GAME_KEYS.includes(e.code)) e.preventDefault();
+      if (e.type === "keydown" && e.code === "KeyP" && !e.repeat) {
+        setPaused((p) => !p);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("keyup", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keyup", onKey);
+    };
+  }, [real, over]);
+
   const restart = () => {
     setScore(0);
     setRealLives(INITIAL_LIVES);
