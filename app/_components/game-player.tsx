@@ -1,13 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ComponentType } from "react";
 import Link from "next/link";
 import type { Game } from "../data/games";
+import {
+  AsteroidesControlsHint,
+  AsteroidesGame,
+} from "./games/asteroides-game";
+import type { GameComponentProps, GameStats } from "./games/types";
 import { useSession } from "./session-provider";
 
 const INITIAL_LIVES = 3;
 const POINTS_PER_LEVEL = 2500;
 const SCORES_KEY = "av_scores";
+
+// Juegos con motor real. Un id sin entrada usa el simulador.
+const REAL_GAMES: Record<
+  string,
+  { Component: ComponentType<GameComponentProps>; Controls?: ComponentType }
+> = {
+  asteroides: { Component: AsteroidesGame, Controls: AsteroidesControlsHint },
+};
 
 function saveScore(entry: { game: string; score: number; name: string }) {
   try {
@@ -28,22 +41,40 @@ export function GamePlayer({ game }: { game: Game }) {
   const [over, setOver] = useState(false);
   const [nameEdit, setNameEdit] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [runKey, setRunKey] = useState(0);
+  const [realLives, setRealLives] = useState(INITIAL_LIVES);
+  const [realLevel, setRealLevel] = useState(1);
 
-  const lives = INITIAL_LIVES;
-  const level = 1 + Math.floor(score / POINTS_PER_LEVEL);
+  const real = REAL_GAMES[game.id];
+  const lives = real ? realLives : INITIAL_LIVES;
+  const level = real ? realLevel : 1 + Math.floor(score / POINTS_PER_LEVEL);
   const name = nameEdit ?? user?.name ?? "INVITADO";
 
+  const handleStats = useCallback((s: GameStats) => {
+    setScore(s.score);
+    setRealLives(s.lives);
+    setRealLevel(s.level);
+  }, []);
+
+  const handleGameOver = useCallback((finalScore: number) => {
+    setScore(finalScore);
+    setOver(true);
+  }, []);
+
   useEffect(() => {
-    if (over || paused) return;
+    if (real || over || paused) return;
     const t = setInterval(
       () => setScore((s) => s + Math.floor(10 + Math.random() * 90)),
       220,
     );
     return () => clearInterval(t);
-  }, [over, paused]);
+  }, [real, over, paused]);
 
   const restart = () => {
     setScore(0);
+    setRealLives(INITIAL_LIVES);
+    setRealLevel(1);
+    setRunKey((k) => k + 1);
     setPaused(false);
     setOver(false);
     setSaved(false);
@@ -92,13 +123,22 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          <div className="game-arena">
-            <div className="grid-floor"></div>
-            <div className="enemy e1"></div>
-            <div className="enemy e2"></div>
-            <div className="enemy e3"></div>
-            <div className="player-ship"></div>
-          </div>
+          {real ? (
+            <real.Component
+              paused={paused || over}
+              runKey={runKey}
+              onStats={handleStats}
+              onGameOver={handleGameOver}
+            />
+          ) : (
+            <div className="game-arena">
+              <div className="grid-floor"></div>
+              <div className="enemy e1"></div>
+              <div className="enemy e2"></div>
+              <div className="enemy e3"></div>
+              <div className="player-ship"></div>
+            </div>
+          )}
           {paused && (
             <div
               className="crt-content"
@@ -129,6 +169,7 @@ export function GamePlayer({ game }: { game: Game }) {
           <span>CARGA · 1MB</span>
         </div>
       </div>
+      {real?.Controls && <real.Controls />}
 
       {over && (
         <div className="modal-bd">
