@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { CATS, GAMES } from "../data/games";
 import { GameCard } from "./game-card";
 
-export function Library() {
+export function Library({ bests }: { bests: Record<string, number> }) {
 	const [q, setQ] = useState("");
 	const [cat, setCat] = useState<(typeof CATS)[number]>("TODOS");
 
@@ -51,7 +51,7 @@ export function Library() {
 
 			<div className="av-grid">
 				{filtered.map((g) => (
-					<GameCard key={g.id} game={g} />
+					<GameCard key={g.id} game={g} best={bests[g.id] ?? 0} />
 				))}
 				{filtered.length === 0 && (
 					<div

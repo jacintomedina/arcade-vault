@@ -157,8 +157,8 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
+| Riesgo                                                                                       | Mitigación                                                                                                                  |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | React Strict Mode monta el efecto dos veces en desarrollo y duplica el bucle                 | `createEngine` devuelve `stop()` y el `useEffect` lo llama en la limpieza; criterio de aceptación sobre un segundo montaje. |
 | Cache Components o SSR evalúan `window`/`canvas`                                             | El motor solo se crea dentro de `useEffect`; ningún módulo toca `document` en el nivel superior.                            |
 | `Math.random()` en render rompe la hidratación                                               | Toda la aleatoriedad vive en el motor, que arranca tras el montaje, nunca durante el render.                                |

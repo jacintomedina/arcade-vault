@@ -120,7 +120,7 @@ export default function Home() {
       <section className="home-section reveal">
         <div className="section-head">
           <div className="kicker pixel neon-yellow">{"// 03"}</div>
-          <h2 className="section-title">ACTIVIDAD EN VIVO</h2>
+          <h2 className="section-title">ACTIVIDAD</h2>
           <div className="section-rule"></div>
         </div>
         <div className="activity-grid">
@@ -219,7 +219,7 @@ export default function Home() {
       <section className="home-final reveal">
         <h2 className="final-title pixel">¿LISTO PARA JUGAR?</h2>
         <Link className="btn xl pulse final-cta" href="/games">
-          INSERTAR MONEDA →
+          INSERT COIN →
         </Link>
         <div className="final-tag">
           Gratis. Sin registro obligatorio. Empieza en segundos.

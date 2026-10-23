@@ -10,30 +10,18 @@ import {
 import type { GameComponentProps, GameStats } from "./games/types";
 import { HighlightIcon } from "./about/highlight-icon";
 import { useSession } from "./session-provider";
+import { startGameSession, submitScore } from "../_actions/scores";
 
 const INITIAL_LIVES = 3;
-const POINTS_PER_LEVEL = 2500;
-const SCORES_KEY = "av_scores";
+const SAVE_ERROR = "No se pudo guardar la puntuación.";
 
-// Juegos con motor real. Un id sin entrada usa el simulador.
+// Motor de cada juego del catálogo.
 const REAL_GAMES: Record<
   string,
   { Component: ComponentType<GameComponentProps>; Controls?: ComponentType }
 > = {
   asteroides: { Component: AsteroidesGame, Controls: AsteroidesControlsHint },
 };
-
-function saveScore(entry: { game: string; score: number; name: string }) {
-  try {
-    const raw = localStorage.getItem(SCORES_KEY);
-    const parsed: unknown = raw ? JSON.parse(raw) : [];
-    const all = Array.isArray(parsed) ? parsed : [];
-    all.push({ ...entry, at: Date.now() });
-    localStorage.setItem(SCORES_KEY, JSON.stringify(all));
-  } catch {
-    // localStorage bloqueado o JSON corrupto: la marca no se guarda
-  }
-}
 
 export function GamePlayer({ game }: { game: Game }) {
   const { user } = useSession();
@@ -42,19 +30,22 @@ export function GamePlayer({ game }: { game: Game }) {
   const [over, setOver] = useState(false);
   const [nameEdit, setNameEdit] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [rank, setRank] = useState<number | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionFailed, setSessionFailed] = useState(false);
   const [runKey, setRunKey] = useState(0);
-  const [realLives, setRealLives] = useState(INITIAL_LIVES);
-  const [realLevel, setRealLevel] = useState(1);
+  const [lives, setLives] = useState(INITIAL_LIVES);
+  const [level, setLevel] = useState(1);
 
-  const real = REAL_GAMES[game.id];
-  const lives = real ? realLives : INITIAL_LIVES;
-  const level = real ? realLevel : 1 + Math.floor(score / POINTS_PER_LEVEL);
-  const name = nameEdit ?? user?.name ?? "INVITADO";
+  const { Component, Controls } = REAL_GAMES[game.id];
+  const name = nameEdit ?? user?.name ?? "PLAYER 1";
 
   const handleStats = useCallback((s: GameStats) => {
     setScore(s.score);
-    setRealLives(s.lives);
-    setRealLevel(s.level);
+    setLives(s.lives);
+    setLevel(s.level);
   }, []);
 
   const handleGameOver = useCallback((finalScore: number) => {
@@ -62,14 +53,22 @@ export function GamePlayer({ game }: { game: Game }) {
     setOver(true);
   }, []);
 
+  // Una sesión de partida del servidor por cada partida.
   useEffect(() => {
-    if (real || over || paused) return;
-    const t = setInterval(
-      () => setScore((s) => s + Math.floor(10 + Math.random() * 90)),
-      220,
-    );
-    return () => clearInterval(t);
-  }, [real, over, paused]);
+    let cancelled = false;
+    startGameSession(game.id)
+      .then((r) => {
+        if (cancelled) return;
+        if (r.ok) setSessionId(r.sessionId);
+        else setSessionFailed(true);
+      })
+      .catch(() => {
+        if (!cancelled) setSessionFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [game.id, runKey]);
 
   useEffect(() => {
     const GAME_KEYS = [
@@ -88,7 +87,7 @@ export function GamePlayer({ game }: { game: Game }) {
     const onKey = (e: KeyboardEvent) => {
       if (over || isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey)
         return;
-      if (real && GAME_KEYS.includes(e.code)) e.preventDefault();
+      if (GAME_KEYS.includes(e.code)) e.preventDefault();
       if (e.type === "keydown" && e.code === "KeyP" && !e.repeat) {
         setPaused((p) => !p);
       }
@@ -99,21 +98,40 @@ export function GamePlayer({ game }: { game: Game }) {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("keyup", onKey);
     };
-  }, [real, over]);
+  }, [over]);
 
   const restart = () => {
     setScore(0);
-    setRealLives(INITIAL_LIVES);
-    setRealLevel(1);
+    setLives(INITIAL_LIVES);
+    setLevel(1);
     setRunKey((k) => k + 1);
     setPaused(false);
     setOver(false);
     setSaved(false);
+    setSaving(false);
+    setRank(null);
+    setSaveError(null);
+    setSessionId(null);
+    setSessionFailed(false);
   };
 
-  const save = () => {
-    saveScore({ game: game.id, score, name });
-    setSaved(true);
+  const save = async () => {
+    if (!sessionId || saving) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const r = await submitScore(sessionId, name, score);
+      if (r.ok) {
+        setRank(r.rank);
+        setSaved(true);
+      } else {
+        setSaveError(r.error);
+      }
+    } catch {
+      setSaveError(SAVE_ERROR);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -160,22 +178,12 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          {real ? (
-            <real.Component
-              paused={paused || over}
-              runKey={runKey}
-              onStats={handleStats}
-              onGameOver={handleGameOver}
-            />
-          ) : (
-            <div className="game-arena">
-              <div className="grid-floor"></div>
-              <div className="enemy e1"></div>
-              <div className="enemy e2"></div>
-              <div className="enemy e3"></div>
-              <div className="player-ship"></div>
-            </div>
-          )}
+          <Component
+            paused={paused || over}
+            runKey={runKey}
+            onStats={handleStats}
+            onGameOver={handleGameOver}
+          />
           {paused && (
             <div
               className="crt-content"
@@ -206,7 +214,7 @@ export function GamePlayer({ game }: { game: Game }) {
           <span>CARGA · 1MB</span>
         </div>
       </div>
-      {real?.Controls && <real.Controls />}
+      {Controls && <Controls />}
 
       {over && (
         <div className="modal-bd">
@@ -215,21 +223,41 @@ export function GamePlayer({ game }: { game: Game }) {
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{score.toLocaleString("es-ES")}</div>
             {!saved ? (
-              <div className="input-row">
-                <input
-                  value={name}
-                  onChange={(e) =>
-                    setNameEdit(e.target.value.toUpperCase().slice(0, 10))
-                  }
-                  placeholder="TUS INICIALES"
-                  aria-label="Tus iniciales"
-                />
-                <button className="btn yellow" onClick={save}>
-                  GUARDAR PUNTUACIÓN
-                </button>
-              </div>
+              <>
+                <div className="input-row">
+                  <input
+                    value={name}
+                    onChange={(e) =>
+                      setNameEdit(e.target.value.toUpperCase().slice(0, 10))
+                    }
+                    placeholder="TUS INICIALES"
+                    aria-label="Tus iniciales"
+                  />
+                  <button
+                    className="btn yellow"
+                    onClick={save}
+                    disabled={!sessionId || saving}
+                  >
+                    {saving ? "GUARDANDO…" : "GUARDAR PUNTUACIÓN"}
+                  </button>
+                </div>
+                {(sessionFailed || saveError) && (
+                  <p className="save-error" role="alert">
+                    {sessionFailed
+                      ? "No se pudo iniciar la partida en el servidor."
+                      : saveError}
+                  </p>
+                )}
+              </>
             ) : (
-              <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+              <>
+                <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+                {rank !== null && (
+                  <div className="save-rank">
+                    RANGO #{String(rank).padStart(2, "0")}
+                  </div>
+                )}
+              </>
             )}
             <div className="actions">
               <button className="btn" onClick={restart}>
