@@ -1018,6 +1018,15 @@ a { color: inherit; text-decoration: none; }
   color: var(--yellow); letter-spacing: 0.16em; background: rgba(245,255,0,0.04);
   border-bottom: 1px solid var(--line-2);
 }
+.hall-empty {
+  border: 1px dashed var(--line);
+  background: var(--bg-2);
+  padding: 48px 20px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.hall-empty .pixel { font-size: 16px; }
+.hall-empty p { margin: 0; font-size: 11px; letter-spacing: 0.16em; color: var(--ink-dim); }
 @keyframes rise {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }

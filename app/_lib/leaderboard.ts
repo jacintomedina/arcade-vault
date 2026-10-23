@@ -21,6 +21,12 @@ function createReadClient() {
   );
 }
 
+// dd/mm/aaaa en UTC, igual en servidor y cliente.
+export function formatScoreDate(iso: string): string {
+  const [y, m, d] = iso.slice(0, 10).split("-");
+  return `${d}/${m}/${y}`;
+}
+
 // Top 10 por juego. Sin `gameId` devuelve el de todos los juegos.
 // `submitScore` invalida la etiqueta "leaderboard".
 export async function getLeaderboard(
