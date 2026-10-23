@@ -10,10 +10,11 @@ import {
 import type { GameComponentProps, GameStats } from "./games/types";
 import { HighlightIcon } from "./about/highlight-icon";
 import { useSession } from "./session-provider";
+import { startGameSession, submitScore } from "../_actions/scores";
 
 const INITIAL_LIVES = 3;
 const POINTS_PER_LEVEL = 2500;
-const SCORES_KEY = "av_scores";
+const SAVE_ERROR = "No se pudo guardar la puntuación.";
 
 // Juegos con motor real. Un id sin entrada usa el simulador.
 const REAL_GAMES: Record<
@@ -23,18 +24,6 @@ const REAL_GAMES: Record<
   asteroides: { Component: AsteroidesGame, Controls: AsteroidesControlsHint },
 };
 
-function saveScore(entry: { game: string; score: number; name: string }) {
-  try {
-    const raw = localStorage.getItem(SCORES_KEY);
-    const parsed: unknown = raw ? JSON.parse(raw) : [];
-    const all = Array.isArray(parsed) ? parsed : [];
-    all.push({ ...entry, at: Date.now() });
-    localStorage.setItem(SCORES_KEY, JSON.stringify(all));
-  } catch {
-    // localStorage bloqueado o JSON corrupto: la marca no se guarda
-  }
-}
-
 export function GamePlayer({ game }: { game: Game }) {
   const { user } = useSession();
   const [score, setScore] = useState(0);
@@ -42,6 +31,11 @@ export function GamePlayer({ game }: { game: Game }) {
   const [over, setOver] = useState(false);
   const [nameEdit, setNameEdit] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [rank, setRank] = useState<number | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionFailed, setSessionFailed] = useState(false);
   const [runKey, setRunKey] = useState(0);
   const [realLives, setRealLives] = useState(INITIAL_LIVES);
   const [realLevel, setRealLevel] = useState(1);
@@ -61,6 +55,24 @@ export function GamePlayer({ game }: { game: Game }) {
     setScore(finalScore);
     setOver(true);
   }, []);
+
+  // Una sesión de partida del servidor por cada partida real.
+  useEffect(() => {
+    if (!real) return;
+    let cancelled = false;
+    startGameSession(game.id)
+      .then((r) => {
+        if (cancelled) return;
+        if (r.ok) setSessionId(r.sessionId);
+        else setSessionFailed(true);
+      })
+      .catch(() => {
+        if (!cancelled) setSessionFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [real, game.id, runKey]);
 
   useEffect(() => {
     if (real || over || paused) return;
@@ -109,11 +121,30 @@ export function GamePlayer({ game }: { game: Game }) {
     setPaused(false);
     setOver(false);
     setSaved(false);
+    setSaving(false);
+    setRank(null);
+    setSaveError(null);
+    setSessionId(null);
+    setSessionFailed(false);
   };
 
-  const save = () => {
-    saveScore({ game: game.id, score, name });
-    setSaved(true);
+  const save = async () => {
+    if (!sessionId || saving) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const r = await submitScore(sessionId, name, score);
+      if (r.ok) {
+        setRank(r.rank);
+        setSaved(true);
+      } else {
+        setSaveError(r.error);
+      }
+    } catch {
+      setSaveError(SAVE_ERROR);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -214,23 +245,44 @@ export function GamePlayer({ game }: { game: Game }) {
             <h2>FIN DEL JUEGO</h2>
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{score.toLocaleString("es-ES")}</div>
-            {!saved ? (
-              <div className="input-row">
-                <input
-                  value={name}
-                  onChange={(e) =>
-                    setNameEdit(e.target.value.toUpperCase().slice(0, 10))
-                  }
-                  placeholder="TUS INICIALES"
-                  aria-label="Tus iniciales"
-                />
-                <button className="btn yellow" onClick={save}>
-                  GUARDAR PUNTUACIÓN
-                </button>
-              </div>
-            ) : (
-              <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
-            )}
+            {real &&
+              (!saved ? (
+                <>
+                  <div className="input-row">
+                    <input
+                      value={name}
+                      onChange={(e) =>
+                        setNameEdit(e.target.value.toUpperCase().slice(0, 10))
+                      }
+                      placeholder="TUS INICIALES"
+                      aria-label="Tus iniciales"
+                    />
+                    <button
+                      className="btn yellow"
+                      onClick={save}
+                      disabled={!sessionId || saving}
+                    >
+                      {saving ? "GUARDANDO…" : "GUARDAR PUNTUACIÓN"}
+                    </button>
+                  </div>
+                  {(sessionFailed || saveError) && (
+                    <p className="save-error" role="alert">
+                      {sessionFailed
+                        ? "No se pudo iniciar la partida en el servidor."
+                        : saveError}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+                  {rank !== null && (
+                    <div className="save-rank">
+                      RANGO #{String(rank).padStart(2, "0")}
+                    </div>
+                  )}
+                </>
+              ))}
             <div className="actions">
               <button className="btn" onClick={restart}>
                 JUGAR DE NUEVO
