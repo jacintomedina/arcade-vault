@@ -43,7 +43,7 @@ export function GamePlayer({ game }: { game: Game }) {
   const real = REAL_GAMES[game.id];
   const lives = real ? realLives : INITIAL_LIVES;
   const level = real ? realLevel : 1 + Math.floor(score / POINTS_PER_LEVEL);
-  const name = nameEdit ?? user?.name ?? "INVITADO";
+  const name = nameEdit ?? user?.name ?? "PLAYER 1";
 
   const handleStats = useCallback((s: GameStats) => {
     setScore(s.score);

@@ -1,6 +1,6 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { createAdminClient } from "../_lib/supabase/admin";
 
 export type StartSessionResult =
@@ -122,6 +122,10 @@ export async function submitScore(
     .gt("score", score);
 
   updateTag("leaderboard");
+  // Invalida también la caché del router del cliente: sin esto, /hall y la
+  // ficha del juego siguen mostrando la lista anterior al navegar a ellas.
+  revalidatePath("/hall");
+  revalidatePath(`/games/${session.game_id}`);
 
   if (rankError || count === null) return { ok: false, error: ERR_SAVE };
   return { ok: true, rank: count + 1 };
