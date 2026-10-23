@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GAMES } from "../../data/games";
-import { seededScores } from "../../data/scores";
+import { formatScoreDate, getLeaderboard } from "../../_lib/leaderboard";
 
 export function generateStaticParams() {
   return GAMES.map((g) => ({ id: g.id }));
@@ -24,7 +24,7 @@ export default async function GameDetailPage({
   const game = GAMES.find((g) => g.id === id);
   if (!game) notFound();
 
-  const scores = seededScores(id.length * 17 + 3, 10);
+  const scores = await getLeaderboard(game.id);
 
   return (
     <div className="av-detail fade-in">
@@ -85,9 +85,15 @@ export default async function GameDetailPage({
       <aside>
         <div className="leaderboard">
           <h3>MEJORES PUNTUACIONES</h3>
+          {scores.length === 0 && (
+            <div className="lb-empty">
+              <div className="pixel neon-yellow">SÉ EL PRIMERO EN JUGAR!</div>
+              <p className="mono">AÚN NO HAY MARCAS</p>
+            </div>
+          )}
           {scores.map((r, i) => (
             <div
-              key={r.name}
+              key={r.rank}
               className={
                 "lb-row" +
                 (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")
@@ -95,7 +101,7 @@ export default async function GameDetailPage({
             >
               <div className="rk">#{String(r.rank).padStart(2, "0")}</div>
               <div className="pl">
-                {r.name}
+                {r.playerName}
                 <div
                   style={{
                     fontSize: 10,
@@ -103,7 +109,7 @@ export default async function GameDetailPage({
                     letterSpacing: "0.1em",
                   }}
                 >
-                  {r.date}
+                  {formatScoreDate(r.createdAt)}
                 </div>
               </div>
               <div className="sc">{r.score.toLocaleString("es-ES")}</div>
