@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { cacheLife, cacheTag } from "next/cache";
+import { GAMES } from "../data/games";
 import type { Database } from "./supabase/database.types";
 
 export interface LeaderboardRow {
@@ -19,6 +20,11 @@ function createReadClient() {
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     { auth: { persistSession: false, autoRefreshToken: false } },
   );
+}
+
+export interface GameScoreStats {
+  best: number; // marca nº 1 del juego (0 sin marcas)
+  plays: number; // marcas guardadas
 }
 
 // dd/mm/aaaa en UTC, igual en servidor y cliente.
@@ -63,4 +69,38 @@ export async function getLeaderboard(
           },
         ],
   );
+}
+
+// Mejor marca y marcas guardadas de cada juego del catálogo.
+export async function getGameStats(): Promise<Record<string, GameScoreStats>> {
+  "use cache";
+  cacheTag("leaderboard");
+  cacheLife("hours");
+
+  const supabase = createReadClient();
+  const entries = await Promise.all(
+    GAMES.map(async (g) => {
+      const [top, count] = await Promise.all([
+        supabase
+          .from("leaderboard")
+          .select("score")
+          .eq("game_id", g.id)
+          .eq("rank", 1)
+          .maybeSingle(),
+        supabase
+          .from("scores")
+          .select("id", { count: "exact", head: true })
+          .eq("game_id", g.id),
+      ]);
+      if (top.error || count.error) {
+        throw new Error("No se pudieron leer las estadísticas.");
+      }
+      const stats: GameScoreStats = {
+        best: top.data?.score ?? 0,
+        plays: count.count ?? 0,
+      };
+      return [g.id, stats] as const;
+    }),
+  );
+  return Object.fromEntries(entries);
 }

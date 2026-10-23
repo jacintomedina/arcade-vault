@@ -1,6 +1,6 @@
 # SPEC 06 — Leaderboard real y tabla de juegos en Supabase
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 04, SPEC 05
 > **Fecha:** 2026-10-23
 > **Objetivo:** Crear en Supabase las tablas `games`, `game_sessions` y `scores` y sustituir las puntuaciones simuladas de `/hall` y `/games/[id]` por un leaderboard real de Asteroides, cuyas puntuaciones solo se guardan desde el modal de fin de partida mediante Server Actions que validan una sesión de partida emitida por el servidor.
@@ -29,16 +29,21 @@ El usuario pidió que "nunca se pueda inventar un score". Con un juego que corre
 - Se elimina el guardado en `localStorage["av_scores"]`.
 - Tipos generados de la base de datos en `app/_lib/supabase/database.types.ts`.
 - Migraciones en `supabase/migrations/`, aplicadas por MCP (`apply_migration`).
-- Invalidación de la caché del leaderboard al guardar una marca (Cache Components).
+- Invalidación de la caché del leaderboard al guardar una marca (Cache Components), incluida la caché del router del cliente (`revalidatePath` de `/hall`, `/games` y `/games/[id]`).
+- **Ampliación (catálogo reducido):** eliminar los juegos simulados. `app/data/games.ts` queda solo con `asteroides`; se borran de la tabla `games` las otras 8 filas (no tienen sesiones ni marcas); desaparece el simulador de `GamePlayer` y las rutas de los demás juegos devuelven 404. `CATS` y `GameCategory` se reducen a lo que usa el catálogo (`SHOOTER`).
+- **Ampliación (datos reales en tarjetas y ficha):** `best` y `plays` salen de la base de datos. "Mejor puntuación" de la tarjeta y "Mejor global" de la ficha muestran la marca nº 1 del juego (0 si no hay marcas). "Partidas" de la ficha muestra el número de marcas guardadas del juego. Se eliminan `best` y `plays` de `app/data/games.ts`.
+- Nombre por defecto del jugador en las partidas: `PLAYER 1`.
 
 **Fuera de alcance (para futuras specs):**
 
 - Leer el catálogo (biblioteca, home, fichas) desde la tabla `games` y borrar `app/data/games.ts`.
+- Contenido inventado de la home que menciona juegos borrados (`RECENT_SCORES`, `TOP_PLAYERS`, `STATS`, `FEATURES`): se anota para una spec de limpieza de la home.
 - Supabase Auth real, perfiles y `user_id` en `scores`. El nombre sigue siendo libre.
-- Puntuaciones de los juegos simulados (`caida`, `bloque-buster`, etc.): su `max_score_per_second` es `NULL` y el servidor rechaza abrir sesión.
+- Más juegos reales y su catálogo en la base de datos (cuando existan, cada uno entra en su propia spec).
 - Re-simulación de la partida en el servidor (la única garantía fuerte anti-trampas).
 - Rate limiting por IP y limpieza de sesiones sin usar.
-- Sustituir `game.best` y `game.plays` (tarjetas, "Mejor global" de la ficha) ni `TOP_PLAYERS` de la home por datos reales.
+- Sustituir `TOP_PLAYERS` y `RECENT_SCORES` de la home por datos reales.
+- Contar partidas iniciadas o abandonadas: "Partidas" cuenta solo marcas guardadas.
 - Migrar las marcas ya guardadas en `localStorage` de los navegadores.
 - Realtime del leaderboard.
 - Tests automatizados.
@@ -109,7 +114,9 @@ export type SubmitScoreResult =
 	| { ok: true; rank: number }
 	| { ok: false; error: string };
 
-export async function startGameSession(gameId: string): Promise<StartSessionResult>;
+export async function startGameSession(
+	gameId: string,
+): Promise<StartSessionResult>;
 export async function submitScore(
 	sessionId: string,
 	name: string,
@@ -148,6 +155,10 @@ Convenciones:
 8. Modificar `/games/[id]`: `aside.leaderboard` lee de `leaderboard` y muestra estado vacío. Eliminar `app/data/scores.ts`.
 9. Pulido: `npm run lint` y `npm run build` limpios; probar el flujo completo con `npm run dev` y en 375px; confirmar que `SUPABASE_SERVICE_ROLE_KEY` no está en el bundle del cliente.
 
+10. **Ampliación — catálogo reducido.** Migración `solo_asteroides` que borra de `games` los ids distintos de `asteroides`. Reducir `app/data/games.ts` a Asteroides, `CATS` y `GameCategory` a `SHOOTER`. Quitar el simulador de `GamePlayer` (puntuación aleatoria, arena, nivel por puntos) y el nombre por defecto `PLAYER 1`.
+11. **Ampliación — datos reales.** `getGameStats()` en `app/_lib/leaderboard.ts` (`use cache`, `cacheTag("leaderboard")`) con `best` y `plays` por juego. `/games` pasa `best` a `Library` y `GameCard`; `/games/[id]` lo usa para "Mejor global" y "Partidas". Quitar `best` y `plays` de `Game`. `submitScore` invalida también `/games`.
+12. Verificar: lint, build, flujo de guardado (tarjeta y ficha se actualizan al volver), rutas de juegos borrados con 404 y 375px.
+
 Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
@@ -171,11 +182,15 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [ ] `/hall` muestra podio y tabla con las marcas reales de Asteroides, ordenadas por puntuación y desempate por antigüedad.
 - [ ] Las pestañas de juegos sin marcas en `/hall` y el panel de `/games/caida` muestran el estado vacío "SÉ EL PRIMERO".
 - [ ] Tras guardar una marca, `/hall` y `/games/asteroides` la muestran al recargar sin reconstruir la app.
-- [ ] El modal de fin de partida de un juego simulado no ofrece guardar puntuación.
 - [ ] No quedan referencias a `seededScores`, `PLAYERS`, `app/data/scores.ts` ni a `av_scores` en el código.
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` no aparece en `.next/static` ni en ningún archivo de `specs/` ni de `.env.example` con valor.
 - [ ] `/hall` y `/games/[id]` no tienen scroll horizontal a 375px.
 - [ ] Las rutas de SPEC 01 a SPEC 05 siguen funcionando y `GET /api/health/supabase` devuelve 200.
+- [ ] `games` (tabla) y `app/data/games.ts` contienen solo `asteroides`; `/games/caida` y `/games/caida/play` devuelven 404.
+- [ ] `GamePlayer` no contiene simulador (sin puntuación aleatoria ni `game-arena`) y el nombre por defecto es `PLAYER 1`.
+- [ ] La tarjeta de `/games` y "Mejor global" de la ficha muestran la marca nº 1 real (0 sin marcas) y "Partidas" el número de marcas guardadas.
+- [ ] Tras guardar una marca y volver con SALIR o VOLVER AL VAULT, tarjeta, ficha y `/hall` muestran los datos nuevos sin recargar.
+- [ ] No quedan `best` ni `plays` en `app/data/games.ts`.
 
 ## Decisiones tomadas y descartadas
 
@@ -190,30 +205,32 @@ Cada paso deja la app arrancando con `npm run dev`.
 - **Sí:** `scores.session_id unique`. Una sesión, una marca, garantizado por la BD. **No:** confiar solo en la comprobación del código.
 - **Sí:** top 10 por juego con vista `leaderboard` y rango propio en el modal. **No:** top 20 ni "tu mejor marca" (sin identidad real no hay "tú").
 - **Sí:** quitar el bloque "TU MEJOR MARCA" de `/hall`. Era simulado y no hay identidad que lo respalde.
-- **Sí:** `game.best` y `game.plays` quedan como están. Reemplazarlos exige contadores reales de partidas y afecta a la biblioteca y la home. **No:** mezclarlo aquí.
+- **Sí (ampliación):** `best` y `plays` pasan a datos reales. `best` = marca nº 1; `plays` = marcas guardadas, que se pueden contar con lectura pública sin exponer `game_sessions`. **No:** contar sesiones iniciadas (se inflan por abandonos y por el doble montaje de React en desarrollo).
+- **Sí (ampliación):** borrar los juegos simulados y quedarse solo con `asteroides`. Petición del usuario: es el único jugable y los demás generaban datos falsos. **No:** conservar fichas sin juego.
+- **Sí (ampliación):** `revalidatePath` además de `updateTag`. `updateTag` no invalida la caché del router del cliente y la ficha mostraba la lista anterior al volver del juego.
 - **Sí:** el servidor calcula el rango. **No:** que el cliente lo deduzca de una lista.
 
 ## Riesgos
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
-| Un bot abre una sesión, espera y envía una puntuación plausible | Límite aceptado y documentado. Mitigaciones futuras fuera de alcance: rate limiting y re-simulación. El tope por segundo y el uso único limitan el daño. |
-| Cuenta de segundos inflada por la pausa o por dejar la pestaña abierta | Aceptado: el tope usa tiempo real transcurrido, más permisivo que el tiempo jugado. Nunca rechaza una partida legítima. |
-| Fuga de `SUPABASE_SERVICE_ROLE_KEY` al cliente | Sin prefijo `NEXT_PUBLIC_`, `import "server-only"` en `admin.ts` y grep en `.next/static` como criterio de aceptación. |
-| Acumulación de sesiones sin consumir (abuso o abandono) | Aceptado en esta spec. Limpieza y rate limiting en spec futura. |
-| Cache Components: lecturas con `cookies()` o caché obsoleta del leaderboard | Lectura con cliente sin cookies dentro de `use cache` con `cacheTag("leaderboard")`; `submitScore` invalida la etiqueta. Leer docs en el paso 1. |
-| Carrera entre dos envíos de la misma sesión | `UPDATE … WHERE consumed_at IS NULL` condiciona el `INSERT` y `scores.session_id` es único. Criterio de aceptación de envío simultáneo. |
-| Sesión no lista cuando el jugador pierde muy rápido | GUARDAR queda deshabilitado hasta tener `sessionId`; si falla, el modal informa y no bloquea el resto de acciones. |
-| La vista `leaderboard` ignora RLS | Se crea con `security_invoker = true`; `get_advisors` lo verifica. |
-| Nombres ofensivos | Fuera de alcance; se anota para una spec de moderación. |
+| Riesgo                                                                      | Mitigación                                                                                                                                               |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Un bot abre una sesión, espera y envía una puntuación plausible             | Límite aceptado y documentado. Mitigaciones futuras fuera de alcance: rate limiting y re-simulación. El tope por segundo y el uso único limitan el daño. |
+| Cuenta de segundos inflada por la pausa o por dejar la pestaña abierta      | Aceptado: el tope usa tiempo real transcurrido, más permisivo que el tiempo jugado. Nunca rechaza una partida legítima.                                  |
+| Fuga de `SUPABASE_SERVICE_ROLE_KEY` al cliente                              | Sin prefijo `NEXT_PUBLIC_`, `import "server-only"` en `admin.ts` y grep en `.next/static` como criterio de aceptación.                                   |
+| Acumulación de sesiones sin consumir (abuso o abandono)                     | Aceptado en esta spec. Limpieza y rate limiting en spec futura.                                                                                          |
+| Cache Components: lecturas con `cookies()` o caché obsoleta del leaderboard | Lectura con cliente sin cookies dentro de `use cache` con `cacheTag("leaderboard")`; `submitScore` invalida la etiqueta. Leer docs en el paso 1.         |
+| Carrera entre dos envíos de la misma sesión                                 | `UPDATE … WHERE consumed_at IS NULL` condiciona el `INSERT` y `scores.session_id` es único. Criterio de aceptación de envío simultáneo.                  |
+| Sesión no lista cuando el jugador pierde muy rápido                         | GUARDAR queda deshabilitado hasta tener `sessionId`; si falla, el modal informa y no bloquea el resto de acciones.                                       |
+| La vista `leaderboard` ignora RLS                                           | Se crea con `security_invoker = true`; `get_advisors` lo verifica.                                                                                       |
+| Nombres ofensivos                                                           | Fuera de alcance; se anota para una spec de moderación.                                                                                                  |
 
 ## Lo que **no** está en esta spec
 
 - Catálogo de juegos leído desde la BD.
 - Auth real, perfiles, `user_id` en puntuaciones.
-- Puntuaciones de juegos simulados.
+- Contenido inventado de la home (`RECENT_SCORES`, `TOP_PLAYERS`, `STATS`, `FEATURES`).
 - Re-simulación de la partida, rate limiting, limpieza de sesiones, moderación de nombres.
-- `best`/`plays` reales ni `TOP_PLAYERS` real en la home.
+- `TOP_PLAYERS` y `RECENT_SCORES` reales en la home.
 - Realtime y Edge Functions.
 - Tests automatizados.
 

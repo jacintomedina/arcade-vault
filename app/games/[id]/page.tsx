@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GAMES } from "../../data/games";
-import { formatScoreDate, getLeaderboard } from "../../_lib/leaderboard";
+import {
+  formatScoreDate,
+  getGameStats,
+  getLeaderboard,
+} from "../../_lib/leaderboard";
 
 export function generateStaticParams() {
   return GAMES.map((g) => ({ id: g.id }));
@@ -24,7 +28,11 @@ export default async function GameDetailPage({
   const game = GAMES.find((g) => g.id === id);
   if (!game) notFound();
 
-  const scores = await getLeaderboard(game.id);
+  const [scores, allStats] = await Promise.all([
+    getLeaderboard(game.id),
+    getGameStats(),
+  ]);
+  const stats = allStats[game.id] ?? { best: 0, plays: 0 };
 
   return (
     <div className="av-detail fade-in">
@@ -44,7 +52,7 @@ export default async function GameDetailPage({
           <div className="stat-strip">
             <div>
               <div className="l">Partidas</div>
-              <div className="v">{game.plays}</div>
+              <div className="v">{stats.plays.toLocaleString("es-ES")}</div>
             </div>
             <div>
               <div className="l">Mejor global</div>
@@ -55,7 +63,7 @@ export default async function GameDetailPage({
                   textShadow: "0 0 6px rgba(255,0,110,0.5)",
                 }}
               >
-                {game.best.toLocaleString("es-ES")}
+                {stats.best.toLocaleString("es-ES")}
               </div>
             </div>
             <div>

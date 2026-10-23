@@ -125,6 +125,7 @@ export async function submitScore(
   // Invalida también la caché del router del cliente: sin esto, /hall y la
   // ficha del juego siguen mostrando la lista anterior al navegar a ellas.
   revalidatePath("/hall");
+  revalidatePath("/games");
   revalidatePath(`/games/${session.game_id}`);
 
   if (rankError || count === null) return { ok: false, error: ERR_SAVE };
