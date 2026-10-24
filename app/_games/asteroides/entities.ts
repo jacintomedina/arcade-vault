@@ -25,6 +25,8 @@ export interface ShipControls {
 	left: boolean;
 	right: boolean;
 	thrust: boolean;
+	/** rumbo deseado en rad (táctil): la nave gira hacia él y propulsa */
+	aim?: number | null;
 }
 
 // ── Bullet ───────────────────────────────────────────────────────────────────
@@ -213,10 +215,21 @@ export class Ship {
 		const THRUST = 260; // px/s²
 		const DRAG = 0.987;
 
-		if (controls.left) this.angle -= ROT * dt;
-		if (controls.right) this.angle += ROT * dt;
+		let thrust = controls.thrust;
+		if (controls.aim != null) {
+			const TAU = Math.PI * 2;
+			let diff = (controls.aim - this.angle) % TAU;
+			if (diff > Math.PI) diff -= TAU;
+			else if (diff < -Math.PI) diff += TAU;
+			const step = ROT * dt;
+			this.angle += Math.abs(diff) <= step ? diff : Math.sign(diff) * step;
+			thrust = Math.abs(diff) < 0.6;
+		} else {
+			if (controls.left) this.angle -= ROT * dt;
+			if (controls.right) this.angle += ROT * dt;
+		}
 
-		this.thrusting = controls.thrust;
+		this.thrusting = thrust;
 		if (this.thrusting) {
 			this.vx += Math.cos(this.angle) * THRUST * dt;
 			this.vy += Math.sin(this.angle) * THRUST * dt;

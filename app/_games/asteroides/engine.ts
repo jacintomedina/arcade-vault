@@ -28,6 +28,7 @@ export interface Engine {
 	stop(): void; // cancela rAF y quita listeners
 	setPaused(p: boolean): void;
 	setInput(k: InputKey, down: boolean): void; // táctil
+	setAim(angle: number | null): void; // joystick: rumbo absoluto en rad
 }
 
 type State = "playing" | "dead" | "gameover";
@@ -261,6 +262,9 @@ export function createEngine(opts: EngineOptions): Engine {
 		},
 		setInput(k, down) {
 			if (!paused) input.set(k, down);
+		},
+		setAim(angle) {
+			if (!paused) input.setAim(angle);
 		},
 	};
 }

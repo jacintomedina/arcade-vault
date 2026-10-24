@@ -48,8 +48,11 @@ export function AsteroidesGame({
 	}, [paused]);
 
 	useEffect(() => {
-		inputRef.current = (key, down) =>
-			engineRef.current?.setInput(key as InputKey, down);
+		inputRef.current = {
+			press: (key, down) =>
+				engineRef.current?.setInput(key as InputKey, down),
+			aim: (angle) => engineRef.current?.setAim(angle),
+		};
 		return () => {
 			inputRef.current = null;
 		};
@@ -89,20 +92,8 @@ export function AsteroidesControlsHint() {
 const JOY_RADIUS = 44;
 const JOY_DEADZONE = 0.35;
 
-export function AsteroidesTouchControls({ onInput }: TouchControlsProps) {
+export function AsteroidesTouchControls({ input }: TouchControlsProps) {
 	const knobRef = useRef<HTMLDivElement>(null);
-	const active = useRef<Record<"left" | "right" | "thrust", boolean>>({
-		left: false,
-		right: false,
-		thrust: false,
-	});
-
-	const apply = (next: typeof active.current) => {
-		for (const k of ["left", "right", "thrust"] as const) {
-			if (next[k] !== active.current[k]) onInput(k, next[k]);
-		}
-		active.current = next;
-	};
 
 	const move = (e: PointerEvent<HTMLDivElement>) => {
 		const r = e.currentTarget.getBoundingClientRect();
@@ -115,13 +106,13 @@ export function AsteroidesTouchControls({ onInput }: TouchControlsProps) {
 		}
 		if (knobRef.current)
 			knobRef.current.style.transform = `translate(${dx}px, ${dy}px)`;
-		const t = JOY_RADIUS * JOY_DEADZONE;
-		apply({ left: dx < -t, right: dx > t, thrust: dy < -t });
+		// Arriba del joystick = arriba del canvas (-π/2), sea cual sea la orientación de la nave
+		input.aim(len > JOY_RADIUS * JOY_DEADZONE ? Math.atan2(dy, dx) : null);
 	};
 
 	const release = () => {
 		if (knobRef.current) knobRef.current.style.transform = "";
-		apply({ left: false, right: false, thrust: false });
+		input.aim(null);
 	};
 
 	return (
@@ -129,7 +120,7 @@ export function AsteroidesTouchControls({ onInput }: TouchControlsProps) {
 			<div
 				className="joystick"
 				role="group"
-				aria-label="Joystick: rotar y propulsar"
+				aria-label="Joystick: dirección de la nave"
 				onPointerDown={(e) => {
 					e.preventDefault();
 					e.currentTarget.setPointerCapture(e.pointerId);
@@ -152,10 +143,10 @@ export function AsteroidesTouchControls({ onInput }: TouchControlsProps) {
 				onPointerDown={(e) => {
 					e.preventDefault();
 					e.currentTarget.setPointerCapture(e.pointerId);
-					onInput("fire", true);
+					input.press("fire", true);
 				}}
-				onPointerUp={() => onInput("fire", false)}
-				onPointerCancel={() => onInput("fire", false)}
+				onPointerUp={() => input.press("fire", false)}
+				onPointerCancel={() => input.press("fire", false)}
 				onContextMenu={(e) => e.preventDefault()}
 			>
 				FUEGO

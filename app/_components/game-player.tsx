@@ -17,7 +17,7 @@ import {
 import type {
   GameComponentProps,
   GameStats,
-  InputHandler,
+  GameInput,
   TouchControlsProps,
 } from "./games/types";
 import { HighlightIcon } from "./about/highlight-icon";
@@ -60,11 +60,11 @@ export function GamePlayer({ game }: { game: Game }) {
   const [level, setLevel] = useState(1);
 
   const { Component, Controls, TouchControls } = REAL_GAMES[game.id];
-  const inputRef = useRef<InputHandler | null>(null);
-  const sendInput = useCallback<InputHandler>(
-    (key, down) => inputRef.current?.(key, down),
-    [],
-  );
+  const inputRef = useRef<GameInput | null>(null);
+  const [touchInput] = useState<GameInput>(() => ({
+    press: (key, down) => inputRef.current?.press(key, down),
+    aim: (angle) => inputRef.current?.aim(angle),
+  }));
   const name = nameEdit ?? user?.name ?? "PLAYER 1";
 
   const handleStats = useCallback((s: GameStats) => {
@@ -240,7 +240,7 @@ export function GamePlayer({ game }: { game: Game }) {
           <span>CARGA · 1MB</span>
         </div>
       </div>
-      {TouchControls && <TouchControls onInput={sendInput} />}
+      {TouchControls && <TouchControls input={touchInput} />}
       {Controls && <Controls />}
 
       {over && (
