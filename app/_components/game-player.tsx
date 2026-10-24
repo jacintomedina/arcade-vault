@@ -1,13 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ComponentType } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+} from "react";
 import Link from "next/link";
 import type { Game } from "../data/games";
 import {
   AsteroidesControlsHint,
   AsteroidesGame,
+  AsteroidesTouchControls,
 } from "./games/asteroides-game";
-import type { GameComponentProps, GameStats } from "./games/types";
+import type {
+  GameComponentProps,
+  GameStats,
+  GameInput,
+  TouchControlsProps,
+} from "./games/types";
 import { HighlightIcon } from "./about/highlight-icon";
 import { useSession } from "./session-provider";
 import { startGameSession, submitScore } from "../_actions/scores";
@@ -18,9 +30,17 @@ const SAVE_ERROR = "No se pudo guardar la puntuación.";
 // Motor de cada juego del catálogo.
 const REAL_GAMES: Record<
   string,
-  { Component: ComponentType<GameComponentProps>; Controls?: ComponentType }
+  {
+    Component: ComponentType<GameComponentProps>;
+    Controls?: ComponentType;
+    TouchControls?: ComponentType<TouchControlsProps>;
+  }
 > = {
-  asteroides: { Component: AsteroidesGame, Controls: AsteroidesControlsHint },
+  asteroides: {
+    Component: AsteroidesGame,
+    Controls: AsteroidesControlsHint,
+    TouchControls: AsteroidesTouchControls,
+  },
 };
 
 export function GamePlayer({ game }: { game: Game }) {
@@ -39,7 +59,12 @@ export function GamePlayer({ game }: { game: Game }) {
   const [lives, setLives] = useState(INITIAL_LIVES);
   const [level, setLevel] = useState(1);
 
-  const { Component, Controls } = REAL_GAMES[game.id];
+  const { Component, Controls, TouchControls } = REAL_GAMES[game.id];
+  const inputRef = useRef<GameInput | null>(null);
+  const [touchInput] = useState<GameInput>(() => ({
+    press: (key, down) => inputRef.current?.press(key, down),
+    aim: (angle) => inputRef.current?.aim(angle),
+  }));
   const name = nameEdit ?? user?.name ?? "PLAYER 1";
 
   const handleStats = useCallback((s: GameStats) => {
@@ -181,6 +206,7 @@ export function GamePlayer({ game }: { game: Game }) {
           <Component
             paused={paused || over}
             runKey={runKey}
+            inputRef={inputRef}
             onStats={handleStats}
             onGameOver={handleGameOver}
           />
@@ -214,6 +240,7 @@ export function GamePlayer({ game }: { game: Game }) {
           <span>CARGA · 1MB</span>
         </div>
       </div>
+      {TouchControls && <TouchControls input={touchInput} />}
       {Controls && <Controls />}
 
       {over && (

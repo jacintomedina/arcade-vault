@@ -13,6 +13,7 @@ export interface Input {
 	attach(): void;
 	detach(): void;
 	set(k: InputKey, down: boolean): void;
+	setAim(angle: number | null): void;
 	controls(): ShipControls;
 	/** true una sola vez por pulsación de disparo */
 	consumeFire(): boolean;
@@ -27,6 +28,7 @@ export function createInput(): Input {
 		fire: false,
 	};
 	let firePressed = false;
+	let aim: number | null = null;
 
 	const set = (k: InputKey, down: boolean) => {
 		if (k === "fire" && down && !held.fire) firePressed = true;
@@ -52,10 +54,14 @@ export function createInput(): Input {
 			window.removeEventListener("keyup", onKeyUp);
 		},
 		set,
+		setAim(angle) {
+			aim = angle;
+		},
 		controls: () => ({
 			left: held.left,
 			right: held.right,
 			thrust: held.thrust,
+			aim,
 		}),
 		consumeFire() {
 			const v = firePressed;
@@ -65,6 +71,7 @@ export function createInput(): Input {
 		clear() {
 			held.left = held.right = held.thrust = held.fire = false;
 			firePressed = false;
+			aim = null;
 		},
 	};
 }
