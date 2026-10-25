@@ -14,6 +14,7 @@ import {
   AsteroidesGame,
   AsteroidesTouchControls,
 } from "./games/asteroides-game";
+import { TetrisControlsHint, TetrisGame } from "./games/tetris-game";
 import type {
   GameComponentProps,
   GameStats,
@@ -34,6 +35,7 @@ const REAL_GAMES: Record<
     Component: ComponentType<GameComponentProps>;
     Controls?: ComponentType;
     TouchControls?: ComponentType<TouchControlsProps>;
+    initialLives?: number; // por defecto INITIAL_LIVES
   }
 > = {
   asteroides: {
@@ -41,10 +43,18 @@ const REAL_GAMES: Record<
     Controls: AsteroidesControlsHint,
     TouchControls: AsteroidesTouchControls,
   },
+  tetris: {
+    Component: TetrisGame,
+    Controls: TetrisControlsHint,
+    initialLives: 1, // evita ver 3 corazones antes del primer onStats
+  },
 };
 
 export function GamePlayer({ game }: { game: Game }) {
   const { user } = useSession();
+  const { Component, Controls, TouchControls, initialLives } =
+    REAL_GAMES[game.id];
+  const startLives = initialLives ?? INITIAL_LIVES;
   const [score, setScore] = useState(0);
   const [paused, setPaused] = useState(false);
   const [over, setOver] = useState(false);
@@ -56,10 +66,9 @@ export function GamePlayer({ game }: { game: Game }) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [sessionFailed, setSessionFailed] = useState(false);
   const [runKey, setRunKey] = useState(0);
-  const [lives, setLives] = useState(INITIAL_LIVES);
+  const [lives, setLives] = useState(startLives);
   const [level, setLevel] = useState(1);
 
-  const { Component, Controls, TouchControls } = REAL_GAMES[game.id];
   const inputRef = useRef<GameInput | null>(null);
   const [touchInput] = useState<GameInput>(() => ({
     press: (key, down) => inputRef.current?.press(key, down),
@@ -127,7 +136,7 @@ export function GamePlayer({ game }: { game: Game }) {
 
   const restart = () => {
     setScore(0);
-    setLives(INITIAL_LIVES);
+    setLives(startLives);
     setLevel(1);
     setRunKey((k) => k + 1);
     setPaused(false);
