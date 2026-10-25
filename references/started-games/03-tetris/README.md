@@ -25,6 +25,7 @@ Implementación del clásico **Tetris** en JavaScript vanilla, usando HTML5 Canv
   - [Tecnologías](#tecnologías)
   - [Estructura del proyecto](#estructura-del-proyecto)
   - [Personalización](#personalización)
+  - [Cambios en el port a Arcade Vault](#cambios-en-el-port-a-arcade-vault)
   - [Licencia](#licencia)
 
 ---
@@ -178,6 +179,27 @@ Algunos parámetros fáciles de tunear en `game.js`:
 | `dropInterval` | Velocidad inicial de caída en ms         | `1000`                |
 
 > Si cambias `COLS`, `ROWS` o `BLOCK`, recuerda ajustar también `width` y `height` del `<canvas id="board">` en `index.html` para que coincida (`COLS × BLOCK` × `ROWS × BLOCK`).
+
+---
+
+## Cambios en el port a Arcade Vault
+
+Este README describe el `game.js` vanilla de esta carpeta, que no cambia. La versión portada a TypeScript para la plataforma (ver `specs/07-juego-tetris.md`) difiere en lo siguiente:
+
+| Aspecto            | Este original                                         | Port en Arcade Vault                                                              |
+| ------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Piezas             | 8 en el código (7 clásicas + tuerca `N`), README dice 7 | Niveles 1–5: solo las 7 clásicas. Desde el nivel 6 entra también la tuerca `N`.   |
+| Nivel              | `floor(líneas / 10) + 1`, sin techo                   | Máximo 15 (multiplicador y HUD).                                                  |
+| Borrado de líneas  | Inmediato                                             | Las filas parpadean 0,3 s antes de eliminarse.                                    |
+| Movimiento         | Auto-repeat del sistema operativo                     | Auto-repeat propio: retardo 170 ms, repetición cada 50 ms (`←` `→` `↓`).          |
+| HUD                | Panel HTML con SCORE, LINES y LEVEL                   | HUD de la plataforma con puntuación, nivel y una única vida fija. Sin LINES.      |
+| Pieza siguiente    | Segundo canvas de 120×120                             | Pintada en el canvas principal de 800×600, a la derecha del tablero.              |
+| Pausa y fin        | Overlay propio con botón "Reiniciar"                  | Pausa, modal "FIN DEL JUEGO", guardado de puntuación y reinicio los gestiona la plataforma. |
+| Tema               | Toggle claro/oscuro con `localStorage`                | Sin toggle; fondo negro dentro del marco CRT.                                     |
+| Táctil             | No                                                    | Botones ◀ ▶ ▼, ROTAR y CAÍDA.                                                     |
+| Puntuación         | Local, sin guardar                                    | Leaderboard en Supabase mediante sesión de partida del servidor (tope 12200 pts/s). |
+
+Se conservan sin cambios: tablero 10×20, rotación horaria con wall kicks, pieza fantasma, soft drop (+1/fila), hard drop (+2/celda), tabla de líneas `[0, 100, 300, 500, 800] × nivel` y el intervalo de caída `max(100 ms, 1000 − (nivel − 1) × 90 ms)`.
 
 ---
 
