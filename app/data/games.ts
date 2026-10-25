@@ -1,4 +1,4 @@
-export type GameCategory = "SHOOTER";
+export type GameCategory = "SHOOTER" | "PUZZLE";
 export type GameColor = "cyan" | "magenta" | "yellow" | "green";
 
 export interface Game {
@@ -21,6 +21,15 @@ export const GAMES: Game[] = [
     cover: "cover-asteroides",
     color: "cyan",
   },
+  {
+    id: "tetris",
+    title: "TETRIS",
+    short: "Encaja las piezas y completa líneas antes de llegar arriba.",
+    long: "Las piezas caen cada vez más rápido: muévelas, rótalas y encájalas para completar filas y borrarlas. Combina varias líneas a la vez para multiplicar los puntos. Desde el nivel 6 aparece la tuerca, una pieza en anillo que complica el apilado.",
+    cat: "PUZZLE",
+    cover: "cover-tetris",
+    color: "magenta",
+  },
 ];
 
-export const CATS: ("TODOS" | GameCategory)[] = ["TODOS", "SHOOTER"];
+export const CATS: ("TODOS" | GameCategory)[] = ["TODOS", "SHOOTER", "PUZZLE"];
