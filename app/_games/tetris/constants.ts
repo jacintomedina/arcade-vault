@@ -5,11 +5,12 @@ export const H = 600;
 export const COLS = 10;
 export const ROWS = 20;
 export const BLOCK = 30;
-export const BOARD_X = 150;
+export const BOARD_X = 250; // tablero centrado: (800 − 300) / 2
 
-// Panel SIGUIENTE: caja de 4×4 celdas
-export const NEXT_X = 520;
-export const NEXT_Y = 60;
+// Columna derecha, centrada entre el tablero y el borde del canvas y alineada
+// abajo con él: puntuación y nivel arriba, caja SIGUIENTE de 4×4 celdas debajo.
+export const NEXT_X = 615;
+export const NEXT_Y = 480; // H − 4 × BLOCK
 
 // Índice = tipo de pieza (posición 0 sin uso)
 export const COLORS = [

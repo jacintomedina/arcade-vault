@@ -41,6 +41,7 @@ type State = "playing" | "clearing" | "gameover";
 
 const KICKS = [0, -1, 1, -2, 2];
 const BLINK_PERIOD = 0.075;
+const PANEL_CX = NEXT_X + 2 * BLOCK; // centro de la columna derecha
 
 export function createEngine(opts: EngineOptions): Engine {
 	const { canvas, onStats, onGameOver } = opts;
@@ -223,18 +224,45 @@ export function createEngine(opts: EngineOptions): Engine {
 				drawBlock(g, BOARD_X, 0, piece.x + c, y + r, piece.shape[r][c], alpha);
 	}
 
-	function drawNext() {
-		g.fillStyle = "rgba(255,255,255,0.85)";
+	function drawLabel(text: string, y: number) {
+		g.fillStyle = "rgba(255,255,255,0.6)";
 		g.font = "bold 14px monospace";
+		g.fillText(text, PANEL_CX, y);
+	}
+
+	function drawValue(text: string, y: number) {
+		g.fillStyle = "#fff";
+		g.font = "bold 28px monospace";
+		g.fillText(text, PANEL_CX, y);
+	}
+
+	function drawSidePanel() {
+		g.textAlign = "center";
 		g.textBaseline = "alphabetic";
-		g.fillText("SIGUIENTE", NEXT_X, NEXT_Y - 12);
+		drawLabel("PUNTUACIÓN", NEXT_Y - 180);
+		drawValue(String(score), NEXT_Y - 148);
+		drawLabel("NIVEL", NEXT_Y - 100);
+		drawValue(String(level), NEXT_Y - 68);
+		drawLabel("SIGUIENTE", NEXT_Y - 12);
+		g.textAlign = "start";
+
 		g.strokeStyle = "rgba(255,255,255,0.25)";
 		g.lineWidth = 1;
 		g.strokeRect(NEXT_X, NEXT_Y, 4 * BLOCK, 4 * BLOCK);
 
+		// Centra la pieza por su caja real (la I, por ejemplo, ocupa una sola fila)
 		const shape = next.shape;
-		const offX = Math.floor((4 - shape[0].length) / 2);
-		const offY = Math.floor((4 - shape.length) / 2);
+		let minR = shape.length, maxR = -1, minC = shape[0].length, maxC = -1;
+		for (let r = 0; r < shape.length; r++)
+			for (let c = 0; c < shape[r].length; c++)
+				if (shape[r][c]) {
+					minR = Math.min(minR, r);
+					maxR = Math.max(maxR, r);
+					minC = Math.min(minC, c);
+					maxC = Math.max(maxC, c);
+				}
+		const offX = (4 - (maxC - minC + 1)) / 2 - minC;
+		const offY = (4 - (maxR - minR + 1)) / 2 - minR;
 		for (let r = 0; r < shape.length; r++)
 			for (let c = 0; c < shape[r].length; c++)
 				drawBlock(g, NEXT_X, NEXT_Y, offX + c, offY + r, shape[r][c]);
@@ -265,7 +293,7 @@ export function createEngine(opts: EngineOptions): Engine {
 			drawPiece(current, current.y, 1);
 		}
 
-		drawNext();
+		drawSidePanel();
 	}
 
 	function loop(ts: number) {

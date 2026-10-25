@@ -126,26 +126,40 @@ function HoldButton({
 	);
 }
 
+// El triángulo base apunta a la izquierda; rotate lo orienta.
+const Arrow = ({ rotate }: { rotate: number }) => (
+	<svg
+		width="22"
+		height="22"
+		viewBox="0 0 24 24"
+		fill="currentColor"
+		aria-hidden="true"
+		style={{ transform: `rotate(${rotate}deg)` }}
+	>
+		<polygon points="19,4 19,20 5,12" />
+	</svg>
+);
+
 export function TetrisTouchControls({ input }: TouchControlsProps) {
 	return (
 		<div className="touch-controls tetris-touch" aria-label="Controles táctiles">
 			<div className="tt-pad">
 				<HoldButton input={input} k="left" className="tt-move" label="Mover a la izquierda">
-					◀
+					<Arrow rotate={0} />
 				</HoldButton>
 				<HoldButton input={input} k="down" className="tt-move" label="Bajar">
-					▼
+					<Arrow rotate={-90} />
 				</HoldButton>
 				<HoldButton input={input} k="right" className="tt-move" label="Mover a la derecha">
-					▶
+					<Arrow rotate={180} />
 				</HoldButton>
 			</div>
 			<div className="tt-actions">
-				<HoldButton input={input} k="rotate" className="tt-rotate" label="Rotar">
-					ROTAR
-				</HoldButton>
 				<HoldButton input={input} k="drop" className="tt-drop" label="Caída instantánea">
 					CAÍDA
+				</HoldButton>
+				<HoldButton input={input} k="rotate" className="tt-rotate" label="Rotar">
+					ROTAR
 				</HoldButton>
 			</div>
 		</div>

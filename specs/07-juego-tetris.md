@@ -26,7 +26,7 @@ Frente a Asteroides tiene cuatro particularidades:
 - Port de `game.js` a TypeScript en `app/_games/tetris/` (`constants.ts`, `entities.ts`, `input.ts`, `engine.ts`), sin globals ni acceso a `document`/`window` fuera de funciones de montaje.
 - Componente cliente `app/_components/games/tetris-game.tsx` con `TetrisGame`, `TetrisControlsHint` y `TetrisTouchControls`.
 - Registro en `REAL_GAMES` de `app/_components/game-player.tsx`.
-- Canvas lógico 800×600. Tablero de 300×600 (10×20 celdas de 30 px) en la columna `x = 150`. Panel SIGUIENTE pintado en el canvas a la derecha del tablero.
+- Canvas lógico 800×600. Tablero de 300×600 (10×20 celdas de 30 px) centrado en `x = 250`. Columna derecha pintada en el canvas, de arriba abajo: PUNTUACIÓN, NIVEL y panel SIGUIENTE.
 - Mecánicas del original que se conservan:
   - Tablero 10×20.
   - 8 piezas: I, O, T, S, Z, J, L y N (tuerca, anillo 3×3), con los colores y formas de `game.js`.
@@ -47,7 +47,7 @@ Frente a Asteroides tiene cuatro particularidades:
   - Se descartan el toggle claro/oscuro, el panel HTML, el overlay PAUSA/GAME OVER y el reinicio con botón del original.
   - Las líneas de rejilla usan `rgba(255,255,255,0.06)` sobre fondo negro, en lugar de la variable CSS `--grid-line`.
 - Entrada de teclado: `←` `→` mover, `↓` bajar, `↑` o `X` rotar, `Espacio` caída instantánea, `P` pausar.
-- Controles táctiles: botones ◀ ▶ ▼ con repetición al mantener, más ROTAR y CAÍDA.
+- Controles táctiles: botones ◀ ▼ ▶ con repetición al mantener a la izquierda, y CAÍDA y ROTAR a la derecha (en ese orden). El aviso de teclas (`.controls-hint`) se oculta en pantallas táctiles y a ≤720 px.
 - Pausa real: PAUSA y `P` detienen `update` y `draw`; al reanudar no hay salto de `dt`.
 - Contrato ampliado sin romper Asteroides: propiedad opcional `initialLives` en la entrada de `REAL_GAMES` (3 por defecto, 1 para Tetris). `GameStats` no cambia.
 - Migración `supabase/migrations/<timestamp>_juego_tetris.sql` con la fila de `games` y `max_score_per_second = 12200`.
@@ -109,18 +109,18 @@ Estados del motor: `playing`, `clearing` (0,3 s con las filas parpadeando, sin g
 
 Archivos de `app/_games/tetris/`:
 
-- `constants.ts`: `W`, `H`, `COLS`, `ROWS`, `BLOCK`, `BOARD_X`, `COLORS`, `PIECES`, `LINE_SCORES`, `MAX_LEVEL`, `NUT_MIN_LEVEL`, `MAX_DT`, `DAS`, `ARR`, `CLEAR_TIME`.
-- `entities.ts`: tipo `Piece`, funciones `randomPiece(level)` (recibe el nivel para decidir si entra la tuerca), `rotateCW`, `collide` y `drawBlock(ctx, ...)`.
-- `input.ts`: `createInput()` con `attach()`, `detach()`, `set()`, `clear()`, auto-repeat y pulsaciones de un solo disparo para rotar y caída.
+- `constants.ts`: `W`, `H`, `COLS`, `ROWS`, `BLOCK`, `BOARD_X`, `NEXT_X`, `NEXT_Y`, `COLORS`, `PIECES`, `LINE_SCORES`, `MAX_LEVEL`, `NUT_MIN_LEVEL`, `MAX_DT`, `DAS`, `ARR`, `CLEAR_TIME`.
+- `entities.ts`: tipos `Piece` y `Board`, funciones `randomPiece(level)` (recibe el nivel para decidir si entra la tuerca), `rotateCW`, `collide(board, ...)`, `createBoard` y `drawBlock(ctx, ox, oy, ...)`.
+- `input.ts`: `createInput()` con `attach()`, `detach()`, `set()`, `poll(dt)` (consume pasos pendientes y avanza el auto-repeat), `clear()`, auto-repeat y pulsaciones de un solo disparo para rotar y caída.
 - `engine.ts`: bucle, tablero, gravedad, fijación, borrado de líneas, `onStats` y `onGameOver`.
 
 Convenciones:
 
 - Origen arriba a la izquierda. Tamaño lógico 800×600.
-- Panel SIGUIENTE: caja de 4×4 celdas de 30 px en `x = 520`, `y = 60`, con la etiqueta "SIGUIENTE" pintada encima.
+- Columna derecha centrada en `x = 615 + 60`: PUNTUACIÓN (y = 300) y NIVEL (y = 380) con su valor debajo. Panel SIGUIENTE: caja de 4×4 celdas de 30 px en `x = 615`, `y = 480`, con la etiqueta "SIGUIENTE" encima. La columna queda alineada abajo con el tablero. La pieza se centra en la caja por su tamaño real.
 - `dt` en segundos, limitado a 0,05 s. El acumulador de caída se reinicia a 0 al bajar, como en el original.
 - `onStats` emite `{ score, lives: 1, level }` solo cuando cambia la puntuación o el nivel. Las líneas son estado interno del motor (nivel y puntos), no se muestran.
-- El canvas no pinta puntuación, nivel, líneas ni texto de fin de partida.
+- El canvas pinta puntuación y nivel en la columna derecha (petición del usuario). No pinta líneas ni texto de fin de partida.
 
 Fila de `games`:
 
@@ -153,39 +153,39 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` termina sin errores.
-- [ ] `npm run build` termina sin errores ni advertencias de Cache Components.
-- [ ] `/games` muestra la tarjeta TETRIS con su portada `cover-tetris` y Asteroides sigue igual.
-- [ ] `/games/tetris` muestra la ficha y su botón de jugar lleva a `/games/tetris/play`.
-- [ ] `/games/tetris/play` muestra un canvas con el tablero 10×20, el panel SIGUIENTE y ni puntuación, nivel, líneas ni texto de fin pintados.
-- [ ] Hay 8 tipos de pieza, incluida la tuerca 3×3, con los colores de `game.js`.
-- [ ] En los niveles 1 a 5 nunca aparece la tuerca; desde el nivel 6 puede aparecer.
-- [ ] La pieza SIGUIENTE ya generada antes de subir de nivel no se regenera: si se generó en el nivel 5, no es tuerca; la primera tuerca posible es la pieza generada con el nivel 6 ya activo.
-- [ ] `←` y `→` mueven la pieza una celda y no la sacan del tablero.
-- [ ] Mantener `←`, `→` o `↓` repite tras 170 ms y luego cada 50 ms.
-- [ ] `↑` y `X` rotan en sentido horario, con wall kicks de hasta 2 columnas.
-- [ ] La pieza fantasma se muestra al 20 % de opacidad donde aterrizará la pieza.
-- [ ] `↓` suma 1 punto por fila; si no puede bajar, la pieza se fija.
-- [ ] `Espacio` suma 2 puntos por celda recorrida y fija la pieza al instante.
-- [ ] Borrar 1, 2, 3 y 4 líneas suma 100, 300, 500 y 800 por el nivel actual.
-- [ ] Las filas completas parpadean 0,3 s antes de eliminarse y la gravedad y la entrada se detienen durante ese tiempo.
-- [ ] El nivel sube cada 10 líneas y no pasa de 15.
-- [ ] El intervalo de caída es 1 s en nivel 1 y 0,1 s desde el nivel 11.
-- [ ] La partida termina cuando una pieza nueva colisiona al aparecer.
-- [ ] El HUD de la plataforma refleja puntuación y nivel en tiempo real y muestra exactamente 1 corazón en VIDAS durante toda la partida, también justo tras montar y tras "JUGAR DE NUEVO".
-- [ ] PAUSA y la tecla `P` congelan el juego; al reanudar no hay salto de movimiento.
-- [ ] Al terminar se abre el modal "FIN DEL JUEGO" con la puntuación final.
-- [ ] GUARDAR PUNTUACIÓN inserta una fila en `scores` con `game_id = 'tetris'` y el modal muestra `#NN`.
-- [ ] "JUGAR DE NUEVO" reinicia con puntuación 0, nivel 1 y 1 corazón, y abre una sesión nueva.
-- [ ] `startGameSession('tetris')` devuelve `sessionId`.
-- [ ] `execute_sql` muestra la fila `tetris` con `max_score_per_second = 12200`.
-- [ ] `list_tables` muestra RLS activo y `get_advisors` no reporta problemas nuevos.
-- [ ] `/hall` muestra la pestaña TETRIS con estado vacío "SÉ EL PRIMERO" si no hay marcas.
-- [ ] Tarjeta y ficha muestran la mejor marca y las partidas reales de Tetris (0 sin marcas).
-- [ ] Con las flechas y `Espacio` la página no hace scroll durante la partida.
-- [ ] Al salir de `/games/tetris/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad).
-- [ ] A 375px el canvas ocupa el ancho del marco, sin scroll horizontal, y los botones ◀ ▶ ▼, ROTAR y CAÍDA controlan la pieza.
-- [ ] `/games/asteroides/play` y las rutas de SPEC 01 a 06 siguen funcionando, con el HUD de Asteroides mostrando VIDAS.
+- [x] `npm run lint` termina sin errores.
+- [x] `npm run build` termina sin errores ni advertencias de Cache Components.
+- [x] `/games` muestra la tarjeta TETRIS con su portada `cover-tetris` y Asteroides sigue igual.
+- [x] `/games/tetris` muestra la ficha y su botón de jugar lleva a `/games/tetris/play`.
+- [x] `/games/tetris/play` muestra un canvas con el tablero 10×20, el tablero centrado, PUNTUACIÓN, NIVEL y SIGUIENTE a la derecha, y ni líneas ni texto de fin pintados.
+- [x] Hay 8 tipos de pieza, incluida la tuerca 3×3, con los colores de `game.js`.
+- [x] En los niveles 1 a 5 nunca aparece la tuerca; desde el nivel 6 puede aparecer.
+- [x] La pieza SIGUIENTE ya generada antes de subir de nivel no se regenera: si se generó en el nivel 5, no es tuerca; la primera tuerca posible es la pieza generada con el nivel 6 ya activo.
+- [x] `←` y `→` mueven la pieza una celda y no la sacan del tablero.
+- [x] Mantener `←`, `→` o `↓` repite tras 170 ms y luego cada 50 ms.
+- [x] `↑` y `X` rotan en sentido horario, con wall kicks de hasta 2 columnas.
+- [x] La pieza fantasma se muestra al 20 % de opacidad donde aterrizará la pieza.
+- [x] `↓` suma 1 punto por fila; si no puede bajar, la pieza se fija.
+- [x] `Espacio` suma 2 puntos por celda recorrida y fija la pieza al instante.
+- [x] Borrar 1, 2, 3 y 4 líneas suma 100, 300, 500 y 800 por el nivel actual.
+- [x] Las filas completas parpadean 0,3 s antes de eliminarse y la gravedad y la entrada se detienen durante ese tiempo.
+- [x] El nivel sube cada 10 líneas y no pasa de 15.
+- [x] El intervalo de caída es 1 s en nivel 1 y 0,1 s desde el nivel 11.
+- [x] La partida termina cuando una pieza nueva colisiona al aparecer.
+- [x] El HUD de la plataforma refleja puntuación y nivel en tiempo real y muestra exactamente 1 corazón en VIDAS durante toda la partida, también justo tras montar y tras "JUGAR DE NUEVO".
+- [x] PAUSA y la tecla `P` congelan el juego; al reanudar no hay salto de movimiento.
+- [x] Al terminar se abre el modal "FIN DEL JUEGO" con la puntuación final.
+- [x] GUARDAR PUNTUACIÓN inserta una fila en `scores` con `game_id = 'tetris'` y el modal muestra `#NN`.
+- [x] "JUGAR DE NUEVO" reinicia con puntuación 0, nivel 1 y 1 corazón, y abre una sesión nueva.
+- [x] `startGameSession('tetris')` devuelve `sessionId`.
+- [x] `execute_sql` muestra la fila `tetris` con `max_score_per_second = 12200`.
+- [x] `list_tables` muestra RLS activo y `get_advisors` no reporta problemas nuevos.
+- [x] `/hall` muestra la pestaña TETRIS con estado vacío "SÉ EL PRIMERO" si no hay marcas.
+- [x] Tarjeta y ficha muestran la mejor marca y las partidas reales de Tetris (0 sin marcas).
+- [x] Con las flechas y `Espacio` la página no hace scroll durante la partida.
+- [x] Al salir de `/games/tetris/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad).
+- [x] A 375px el canvas ocupa el ancho del marco, sin scroll horizontal, y los botones ◀ ▶ ▼, ROTAR y CAÍDA controlan la pieza.
+- [x] `/games/asteroides/play` y las rutas de SPEC 01 a 06 siguen funcionando, con el HUD de Asteroides mostrando VIDAS.
 
 ## Decisiones tomadas y descartadas
 
@@ -196,7 +196,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - **Sí:** las 8 piezas del código, tuerca incluida, con la tuerca bloqueada hasta el nivel 6 (petición del usuario: la dificultad extra llega tras dominar las clásicas). El código manda sobre el README. **No:** tuerca desde el nivel 1 ni reducir a 7 piezas.
 - **Sí:** la pieza se genera con el nivel vigente en ese momento, incluida la SIGUIENTE. **No:** regenerar la SIGUIENTE al subir de nivel (la vista previa dejaría de ser fiable).
 - **Sí:** HUD con VIDAS y un único corazón fijo (petición del usuario, cambia la decisión inicial de mostrar LÍNEAS). Mantiene el HUD idéntico al de Asteroides y no toca `GameStats`. `initialLives` en el registro evita el parpadeo de 3 corazones. **No:** sustituir VIDAS por LÍNEAS ni ocultar el bloque.
-- **Sí:** canvas lógico 800×600 con el tablero a la izquierda y SIGUIENTE en el canvas. No toca el marco 4:3 ni requiere HTML aparte. **No:** canvas vertical 300×600 ni marco distinto por juego.
+- **Sí:** canvas lógico 800×600 con el tablero centrado y PUNTUACIÓN, NIVEL y SIGUIENTE en la columna derecha del canvas. No toca el marco 4:3 ni requiere HTML aparte. **No:** canvas vertical 300×600 ni marco distinto por juego.
 - **Sí:** nivel máximo 15. Permite fijar un tope de puntos por segundo; la velocidad ya se estabiliza en el nivel 11, así que solo se limita el multiplicador. **No:** nivel ilimitado con tope arbitrario (rechazaría partidas largas legítimas).
 - **Sí:** `max_score_per_second = 12200` en la BD, con el cálculo explicado. Es un máximo teórico por encima de cualquier partida legítima. **No:** constante en código.
 - **Sí:** auto-repeat propio (170 ms / 50 ms) para `←` `→` `↓` y los botones táctiles. Mismo comportamiento en todos los sistemas. **No:** depender del auto-repeat del sistema operativo.
@@ -205,7 +205,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - **Sí:** descartar toggle claro/oscuro, panel HTML y overlay del original. La plataforma ya tiene tema, HUD y modal.
 - **Sí:** aleatorio puro y sin hold, como el original. **No:** 7-bag ni reserva (cambian el juego).
 - **Sí:** `Math.random()` solo dentro del motor, tras el montaje.
-- **Sí: Skins del juego original** - El selector Retro / Neon / Pastel / Pixel Art se implementa. Razón: se añade para que el usuario pueda cambiar el aspecto del juego y se graba la preferencia en el localStorage.
+- **Sí: Skins del juego original** - El selector Retro / Neon / Pastel / Pixel Art se implementa. Razón: se añade para que el usuario pueda cambiar el aspecto del juego y se graba la preferencia en el localStorage. **No implementado:** contradice el Alcance y «Fuera de alcance» (sin tareas ni criterios), así que queda fuera de esta spec.
 
 ## Riesgos
 
