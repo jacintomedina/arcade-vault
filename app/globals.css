@@ -519,6 +519,32 @@ a { color: inherit; text-decoration: none; }
   filter: drop-shadow(0 0 6px rgba(0,245,255,0.6));
 }
 
+.cover-tetris { background: radial-gradient(circle at 50% 100%, #2a0030, #05050f); }
+.cover-tetris::after {
+  content: "";
+  position: absolute;
+  inset: 12% 34% 0 34%;
+  background:
+    linear-gradient(#00f5ff,#00f5ff) 0 0/25% 16.66%,
+    linear-gradient(#00f5ff,#00f5ff) 0 16.66%/25% 16.66%,
+    linear-gradient(#00f5ff,#00f5ff) 0 33.33%/25% 16.66%,
+    linear-gradient(#00f5ff,#00f5ff) 0 50%/25% 16.66%,
+    linear-gradient(#ff006e,#ff006e) 50% 33.33%/25% 16.66%,
+    linear-gradient(#ff006e,#ff006e) 75% 33.33%/25% 16.66%,
+    linear-gradient(#ff006e,#ff006e) 50% 50%/25% 16.66%,
+    linear-gradient(#ff006e,#ff006e) 75% 50%/25% 16.66%,
+    linear-gradient(#f5ff00,#f5ff00) 25% 66.66%/25% 16.66%,
+    linear-gradient(#f5ff00,#f5ff00) 50% 66.66%/25% 16.66%,
+    linear-gradient(#f5ff00,#f5ff00) 75% 66.66%/25% 16.66%,
+    linear-gradient(#f5ff00,#f5ff00) 50% 83.33%/25% 16.66%,
+    linear-gradient(#aa00ff,#aa00ff) 0 66.66%/25% 16.66%,
+    linear-gradient(#aa00ff,#aa00ff) 0 83.33%/25% 16.66%,
+    linear-gradient(#00ff88,#00ff88) 25% 83.33%/25% 16.66%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 8px rgba(255,0,110,0.5));
+  image-rendering: pixelated;
+}
+
 .cover-rana { background: linear-gradient(180deg,#001f2a,#0a0a18); }
 .cover-rana::after {
   content: "";
@@ -700,7 +726,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* real games: canvas + touch controls */
-.asteroides-canvas {
+.asteroides-canvas,
+.tetris-canvas {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   display: block;
