@@ -14,7 +14,11 @@ import {
   AsteroidesGame,
   AsteroidesTouchControls,
 } from "./games/asteroides-game";
-import { TetrisControlsHint, TetrisGame } from "./games/tetris-game";
+import {
+  TetrisControlsHint,
+  TetrisGame,
+  TetrisTouchControls,
+} from "./games/tetris-game";
 import type {
   GameComponentProps,
   GameStats,
@@ -46,6 +50,7 @@ const REAL_GAMES: Record<
   tetris: {
     Component: TetrisGame,
     Controls: TetrisControlsHint,
+    TouchControls: TetrisTouchControls,
     initialLives: 1, // evita ver 3 corazones antes del primer onStats
   },
 };

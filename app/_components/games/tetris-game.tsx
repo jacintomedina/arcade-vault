@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { createEngine, type Engine } from "../../_games/tetris/engine";
 import type { InputKey } from "../../_games/tetris/input";
 import { H, W } from "../../_games/tetris/constants";
-import type { GameComponentProps } from "./types";
+import type { GameComponentProps, TouchControlsProps } from "./types";
 
 export function TetrisGame({
 	paused,
@@ -90,5 +90,64 @@ export function TetrisControlsHint() {
 				<kbd>P</kbd> pausa
 			</span>
 		</p>
+	);
+}
+
+function HoldButton({
+	input,
+	k,
+	className,
+	label,
+	children,
+}: {
+	input: TouchControlsProps["input"];
+	k: InputKey;
+	className: string;
+	label: string;
+	children: ReactNode;
+}) {
+	return (
+		<button
+			type="button"
+			tabIndex={-1}
+			className={`tt-btn ${className}`}
+			aria-label={label}
+			onPointerDown={(e) => {
+				e.preventDefault();
+				e.currentTarget.setPointerCapture(e.pointerId);
+				input.press(k, true);
+			}}
+			onPointerUp={() => input.press(k, false)}
+			onPointerCancel={() => input.press(k, false)}
+			onContextMenu={(e) => e.preventDefault()}
+		>
+			{children}
+		</button>
+	);
+}
+
+export function TetrisTouchControls({ input }: TouchControlsProps) {
+	return (
+		<div className="touch-controls tetris-touch" aria-label="Controles táctiles">
+			<div className="tt-pad">
+				<HoldButton input={input} k="left" className="tt-move" label="Mover a la izquierda">
+					◀
+				</HoldButton>
+				<HoldButton input={input} k="down" className="tt-move" label="Bajar">
+					▼
+				</HoldButton>
+				<HoldButton input={input} k="right" className="tt-move" label="Mover a la derecha">
+					▶
+				</HoldButton>
+			</div>
+			<div className="tt-actions">
+				<HoldButton input={input} k="rotate" className="tt-rotate" label="Rotar">
+					ROTAR
+				</HoldButton>
+				<HoldButton input={input} k="drop" className="tt-drop" label="Caída instantánea">
+					CAÍDA
+				</HoldButton>
+			</div>
+		</div>
 	);
 }
