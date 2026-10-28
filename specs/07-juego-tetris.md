@@ -1,6 +1,6 @@
 # SPEC 07 — Juego Tetris jugable en la plataforma con leaderboard
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 05, SPEC 06
 > **Fecha:** 2026-10-25
 > **Objetivo:** Portar `references/started-games/03-tetris/` a TypeScript y publicarlo como el juego `tetris`, jugable en `/games/tetris/play` con leaderboard real.
@@ -209,21 +209,21 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo                                                                         | Mitigación                                                                                                       |
-| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| React Strict Mode monta el efecto dos veces y duplica el bucle                 | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje. |
-| Módulos del motor evalúan `window` o `document` en SSR                          | Nada a nivel superior; el motor se crea solo dentro de `useEffect`.                                              |
-| `Math.random()` en el render rompe la hidratación                              | La aleatoriedad vive en el motor, que arranca tras el montaje.                                                   |
-| Las flechas y `Espacio` hacen scroll                                            | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll.                   |
-| `dt` enorme al volver de otra pestaña o al reanudar                            | Tope de 0,05 s y reinicio de `lastTime` al reanudar.                                                             |
-| Auto-repeat del motor y `e.repeat` del navegador se suman                      | El motor ignora `e.repeat` y genera sus propias repeticiones.                                                    |
-| Mantener `↓` fija varias piezas seguidas sin querer                            | Comportamiento del original; se conserva. Se anota para una spec de ajuste (lock delay).                         |
-| El tope de 12200 pts/s es muy alto y apenas frena a un bot                     | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño.                     |
-| Cambiar `REAL_GAMES` rompe Asteroides                                          | Solo se amplía: `initialLives` opcional con valor por defecto 3. Criterio de aceptación sobre Asteroides.        |
-| Un corazón fijo sugiere que se puede perder una vida                           | Aceptado por decisión del usuario; el fin de partida es inmediato y el modal explica el resultado.               |
-| La UI de `/hall`, `/games` o `GamePlayer` asume un solo juego                  | Verificar con dos juegos en el catálogo; corregir dentro de esta spec y anotarlo en Decisiones.                  |
-| Canvas 4:3 con tablero vertical deja espacio vacío y puede verse pequeño a 375px | Tablero a 600 px de alto en el lienzo lógico; se comprueba la legibilidad a 375px.                                |
-| Desfase de escalado en los botones táctiles                                     | Tamaño lógico fijo y escalado por CSS; se verifica en 375px y en escritorio.                                     |
+| Riesgo                                                                           | Mitigación                                                                                                               |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| React Strict Mode monta el efecto dos veces y duplica el bucle                   | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje. |
+| Módulos del motor evalúan `window` o `document` en SSR                           | Nada a nivel superior; el motor se crea solo dentro de `useEffect`.                                                      |
+| `Math.random()` en el render rompe la hidratación                                | La aleatoriedad vive en el motor, que arranca tras el montaje.                                                           |
+| Las flechas y `Espacio` hacen scroll                                             | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll.                          |
+| `dt` enorme al volver de otra pestaña o al reanudar                              | Tope de 0,05 s y reinicio de `lastTime` al reanudar.                                                                     |
+| Auto-repeat del motor y `e.repeat` del navegador se suman                        | El motor ignora `e.repeat` y genera sus propias repeticiones.                                                            |
+| Mantener `↓` fija varias piezas seguidas sin querer                              | Comportamiento del original; se conserva. Se anota para una spec de ajuste (lock delay).                                 |
+| El tope de 12200 pts/s es muy alto y apenas frena a un bot                       | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño.                             |
+| Cambiar `REAL_GAMES` rompe Asteroides                                            | Solo se amplía: `initialLives` opcional con valor por defecto 3. Criterio de aceptación sobre Asteroides.                |
+| Un corazón fijo sugiere que se puede perder una vida                             | Aceptado por decisión del usuario; el fin de partida es inmediato y el modal explica el resultado.                       |
+| La UI de `/hall`, `/games` o `GamePlayer` asume un solo juego                    | Verificar con dos juegos en el catálogo; corregir dentro de esta spec y anotarlo en Decisiones.                          |
+| Canvas 4:3 con tablero vertical deja espacio vacío y puede verse pequeño a 375px | Tablero a 600 px de alto en el lienzo lógico; se comprueba la legibilidad a 375px.                                       |
+| Desfase de escalado en los botones táctiles                                      | Tamaño lógico fijo y escalado por CSS; se verifica en 375px y en escritorio.                                             |
 
 ## Lo que **no** está en esta spec
 
