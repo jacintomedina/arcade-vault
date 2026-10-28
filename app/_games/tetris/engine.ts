@@ -239,10 +239,12 @@ export function createEngine(opts: EngineOptions): Engine {
 	function drawSidePanel() {
 		g.textAlign = "center";
 		g.textBaseline = "alphabetic";
-		drawLabel("PUNTUACIÓN", NEXT_Y - 180);
-		drawValue(String(score), NEXT_Y - 148);
-		drawLabel("NIVEL", NEXT_Y - 100);
-		drawValue(String(level), NEXT_Y - 68);
+		drawLabel("NIVEL", NEXT_Y - 240);
+		drawValue(String(level), NEXT_Y - 208);
+		drawLabel("LÍNEAS", NEXT_Y - 160);
+		drawValue(String(lines), NEXT_Y - 128);
+		drawLabel("PUNTUACIÓN", NEXT_Y - 80);
+		drawValue(String(score), NEXT_Y - 48);
 		drawLabel("SIGUIENTE", NEXT_Y - 12);
 		g.textAlign = "start";
 
