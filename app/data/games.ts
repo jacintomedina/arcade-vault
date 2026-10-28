@@ -1,4 +1,4 @@
-export type GameCategory = "SHOOTER" | "PUZZLE";
+export type GameCategory = "SHOOTER" | "PUZZLE" | "ARCADE";
 export type GameColor = "cyan" | "magenta" | "yellow" | "green";
 
 export interface Game {
@@ -30,6 +30,15 @@ export const GAMES: Game[] = [
     cover: "cover-tetris",
     color: "magenta",
   },
+  {
+    id: "arkanoid",
+    title: "ARKANOID",
+    short: "Rompe todos los bloques con la bola y no la dejes caer.",
+    long: "Mueve la pala, lanza la bola y derriba el muro bloque a bloque. El punto donde la bola toca la pala decide su ángulo: golpea con el borde para cruzar la pantalla. Tienes 3 vidas y 10 niveles, y la bola gana velocidad en cada uno.",
+    cat: "ARCADE",
+    cover: "cover-arkanoid",
+    color: "yellow",
+  },
 ];
 
-export const CATS: ("TODOS" | GameCategory)[] = ["TODOS", "SHOOTER", "PUZZLE"];
+export const CATS: ("TODOS" | GameCategory)[] = ["TODOS", "SHOOTER", "PUZZLE", "ARCADE"];

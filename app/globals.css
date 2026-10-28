@@ -545,6 +545,25 @@ a { color: inherit; text-decoration: none; }
   image-rendering: pixelated;
 }
 
+.cover-arkanoid { background: radial-gradient(circle at 50% 100%, #2a2400, #05050f); }
+.cover-arkanoid::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at center, #fff 0 60%, transparent 62%) 64% 66%/7% 9.3% no-repeat,
+    linear-gradient(#f5ff00,#f5ff00) 50% 90%/30% 5% no-repeat;
+  filter: drop-shadow(0 0 6px rgba(245,255,0,0.7));
+}
+.cover-arkanoid::after {
+  content: "";
+  position: absolute; inset: 14% 10% 42% 10%;
+  background:
+    repeating-linear-gradient(90deg, #fff6a0 0 10.5%, transparent 10.5% 12.5%) 0 0/100% 26% no-repeat,
+    repeating-linear-gradient(90deg, #f5ff00 0 10.5%, transparent 10.5% 12.5%) 0 50%/100% 26% no-repeat,
+    repeating-linear-gradient(90deg, #ffae00 0 10.5%, transparent 10.5% 12.5%) 0 100%/100% 26% no-repeat;
+  filter: drop-shadow(0 0 8px rgba(245,255,0,0.4));
+}
+
 .cover-rana { background: linear-gradient(180deg,#001f2a,#0a0a18); }
 .cover-rana::after {
   content: "";
@@ -730,12 +749,14 @@ a { color: inherit; text-decoration: none; }
 
 /* real games: canvas + touch controls */
 .asteroides-canvas,
-.tetris-canvas {
+.tetris-canvas,
+.arkanoid-canvas {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   display: block;
   background: #000;
 }
+.arkanoid-canvas { touch-action: none; }
 .touch-controls { display: none; }
 @media (pointer: coarse) {
   .touch-controls {
