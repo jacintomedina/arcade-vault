@@ -17,6 +17,7 @@ import {
 import {
   ArkanoidControlsHint,
   ArkanoidGame,
+  ArkanoidTouchControls,
 } from "./games/arkanoid-game";
 import {
   TetrisControlsHint,
@@ -60,6 +61,7 @@ const REAL_GAMES: Record<
   arkanoid: {
     Component: ArkanoidGame,
     Controls: ArkanoidControlsHint,
+    TouchControls: ArkanoidTouchControls,
   },
 };
 

@@ -837,6 +837,18 @@ a { color: inherit; text-decoration: none; }
 }
 .tt-drop:active { background: rgba(245,255,0,0.25); }
 
+/* Arkanoid: botón de saque */
+.ak-launch {
+  min-width: 120px; height: 56px;
+  padding: 0 20px;
+  border-radius: 28px;
+  font-size: 10px;
+  color: var(--yellow);
+  border: 1px solid var(--yellow);
+  box-shadow: 0 0 10px rgba(245,255,0,0.35), inset 0 0 8px rgba(245,255,0,0.2);
+}
+.ak-launch:active { background: rgba(245,255,0,0.25); }
+
 .controls-hint {
   display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px;
   margin: 14px 0 0;
