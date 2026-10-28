@@ -39,6 +39,15 @@ export const GAMES: Game[] = [
     cover: "cover-arkanoid",
     color: "yellow",
   },
+  {
+    id: "snake",
+    title: "SNAKE",
+    short: "Come fruta, crece y no te muerdas la cola.",
+    long: "Guía a la serpiente por el tablero y come la fruta que aparece para crecer. Las paredes no te detienen: sales por un lado y vuelves a entrar por el contrario. Cada 5 frutas subes de nivel y la serpiente va más rápido. Si te muerdes el cuerpo, se acabó.",
+    cat: "ARCADE",
+    cover: "cover-snake",
+    color: "cyan",
+  },
 ];
 
 export const CATS: ("TODOS" | GameCategory)[] = ["TODOS", "SHOOTER", "PUZZLE", "ARCADE"];
