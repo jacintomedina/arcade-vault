@@ -854,6 +854,29 @@ a { color: inherit; text-decoration: none; }
 }
 .tt-drop:active { background: rgba(245,255,0,0.25); }
 
+/* Snake: cruceta en cruz centrada */
+@media (pointer: coarse) {
+  .snake-touch { justify-content: center; }
+}
+.sn-pad {
+  display: grid;
+  grid-template: repeat(3, 64px) / repeat(3, 64px);
+  gap: 6px;
+}
+.sn-pad .tt-move { width: 64px; height: 64px; }
+.sn-up { grid-area: 1 / 2; }
+.sn-left { grid-area: 2 / 1; }
+.sn-hub {
+  grid-area: 2 / 2;
+  place-self: center;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(0,245,255,0.25);
+  box-shadow: 0 0 8px rgba(0,245,255,0.5);
+}
+.sn-right { grid-area: 2 / 3; }
+.sn-down { grid-area: 3 / 2; }
+
 /* Arkanoid: botón de saque */
 .ak-launch {
   min-width: 120px; height: 56px;

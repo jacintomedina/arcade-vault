@@ -19,7 +19,11 @@ import {
   ArkanoidGame,
   ArkanoidTouchControls,
 } from "./games/arkanoid-game";
-import { SnakeControlsHint, SnakeGame } from "./games/snake-game";
+import {
+  SnakeControlsHint,
+  SnakeGame,
+  SnakeTouchControls,
+} from "./games/snake-game";
 import {
   TetrisControlsHint,
   TetrisGame,
@@ -67,6 +71,7 @@ const REAL_GAMES: Record<
   snake: {
     Component: SnakeGame,
     Controls: SnakeControlsHint,
+    TouchControls: SnakeTouchControls,
     initialLives: 1, // sin vidas: evita ver 3 corazones antes del primer onStats
   },
 };

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { createEngine, type Engine } from "../../_games/snake/engine";
 import type { InputKey } from "../../_games/snake/input";
 import { H, W } from "../../_games/snake/constants";
-import type { GameComponentProps } from "./types";
+import type { GameComponentProps, TouchControlsProps } from "./types";
 
 export function SnakeGame({
 	paused,
@@ -87,5 +87,60 @@ export function SnakeControlsHint() {
 				<kbd>P</kbd> pausa
 			</span>
 		</p>
+	);
+}
+
+function PadButton({
+	input,
+	k,
+	label,
+	rotate,
+}: {
+	input: TouchControlsProps["input"];
+	k: InputKey;
+	label: string;
+	rotate: number;
+}): ReactNode {
+	return (
+		<button
+			type="button"
+			tabIndex={-1}
+			className={`tt-btn tt-move sn-${k}`}
+			aria-label={label}
+			onPointerDown={(e) => {
+				e.preventDefault();
+				e.currentTarget.setPointerCapture(e.pointerId);
+				input.press(k, true);
+			}}
+			onPointerUp={() => input.press(k, false)}
+			onPointerCancel={() => input.press(k, false)}
+			onContextMenu={(e) => e.preventDefault()}
+		>
+			{/* El triángulo base apunta a la izquierda; rotate lo orienta. */}
+			<svg
+				width="26"
+				height="26"
+				viewBox="0 0 24 24"
+				fill="currentColor"
+				aria-hidden="true"
+				style={{ transform: `rotate(${rotate}deg)` }}
+			>
+				<polygon points="19,4 19,20 5,12" />
+			</svg>
+		</button>
+	);
+}
+
+export function SnakeTouchControls({ input }: TouchControlsProps) {
+	return (
+		<div className="touch-controls snake-touch" aria-label="Controles táctiles">
+			<div className="sn-pad">
+				<PadButton input={input} k="up" label="Subir" rotate={90} />
+				<PadButton input={input} k="left" label="Girar a la izquierda" rotate={0} />
+				<span className="sn-hub" aria-hidden="true" />
+				<PadButton input={input} k="right" label="Girar a la derecha" rotate={180} />
+				<PadButton input={input} k="down" label="Bajar" rotate={-90} />
+			</div>
+		</div>
 	);
 }
