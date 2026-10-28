@@ -1,6 +1,6 @@
 # SPEC 08 — Juego Arkanoid jugable en la plataforma con leaderboard
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 05, SPEC 06, SPEC 07
 > **Fecha:** 2026-10-28
 > **Objetivo:** Portar `references/started-games/04-arkanoid/` a TypeScript y publicarlo como el juego `arkanoid`, jugable en `/games/arkanoid/play` con 10 niveles y leaderboard real.
@@ -173,42 +173,42 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` termina sin errores.
-- [ ] `npm run build` termina sin errores ni advertencias de Cache Components.
-- [ ] `/games` muestra la tarjeta ARKANOID con su portada `cover-arkanoid`, y Asteroides y Tetris siguen igual.
-- [ ] `/games/arkanoid` muestra la ficha y su botón de jugar lleva a `/games/arkanoid/play`.
-- [ ] `/games/arkanoid/play` muestra un canvas con 60 bloques, la pala y la bola sobre ella, y ni HUD ni texto de fin pintados en el canvas.
-- [ ] El spritesheet se carga desde `/games/arkanoid/spritesheet-breakout.png`; si la petición falla, el juego se dibuja con formas simples y sigue siendo jugable.
-- [ ] `←` y `→` mueven la pala a 400 px/s y no la sacan del canvas.
-- [ ] Mover el ratón sobre el canvas centra la pala bajo el puntero, también con el canvas escalado, sin salirse de `[0, 719]` px lógicos.
-- [ ] Arrastrar el dedo sobre el canvas mueve la pala y no hace scroll de la página.
-- [ ] La bola queda sobre la pala hasta pulsar `Espacio`, hacer clic en el canvas o pulsar LANZAR; entonces sale con velocidad `(200, −300)`.
-- [ ] Tras perder una vida y al empezar cada nivel, la bola vuelve a quedar sobre la pala esperando saque.
-- [ ] La bola rebota en las paredes izquierda y derecha y en el techo.
-- [ ] Un golpe en el centro de la pala sale en vertical; en el borde sale a 60° de la vertical; el módulo de la velocidad no cambia.
-- [ ] Romper un bloque suma exactamente 10 puntos, invierte `vy` y muestra la explosión de 4 frames durante 150 ms.
-- [ ] A la velocidad del nivel 10 (×2,36) la bola no atraviesa bloques ni la pala.
-- [ ] Al caer la bola por abajo se pierde una vida; con la tercera termina la partida.
-- [ ] Al romper todos los bloques de un nivel sube el nivel y se carga el siguiente patrón con su velocidad.
-- [ ] Los niveles 1 a 5 tienen 60, 40, 30, 39 y 39 bloques y los niveles 6 a 10 tienen 30, 40, 30, 40 y 56.
-- [ ] El nivel 5 va a ×1,4641 y el nivel 10 a ×2,3579 la velocidad base.
-- [ ] Romper el último bloque del nivel 10 abre el modal "FIN DEL JUEGO" con la puntuación final, sin pasar por el nivel 11.
-- [ ] El HUD de la plataforma refleja puntuación, vidas (3 a 0) y nivel (01 a 10) en tiempo real.
-- [ ] PAUSA y la tecla `P` congelan el juego (incluida la bola en `serving`); al reanudar no hay salto de movimiento.
-- [ ] `Escape` no pausa el juego.
-- [ ] Al terminar se abre el modal "FIN DEL JUEGO" con la puntuación final.
-- [ ] GUARDAR PUNTUACIÓN inserta una fila en `scores` con `game_id = 'arkanoid'` y el modal muestra `#NN`.
-- [ ] "JUGAR DE NUEVO" reinicia con puntuación 0, 3 vidas y nivel 1, y abre una sesión nueva.
-- [ ] `startGameSession('arkanoid')` devuelve `sessionId`.
-- [ ] `execute_sql` muestra la fila `arkanoid` con `max_score_per_second = 1200`.
-- [ ] `list_tables` muestra RLS activo y `get_advisors` no reporta problemas nuevos.
-- [ ] `/hall` muestra la pestaña ARKANOID con estado vacío "SÉ EL PRIMERO" si no hay marcas, y las pestañas de Asteroides y Tetris siguen funcionando.
-- [ ] Tarjeta y ficha muestran la mejor marca y las partidas reales de Arkanoid (0 sin marcas).
-- [ ] La biblioteca `/games` ofrece el filtro ARCADE y muestra solo ARKANOID en él.
-- [ ] Con las flechas y `Espacio` la página no hace scroll durante la partida.
-- [ ] Al salir de `/games/arkanoid/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad).
-- [ ] A 375px el canvas ocupa el ancho del marco, sin scroll horizontal, y los botones ◀ ▶ y LANZAR controlan la pala y el saque.
-- [ ] `/games/asteroides/play`, `/games/tetris/play` y las rutas de SPEC 01 a 07 siguen funcionando.
+- [x] `npm run lint` termina sin errores.
+- [x] `npm run build` termina sin errores ni advertencias de Cache Components.
+- [x] `/games` muestra la tarjeta ARKANOID con su portada `cover-arkanoid`, y Asteroides y Tetris siguen igual.
+- [x] `/games/arkanoid` muestra la ficha y su botón de jugar lleva a `/games/arkanoid/play`.
+- [x] `/games/arkanoid/play` muestra un canvas con 60 bloques, la pala y la bola sobre ella, y ni HUD ni texto de fin pintados en el canvas.
+- [x] El spritesheet se carga desde `/games/arkanoid/spritesheet-breakout.png`; si la petición falla, el juego se dibuja con formas simples y sigue siendo jugable.
+- [x] `←` y `→` mueven la pala a 400 px/s y no la sacan del canvas.
+- [x] Mover el ratón sobre el canvas centra la pala bajo el puntero, también con el canvas escalado, sin salirse de `[0, 719]` px lógicos.
+- [x] Arrastrar el dedo sobre el canvas mueve la pala y no hace scroll de la página.
+- [x] La bola queda sobre la pala hasta pulsar `Espacio`, hacer clic en el canvas o pulsar LANZAR; entonces sale con velocidad `(200, −300)`.
+- [x] Tras perder una vida y al empezar cada nivel, la bola vuelve a quedar sobre la pala esperando saque.
+- [x] La bola rebota en las paredes izquierda y derecha y en el techo.
+- [x] Un golpe en el centro de la pala sale en vertical; en el borde sale a 60° de la vertical; el módulo de la velocidad no cambia.
+- [x] Romper un bloque suma exactamente 10 puntos, invierte `vy` y muestra la explosión de 4 frames durante 150 ms.
+- [x] A la velocidad del nivel 10 (×2,36) la bola no atraviesa bloques ni la pala.
+- [x] Al caer la bola por abajo se pierde una vida; con la tercera termina la partida.
+- [x] Al romper todos los bloques de un nivel sube el nivel y se carga el siguiente patrón con su velocidad.
+- [x] Los niveles 1 a 5 tienen 60, 40, 30, 39 y 39 bloques y los niveles 6 a 10 tienen 30, 40, 30, 40 y 56.
+- [x] El nivel 5 va a ×1,4641 y el nivel 10 a ×2,3579 la velocidad base.
+- [x] Romper el último bloque del nivel 10 abre el modal "FIN DEL JUEGO" con la puntuación final, sin pasar por el nivel 11.
+- [x] El HUD de la plataforma refleja puntuación, vidas (3 a 0) y nivel (01 a 10) en tiempo real.
+- [x] PAUSA y la tecla `P` congelan el juego (incluida la bola en `serving`); al reanudar no hay salto de movimiento.
+- [x] `Escape` no pausa el juego.
+- [x] Al terminar se abre el modal "FIN DEL JUEGO" con la puntuación final.
+- [x] GUARDAR PUNTUACIÓN inserta una fila en `scores` con `game_id = 'arkanoid'` y el modal muestra `#NN`.
+- [x] "JUGAR DE NUEVO" reinicia con puntuación 0, 3 vidas y nivel 1, y abre una sesión nueva.
+- [x] `startGameSession('arkanoid')` devuelve `sessionId`.
+- [x] `execute_sql` muestra la fila `arkanoid` con `max_score_per_second = 1200`.
+- [x] `list_tables` muestra RLS activo y `get_advisors` no reporta problemas nuevos.
+- [x] `/hall` muestra la pestaña ARKANOID con estado vacío "SÉ EL PRIMERO" si no hay marcas, y las pestañas de Asteroides y Tetris siguen funcionando.
+- [x] Tarjeta y ficha muestran la mejor marca y las partidas reales de Arkanoid (0 sin marcas).
+- [x] La biblioteca `/games` ofrece el filtro ARCADE y muestra solo ARKANOID en él.
+- [x] Con las flechas y `Espacio` la página no hace scroll durante la partida.
+- [x] Al salir de `/games/arkanoid/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad).
+- [x] A 375px el canvas ocupa el ancho del marco, sin scroll horizontal, y los botones ◀ ▶ y LANZAR controlan la pala y el saque.
+- [x] `/games/asteroides/play`, `/games/tetris/play` y las rutas de SPEC 01 a 07 siguen funcionando.
 
 ## Decisiones tomadas y descartadas
 
