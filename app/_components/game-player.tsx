@@ -15,6 +15,11 @@ import {
   AsteroidesTouchControls,
 } from "./games/asteroides-game";
 import {
+  ArkanoidControlsHint,
+  ArkanoidGame,
+  ArkanoidTouchControls,
+} from "./games/arkanoid-game";
+import {
   TetrisControlsHint,
   TetrisGame,
   TetrisTouchControls,
@@ -52,6 +57,11 @@ const REAL_GAMES: Record<
     Controls: TetrisControlsHint,
     TouchControls: TetrisTouchControls,
     initialLives: 1, // evita ver 3 corazones antes del primer onStats
+  },
+  arkanoid: {
+    Component: ArkanoidGame,
+    Controls: ArkanoidControlsHint,
+    TouchControls: ArkanoidTouchControls,
   },
 };
 
