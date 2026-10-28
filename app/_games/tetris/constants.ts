@@ -8,7 +8,7 @@ export const BLOCK = 30;
 export const BOARD_X = 250; // tablero centrado: (800 − 300) / 2
 
 // Columna derecha, centrada entre el tablero y el borde del canvas y alineada
-// abajo con él: puntuación y nivel arriba, caja SIGUIENTE de 4×4 celdas debajo.
+// abajo con él: nivel, líneas y puntuación arriba, caja SIGUIENTE de 4×4 celdas debajo.
 export const NEXT_X = 615;
 export const NEXT_Y = 480; // H − 4 × BLOCK
 

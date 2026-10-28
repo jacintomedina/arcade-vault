@@ -716,6 +716,9 @@ a { color: inherit; text-decoration: none; }
   font-size: 8px;
   color: var(--ink-faint);
   letter-spacing: 0.16em;
+  user-select: none; -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .crt-bottom .led {
   display: inline-flex; align-items: center; gap: 6px;
@@ -1001,7 +1004,12 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 24px;
   align-items: end;
 }
-@media (max-width: 720px) { .podium { grid-template-columns: 1fr; } }
+@media (max-width: 720px) {
+  .podium { grid-template-columns: 1fr; }
+  .podium-slot.gold { order: 1; }
+  .podium-slot.silver { order: 2; }
+  .podium-slot.bronze { order: 3; }
+}
 .podium-slot {
   position: relative;
   border: 1px solid var(--line);
