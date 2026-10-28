@@ -153,35 +153,35 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` termina sin errores.
-- [ ] `npm run build` termina sin errores ni advertencias de Cache Components.
-- [ ] `/games` muestra la tarjeta SNAKE con su portada `cover-snake`, y Asteroides, Tetris y Arkanoid siguen igual.
-- [ ] `/games/snake` muestra la ficha y su botón de jugar lleva a `/games/snake/play`.
-- [ ] `/games/snake/play` muestra un tablero de 20×15 celdas, una serpiente de 3 segmentos, una fruta, y ni HUD ni texto de fin pintados en el canvas.
-- [ ] El spritesheet se carga desde `/games/snake/fruits.png`; si la petición falla, la fruta se dibuja como círculo y el juego sigue siendo jugable.
-- [ ] La serpiente no se mueve hasta la primera pulsación de dirección.
-- [ ] `←` `→` `↑` `↓` y `A` `D` `W` `S` giran la serpiente.
-- [ ] Un giro de 180° sobre sí misma se ignora.
-- [ ] Dos giros pulsados dentro del mismo tick se aplican en ticks consecutivos.
-- [ ] La serpiente que sale por un borde reaparece por el opuesto, sin morir.
-- [ ] Comer una fruta suma exactamente 10 puntos y alarga la serpiente 1 segmento.
-- [ ] La fruta nueva nunca aparece sobre la serpiente y es una de las 22 del atlas.
-- [ ] El nivel sube cada 5 frutas y se queda en 9. La velocidad pasa de 8 casillas/s (nivel 1) a 16 casillas/s (nivel 9).
-- [ ] Chocar con el propio cuerpo inicia el parpadeo de 600 ms y luego abre el modal "FIN DEL JUEGO".
-- [ ] Llenar las 300 celdas termina la partida con `onGameOver(score)`.
-- [ ] El HUD de la plataforma refleja puntuación, nivel (01 a 09) y una sola vida en tiempo real, sin enseñar 3 corazones al empezar.
-- [ ] PAUSA y la tecla `P` congelan el juego; al reanudar no hay salto de movimiento.
-- [ ] GUARDAR PUNTUACIÓN inserta una fila en `scores` con `game_id = 'snake'` y el modal muestra `#NN`.
-- [ ] "JUGAR DE NUEVO" reinicia con puntuación 0, nivel 1 y la serpiente quieta, y abre una sesión nueva.
-- [ ] `startGameSession('snake')` devuelve `sessionId`.
-- [ ] `execute_sql` muestra la fila `snake` con `max_score_per_second = 160`.
-- [ ] `list_tables` muestra RLS activo y `get_advisors` no reporta problemas nuevos.
-- [ ] `/hall` muestra la pestaña SNAKE con estado vacío "SÉ EL PRIMERO" si no hay marcas, y las pestañas de los otros juegos siguen funcionando.
-- [ ] Tarjeta y ficha muestran la mejor marca y las partidas reales de Snake (0 sin marcas).
-- [ ] La biblioteca `/games` muestra SNAKE y ARKANOID en el filtro ARCADE.
-- [ ] Con las flechas y `Espacio` la página no hace scroll durante la partida.
-- [ ] Al salir de `/games/snake/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad).
-- [ ] A 375px el canvas ocupa el ancho del marco, sin scroll horizontal, y la cruceta controla la serpiente.
+- [x] `npm run lint` termina sin errores.
+- [x] `npm run build` termina sin errores ni advertencias de Cache Components.
+- [x] `/games` muestra la tarjeta SNAKE con su portada `cover-snake`, y Asteroides, Tetris y Arkanoid siguen igual.
+- [x] `/games/snake` muestra la ficha y su botón de jugar lleva a `/games/snake/play`.
+- [x] `/games/snake/play` muestra un tablero de 20×15 celdas, una serpiente de 3 segmentos, una fruta, y ni HUD ni texto de fin pintados en el canvas.
+- [x] El spritesheet se carga desde `/games/snake/fruits.png`; si la petición falla, la fruta se dibuja como círculo y el juego sigue siendo jugable.
+- [x] La serpiente no se mueve hasta la primera pulsación de dirección.
+- [x] `←` `→` `↑` `↓` y `A` `D` `W` `S` giran la serpiente.
+- [x] Un giro de 180° sobre sí misma se ignora.
+- [x] Dos giros pulsados dentro del mismo tick se aplican en ticks consecutivos.
+- [x] La serpiente que sale por un borde reaparece por el opuesto, sin morir.
+- [x] Comer una fruta suma exactamente 10 puntos y alarga la serpiente 1 segmento.
+- [x] La fruta nueva nunca aparece sobre la serpiente y es una de las 22 del atlas.
+- [x] El nivel sube cada 5 frutas y se queda en 9. La velocidad pasa de 8 casillas/s (nivel 1) a 16 casillas/s (nivel 9).
+- [x] Chocar con el propio cuerpo inicia el parpadeo de 600 ms y luego abre el modal "FIN DEL JUEGO".
+- [x] Llenar las 300 celdas termina la partida con `onGameOver(score)`.
+- [x] El HUD de la plataforma refleja puntuación, nivel (01 a 09) y una sola vida en tiempo real, sin enseñar 3 corazones al empezar.
+- [x] PAUSA y la tecla `P` congelan el juego; al reanudar no hay salto de movimiento.
+- [x] GUARDAR PUNTUACIÓN inserta una fila en `scores` con `game_id = 'snake'` y el modal muestra `#NN`.
+- [x] "JUGAR DE NUEVO" reinicia con puntuación 0, nivel 1 y la serpiente quieta, y abre una sesión nueva.
+- [x] `startGameSession('snake')` devuelve `sessionId`.
+- [x] `execute_sql` muestra la fila `snake` con `max_score_per_second = 160`.
+- [x] `list_tables` muestra RLS activo y `get_advisors` no reporta problemas nuevos.
+- [x] `/hall` muestra la pestaña SNAKE con estado vacío "SÉ EL PRIMERO" si no hay marcas, y las pestañas de los otros juegos siguen funcionando.
+- [x] Tarjeta y ficha muestran la mejor marca y las partidas reales de Snake (0 sin marcas).
+- [x] La biblioteca `/games` muestra SNAKE y ARKANOID en el filtro ARCADE.
+- [x] Con las flechas y `Espacio` la página no hace scroll durante la partida.
+- [x] Al salir de `/games/snake/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad).
+- [x] A 375px el canvas ocupa el ancho del marco, sin scroll horizontal, y la cruceta controla la serpiente.
 - [ ] `/games/asteroides/play`, `/games/tetris/play`, `/games/arkanoid/play` y las rutas de SPEC 01 a 08 siguen funcionando.
 
 ## Decisiones tomadas y descartadas
