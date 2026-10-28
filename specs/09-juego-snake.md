@@ -1,6 +1,6 @@
 # SPEC 09 — Juego Snake jugable en la plataforma con leaderboard
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 05, SPEC 06, SPEC 07, SPEC 08
 > **Fecha:** 2026-10-28
 > **Objetivo:** Crear en TypeScript el juego Snake con los sprites de fruta de `references/source-assets/snake-assets/` y publicarlo como el juego `snake`, jugable en `/games/snake/play` con leaderboard real.
