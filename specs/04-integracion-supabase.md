@@ -108,13 +108,13 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
+| Riesgo                                                              | Mitigación                                                                                                                      |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | Cache Components: `cookies()` en el cliente de servidor es dinámico | Usarlo solo en Route Handler y Server Actions futuras, nunca en el render estático de páginas actuales; leer docs en el paso 1. |
-| Proxy rompe estáticos o añade latencia a todas las rutas | `matcher` que excluye estáticos e imágenes; verificar en el criterio de aceptación. |
-| Variables ausentes rompen el build | Los clientes lanzan error claro solo al ejecutarse; la ruta de diagnóstico devuelve 503, no excepción. |
-| Fuga de secretos | Solo prefijo `NEXT_PUBLIC_` para URL y clave publicable (pensadas para el cliente); la contraseña de base de datos sin prefijo. |
-| Proyecto Supabase pausado o inaccesible | Ruta de diagnóstico lo expone con 503 y mensaje genérico. |
+| Proxy rompe estáticos o añade latencia a todas las rutas            | `matcher` que excluye estáticos e imágenes; verificar en el criterio de aceptación.                                             |
+| Variables ausentes rompen el build                                  | Los clientes lanzan error claro solo al ejecutarse; la ruta de diagnóstico devuelve 503, no excepción.                          |
+| Fuga de secretos                                                    | Solo prefijo `NEXT_PUBLIC_` para URL y clave publicable (pensadas para el cliente); la contraseña de base de datos sin prefijo. |
+| Proyecto Supabase pausado o inaccesible                             | Ruta de diagnóstico lo expone con 503 y mensaje genérico.                                                                       |
 
 ## Lo que **no** está en esta spec
 

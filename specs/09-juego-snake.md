@@ -206,21 +206,21 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
-| React Strict Mode monta el efecto dos veces y duplica el bucle | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje. |
-| Módulos del motor evalúan `window`, `document` o `Image` en SSR | Nada a nivel superior; el motor y la carga del PNG se crean solo dentro de `useEffect`. |
-| `stop()` antes de terminar la carga del PNG | El motor comprueba un flag `stopped` al resolver la carga y no arranca el bucle si ya se detuvo. |
-| `Math.random()` en render rompe la hidratación | Toda la aleatoriedad vive en el motor, que arranca tras el montaje. |
-| Las flechas y `Espacio` hacen scroll | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll. |
-| `W` `A` `S` `D` chocan con otros atajos del navegador | Solo se escuchan sin `ctrl`, `meta` ni `alt`, y no cuando el foco está en un campo de texto. |
-| `dt` enorme al volver de otra pestaña o al reanudar | Tope de 0,05 s y máximo 2 ticks por frame; reinicio de `lastTime` al reanudar. |
-| Fruta nueva imposible de colocar con el tablero casi lleno | Se elige entre las celdas libres; si no queda ninguna, la partida termina como victoria. |
-| El tope de 160 pts/s apenas frena a un bot | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño. |
-| `fruits.png` pesa (3790×442) y retrasa el inicio | Se carga una vez dentro del motor; mientras tanto el estado es `loading`. Si pesa demasiado, se anota para una spec de optimización. |
-| La cruceta o `Espacio` activan un botón enfocado | `tabIndex={-1}` en los botones táctiles, como en Tetris y Arkanoid. |
-| La UI de `/hall`, `/games` o `GamePlayer` asume un número fijo de juegos | Verificar con cuatro juegos; corregir dentro de esta spec y anotarlo en Decisiones. |
-| Cambiar `REAL_GAMES` rompe otros juegos | Solo se añade una entrada; criterio de aceptación sobre los tres juegos anteriores. |
+| Riesgo                                                                   | Mitigación                                                                                                                           |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| React Strict Mode monta el efecto dos veces y duplica el bucle           | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje.             |
+| Módulos del motor evalúan `window`, `document` o `Image` en SSR          | Nada a nivel superior; el motor y la carga del PNG se crean solo dentro de `useEffect`.                                              |
+| `stop()` antes de terminar la carga del PNG                              | El motor comprueba un flag `stopped` al resolver la carga y no arranca el bucle si ya se detuvo.                                     |
+| `Math.random()` en render rompe la hidratación                           | Toda la aleatoriedad vive en el motor, que arranca tras el montaje.                                                                  |
+| Las flechas y `Espacio` hacen scroll                                     | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll.                                      |
+| `W` `A` `S` `D` chocan con otros atajos del navegador                    | Solo se escuchan sin `ctrl`, `meta` ni `alt`, y no cuando el foco está en un campo de texto.                                         |
+| `dt` enorme al volver de otra pestaña o al reanudar                      | Tope de 0,05 s y máximo 2 ticks por frame; reinicio de `lastTime` al reanudar.                                                       |
+| Fruta nueva imposible de colocar con el tablero casi lleno               | Se elige entre las celdas libres; si no queda ninguna, la partida termina como victoria.                                             |
+| El tope de 160 pts/s apenas frena a un bot                               | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño.                                         |
+| `fruits.png` pesa (3790×442) y retrasa el inicio                         | Se carga una vez dentro del motor; mientras tanto el estado es `loading`. Si pesa demasiado, se anota para una spec de optimización. |
+| La cruceta o `Espacio` activan un botón enfocado                         | `tabIndex={-1}` en los botones táctiles, como en Tetris y Arkanoid.                                                                  |
+| La UI de `/hall`, `/games` o `GamePlayer` asume un número fijo de juegos | Verificar con cuatro juegos; corregir dentro de esta spec y anotarlo en Decisiones.                                                  |
+| Cambiar `REAL_GAMES` rompe otros juegos                                  | Solo se añade una entrada; criterio de aceptación sobre los tres juegos anteriores.                                                  |
 
 ## Lo que **no** está en esta spec
 

@@ -32,8 +32,6 @@ Puntúa cada candidato de 1 a 5 en cada criterio y muestra el total:
 - **Formato**: canvas 4:3 en `.crt-screen`, una sola pantalla, sin assets pesados (portada en CSS puro `.cover-<id>`).
 - **Controles**: teclado y táctiles viables en móvil.
 - **Patrón de motor**: encaja con `onStats` / `onGameOver`, `dt` capado a 0.05 s, pausa real, sin HUD propio (lo pone la plataforma).
-- **Diversidad**: equilibrio entre `SHOOTER` / `PUZZLE` / `ARCADE` y uso de colores (`cyan`, `magenta`, `yellow`, `green`).
-- **Coste**: S / M / L, y si existe base en `references/started-games/`.
 - **Reconocible**: clásico conocido, sin problemas de marca (nombre genérico en español si hace falta).
 
 ## Reglas
@@ -45,7 +43,7 @@ Puntúa cada candidato de 1 a 5 en cada criterio y muestra el total:
 
 ## Salida
 
-1. Tabla corta con 3 candidatos y su puntuación.
+1. Tabla corta con 3 candidatos y su puntuación. Columnas: candidato, categoría, puntuación por criterio y total, con las columnas alineadas. Sin columnas de color, coste ni fecha.
 2. Recomendación única con justificación breve.
 3. Brief listo para `/add-game`: `id`, título, `cat`, `color`, descripción breve, controles (teclado y táctil), fórmula de puntuación, `max_score_per_second` propuesto con su cálculo, `initialLives`, juegos implementados cuya lógica se reutiliza, riesgos.
 
@@ -53,6 +51,6 @@ Puntúa cada candidato de 1 a 5 en cada criterio y muestra el total:
 
 - `decisions.md`: añade una entrada fechada (`YYYY-MM-DD`) con candidatos evaluados, puntuaciones, elegido, descartados y razón, y estado (`propuesto` / `aceptado` / `descartado` / `implementado`). Si el usuario acepta o descarta algo, actualiza la entrada existente.
 - `criteria.md`: añade las preferencias del usuario que aprendas (p. ej. "no quiere juegos por turnos").
-- `references/game-suggestions-todo.md`: añade una fila a la tabla por cada candidato sugerido (fecha, `id`, título, categoría, color, coste, puntuación total, estado, notas). Si el candidato ya tiene fila, actualiza su estado en lugar de duplicarla. Márcalo `implementado` cuando aparezca en `GAMES`. Este es el único archivo fuera de tu directorio de memoria donde puedes escribir.
+- `references/game-suggestions-todo.md`: añade una fila a la tabla por cada candidato sugerido. Columnas: `id`, título, categoría, puntuación total, estado, notas (sin fecha, color ni coste). Mantén las columnas alineadas y las notas en una frase de 30 caracteres como máximo, para que la fila no se parta en pantallas estrechas. Si el candidato ya tiene fila, actualiza su estado en lugar de duplicarla. Márcalo `implementado` cuando aparezca en `GAMES`. Este es el único archivo fuera de tu directorio de memoria donde puedes escribir.
 - `MEMORY.md`: índice corto con el estado del catálogo y enlaces a los demás archivos.
 - No guardes lo que ya dice el repo (código, CLAUDE.md, git). Solo decisiones y razones.
