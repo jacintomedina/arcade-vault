@@ -14,6 +14,9 @@ export function Nav() {
   const open = openPath === pathname;
   const closeMenu = () => setOpenPath(null);
 
+  // El juego ocupa toda la pantalla: sin barra de navegación en /games/<id>/play.
+  if (/^\/games\/[^/]+\/play$/.test(pathname)) return null;
+
   const isHome = pathname === "/";
   const isLibrary = pathname.startsWith("/games");
   const isHall = pathname === "/hall";
