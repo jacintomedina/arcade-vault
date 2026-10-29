@@ -1,9 +1,11 @@
 # SPEC 10 — Gamepad táctil estilo Game Boy bajo el canvas
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 05, SPEC 07, SPEC 08, SPEC 09
 > **Fecha:** 2026-10-29
 > **Revisión 1:** 2026-10-29 — carcasa más baja con el HUD cabiendo debajo, y HUD simplificado en táctil (solo PAUSA y selector de skin).
+> **Revisión 2:** 2026-10-29 — el gamepad tiene el mismo ancho que el marco CRT del canvas.
+> **Revisión 3:** 2026-10-29 — el ancho incluye el anillo exterior del marco CRT (bordes dibujados con `box-shadow`), y se corrige `allowedDevOrigins` para poder probar en el móvil por la red local.
 > **Objetivo:** Sustituir los controles táctiles propios de cada juego por un único gamepad estilo Game Boy clásico (cruceta + botones A y B, sin SELECT ni START) que se muestra bajo el canvas en pantallas táctiles, con un HUD simplificado (solo PAUSA y selector de skin) justo debajo del gamepad.
 
 ## Por qué existe esta spec
@@ -34,6 +36,11 @@ El usuario confirmó el diseño: Game Boy clásico (DMG) sin SELECT ni START, ad
 - Carcasa compacta (revisión 1): se reduce solo la altura de la carcasa; el tamaño de los botones no cambia (cruceta 52×52 px, A/B 56×56 px, mínimo 48×48 px).
   - Altura objetivo de la carcasa: unos 176 px (hoy ≈ 248 px). Se logra recortando el relleno vertical, acercando A y B entre sí en vertical y sacando la rejilla del altavoz del flujo (posición absoluta en la esquina redondeada).
   - La forma de la carcasa es rectangular con las esquinas redondeadas. Todas las esquinas tienen el mismo radio.
+- Ancho del gamepad (revisión 2): en táctil la carcasa ocupa el 100 % del ancho del marco CRT (`.crt`), alineada con sus bordes izquierdo y derecho. Se elimina el `max-width` fijo de 340 px.
+  - Se mide contra el objeto visible completo del canvas, bordes incluidos (revisión 3): la caja `.crt` más el anillo exterior de 7 px por lado que dibuja su `box-shadow` (`0 0 0 6px` + `0 0 0 7px`). Es decir, ancho de `.crt` + 14 px, con margen lateral negativo de 7 px en `.gb-pad`. No se mide contra la caja `.crt` sola ni contra el `<canvas>` interior.
+  - Cruceta pegada al lado izquierdo y A/B al derecho (`justify-content: space-between`), con el relleno horizontal de la carcasa; el hueco central crece con el ancho.
+  - Los botones no cambian de tamaño (52 y 56 px) ni la altura de la carcasa (≈ 176 px).
+  - Mismo ancho en 375 px y en 768 px, donde el marco CRT es más ancho que en móvil.
   - El HUD queda inmediatamente debajo de la carcasa, con el menor margen posible entre ambos.
 - HUD simplificado solo en táctil (revisión 1): dentro de `@media (pointer: coarse)` el HUD muestra únicamente el botón PAUSA/REANUDAR y el selector de skin, en una sola fila.
   - Se ocultan con CSS (sin cambiar el JSX ni la lógica): JUGADOR, PUNTUACIÓN, VIDAS, NIVEL, FIN y SALIR.
@@ -104,6 +111,8 @@ Las claves de `press` son las que cada motor ya acepta en su `input.ts`. Antes d
 7. Pulido: 375 px y 768 px, `npx tsc --noEmit`, `npm run lint` y `npm run build` limpios.
 8. (Revisión 1) Carcasa compacta: en `.gb-*` reducir relleno vertical, acercar A y B en vertical (contenedor `.gb-actions` más bajo, botones iguales) y pasar `.gb-speaker` a posición absoluta sin ocupar alto. Medir la carcasa a 375 px: objetivo ≈ 176 px de alto. Botones sin cambios de tamaño.
 9. (Revisión 1) HUD simplificado en táctil: dentro de `@media (pointer: coarse)` ocultar `.hud-stat` (jugador, puntuación, vidas, nivel) y los botones FIN y SALIR del HUD; dejar PAUSA y el selector de skin en una fila; ajustar el margen entre carcasa y HUD. Verificar escritorio sin cambios y que a 375×667 el HUD queda visible bajo la carcasa (ver criterios).
+10. (Revisión 2) Ancho y esquinas del gamepad: en `.gb-pad` quitar `max-width: 340px` y el centrado por `margin: auto`, dejar `width: 100%` con el mismo ancho que `.crt`, y sustituir el radio asimétrico (`16px 16px 64px 16px`) por un único `border-radius: 16px` en las cuatro esquinas. Verificar a 375 px y 768 px que los bordes de `.gb-pad` y `.crt` coinciden, sin scroll horizontal, con los botones intactos y con el altavoz sin solaparse con A.
+11. (Revisión 3) Ancho con bordes y prueba en móvil: en `.gb-pad` usar `width: calc(100% + 14px)` y `margin: 14px -7px 0`; verificar a 375 px y 768 px que sus bordes coinciden con el anillo exterior de `.crt` y que no hay scroll horizontal. En `next.config.ts` cambiar `allowedDevOrigins: ["192.168.1.36:3000"]` por `["192.168.1.36"]`, reiniciar `npm run dev` y comprobar desde la IP de la red local que la página hidrata.
 
 Cada paso deja la app arrancando con `npm run dev`.
 
@@ -121,7 +130,10 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [ ] Soltar o cancelar el toque libera el botón: la nave no sigue girando ni la pala moviéndose.
 - [ ] Pulsar el gamepad no hace scroll, zoom ni abre menú contextual, y los botones no toman el foco.
 - [ ] A 375 px el gamepad cabe sin scroll horizontal y cada botón mide al menos 48×48 px (cruceta 52×52 px y A/B 56×56 px, sin cambios).
-- [ ] A 375 px la carcasa del gamepad mide como máximo 176 px de alto y su aspecto de Game Boy se mantiene (esquina inferior derecha redondeada, altavoz visible).
+- [ ] A 375 px la carcasa del gamepad mide como máximo 176 px de alto y su aspecto de Game Boy se mantiene (rectángulo con las cuatro esquinas del mismo radio, altavoz visible).
+- [ ] En táctil el gamepad tiene el mismo ancho visible que el marco CRT, bordes incluidos: el borde izquierdo de `.gb-pad` coincide con el borde exterior izquierdo del anillo del marco (`.crt` − 7 px), y lo mismo en el derecho (±1 px), a 375 px y a 768 px, sin scroll horizontal.
+- [ ] En el móvil real (servidor de desarrollo por IP de la red local) la página hidrata y los cuatro juegos responden al gamepad, a PAUSA y al selector de skin.
+- [ ] Con el gamepad a todo el ancho, cruceta a la izquierda y A/B a la derecha siguen midiendo 52×52 y 56×56 px.
 - [ ] En táctil el HUD queda inmediatamente debajo de la carcasa y se ve completo, sin scroll, a 375×812. A 375×667 se ve al menos su fila entera con un scroll mínimo (medido y anotado al verificar).
 - [ ] En táctil el HUD muestra solo PAUSA/REANUDAR y el selector de skin, en una fila. No aparecen JUGADOR, PUNTUACIÓN, VIDAS, NIVEL, FIN ni SALIR.
 - [ ] En escritorio el HUD sigue completo (jugador, puntuación, vidas, nivel, skin, PAUSA, FIN y SALIR) y encima del canvas.
@@ -144,6 +156,8 @@ Cada paso deja la app arrancando con `npm run dev`.
 - **Sí:** prefijo `.gb-` para los estilos nuevos. **No:** reutilizar `.tt-*`.
 - **Sí:** el gamepad es independiente de las skins; no cambia con ellas.
 - **Sí (revisión 1):** carcasa más baja manteniendo el tamaño de los botones, para que el HUD quepa debajo. **No:** encoger los botones (el mínimo táctil de 48 px manda).
+- **Sí (revisión 2):** el gamepad ocupa el ancho del marco CRT, para alinear visualmente canvas y mando. **No:** mantener el ancho fijo de 340 px centrado ni medirlo contra el `<canvas>` interior. Revisión 3: el ancho cuenta el anillo exterior del marco, no solo la caja `.crt`.
+- **Sí (revisión 3):** `allowedDevOrigins` solo con el hostname (`192.168.1.36`), sin puerto, como exige Next. Con el puerto, el dev server bloquea los recursos de desarrollo desde el móvil y la página no hidrata. **No:** dejar la entrada con `:3000`.
 - **Sí (revisión 1):** HUD táctil reducido a PAUSA y selector de skin, ocultando el resto con CSS en `pointer: coarse`. **No:** cambiar el JSX ni la lógica del HUD, ni tocar el HUD de escritorio.
 - **Sí (revisión 1):** aceptar que en táctil no se ven puntuación, vidas ni nivel durante la partida, y que no hay FIN ni SALIR. La puntuación final sigue saliendo en el modal de fin. **No:** reubicar esos datos en esta spec (queda para una spec propia si hace falta).
 
@@ -161,6 +175,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 | Las claves de `press` difieren de las asumidas | Paso 1 las confirma en cada `*-game.tsx` antes de tocar nada. |
 | La cruceta (156 px) fija un mínimo de alto: la carcasa no baja mucho de ≈ 176 px | Se recorta relleno y se saca el altavoz del flujo; si a 375×667 el HUD aún no cabe entero, se anota y se decide en otra revisión (p. ej. acotar el canvas). |
 | Sin puntuación, vidas ni FIN/SALIR en táctil, el jugador no ve su progreso ni puede abandonar | Aceptado por el usuario. La puntuación final aparece en el modal. Si molesta, spec propia. |
+| A 768 px el gamepad a todo el ancho (≈ 578 px) deja un hueco central grande entre cruceta y A/B | Aceptado: es la consecuencia de igualar el ancho. Si queda mal, spec propia (p. ej. limitar el ancho en tablet). |
 | Ocultar `.hud-stat` con CSS deja huecos o desalinea PAUSA y el selector | Verificar la fila a 375 px y 768 px en los cuatro juegos. |
 
 ## Lo que **no** está en esta spec

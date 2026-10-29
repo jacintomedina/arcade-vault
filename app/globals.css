@@ -1974,12 +1974,11 @@ a { color: inherit; text-decoration: none; }
   .gb-pad {
     display: block;
     position: relative;
-    width: 100%;
-    max-width: 340px;
-    margin: 14px auto 0;
-    padding: 22px 22px 54px;
-    /* esquina inferior derecha muy redondeada, como la carcasa DMG */
-    border-radius: 16px 16px 64px 16px;
+    /* ancho del marco .crt con su anillo exterior de 7px (box-shadow) */
+    width: calc(100% + 14px);
+    margin: 14px -7px 0;
+    padding: 9px 22px;
+    border-radius: 16px;
     background: linear-gradient(160deg, #1f1f2d, #14141e 70%);
     border: 1px solid var(--line);
     box-shadow:
@@ -2032,7 +2031,7 @@ a { color: inherit; text-decoration: none; }
 /* A y B en diagonal: B abajo a la izquierda, A arriba a la derecha */
 .gb-actions {
   position: relative;
-  width: 124px; height: 104px;
+  width: 124px; height: 84px;
 }
 .gb-act {
   position: absolute;
@@ -2055,7 +2054,7 @@ a { color: inherit; text-decoration: none; }
 /* rejilla del altavoz, inclinada en la esquina redondeada */
 .gb-speaker {
   position: absolute;
-  right: 26px; bottom: 14px;
+  right: 24px; bottom: 12px;
   display: flex; gap: 7px;
   transform: rotate(-30deg);
   pointer-events: none;
@@ -2070,5 +2069,13 @@ a { color: inherit; text-decoration: none; }
 /* táctil: orden canvas, gamepad, HUD */
 @media (pointer: coarse) {
   .av-player { display: flex; flex-direction: column; }
-  .player-hud { order: 3; margin: 14px 0 0; }
+  .player-hud { order: 3; margin: 10px 0 0; padding: 10px 14px; }
+  /* HUD simplificado: solo PAUSA y skin */
+  .player-hud > div:first-child { display: none !important; } /* tiene display inline */
+  .hud-actions .btn.magenta,
+  .hud-actions .btn.ghost { display: none; }
+  .hud-actions { width: 100%; flex-wrap: nowrap; }
+  .hud-actions .skin-select { flex: 1 1 auto; }
+  .hud-actions .skin-select select { flex: 1; min-height: 44px; }
+  .hud-actions .btn.yellow { flex: 0 0 auto; min-height: 44px; }
 }
