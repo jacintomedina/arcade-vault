@@ -87,3 +87,10 @@ Next 16.4.2 + React 19.3. Breaking changes vs. training data. Per `AGENTS.md`, r
 
 - `game-planner` — project subagent (`.claude/agents/game-planner.md`) that decides which game to add next and returns a brief for `/add-game`. Persistent memory (`memory: project`) in `.claude/agent-memory/game-planner/` (`MEMORY.md`, `decisions.md`, `criteria.md`), versioned; it logs every proposal, acceptance and rejection.
 - `game-jam` — project subagent (`.claude/agents/game-jam.md`). Input: a game name or short description. Writes 3 alternative specs (A faithful, B twist, C intense) in `specs/game-jam.agent/<game-id>/` for user review, modeled on SPEC 07/08/09. Autonomous (no questions), writes only there, never implements. The chosen variant is renumbered to `specs/NN-juego-<id>.md` and goes to `/spec-impl` or `/add-game`.
+- `skin-designer` — project subagent (`.claude/agents/skin-designer.md`). Input: id of an implemented game (`asteroides`, `tetris`, `arkanoid`, `snake`). Adds 3 visual skins: `clasico` (default, identical to current look), `neon`, `retro`. Autonomous (no questions). Stops if the id is not in `GAMES`/`REAL_GAMES` or `app/_games/<id>/skins.ts` already exists. What it does:
+  - Creates `app/_games/<id>/skins.ts` (`SkinId`, `SKIN_IDS`, `DEFAULT_SKIN`, `Skin`, `SKINS`); the engine reads colors from the active skin and exposes `setSkin(skin)` (no restart, no logic/`dt`/score changes).
+  - Extends `GameComponentProps` with optional `skin?: string`; unknown value falls back to `DEFAULT_SKIN`.
+  - Adds an optional `skins` field to the `REAL_GAMES` entry (e.g. `skins: SKIN_IDS`); `game-player.tsx` shows a CRT-style dropdown ("Clásico", "Neón", "Retro") only for games that declare it.
+  - Persists the choice in `localStorage` under `av_skin_<id>`, read once after mount. Never stores scores.
+  - New CSS only with `.skin-` prefix. Never touches `scores.ts`, `app/_lib/`, `supabase/`, the `games` row, or other games.
+  - Verifies with `npx tsc --noEmit` and `npm run lint`; no build/dev. Done without a spec — run `/spec` afterwards to document it.
