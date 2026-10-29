@@ -82,3 +82,7 @@ Next 16.4.2 + React 19.3. Breaking changes vs. training data. Per `AGENTS.md`, r
 - `/add-game <carpeta de references/started-games | descripción>` — project skill (`.claude/skills/add-game/`) that turns a game into a real platform game: spec first, then engine, component, `REAL_GAMES` entry, Supabase migration and leaderboard. Support files: `integration-checklist.md`, `porting-guide.md`, `spec-template.md`, `migration-template.sql`.
 - `/spec` and `/spec-impl` — the spec-driven workflow. `specs/.spec-config.yml` has `AutoCreateBranch: true`, so `/spec-impl` creates `spec-NN-slug` on its own.
 - Always use `/frontend-design` to design the user interface.
+
+# Agents
+
+- `game-planner` — project subagent (`.claude/agents/game-planner.md`) that decides which game to add next and returns a brief for `/add-game`. Persistent memory (`memory: project`) in `.claude/agent-memory/game-planner/` (`MEMORY.md`, `decisions.md`, `criteria.md`), versioned; it logs every proposal, acceptance and rejection.
