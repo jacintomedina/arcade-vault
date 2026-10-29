@@ -3,7 +3,8 @@
 > **Estado:** Aprobado
 > **Depende de:** SPEC 05, SPEC 07, SPEC 08, SPEC 09
 > **Fecha:** 2026-10-29
-> **Objetivo:** Sustituir los controles táctiles propios de cada juego por un único gamepad estilo Game Boy clásico (cruceta + botones A y B, sin SELECT ni START) que se muestra bajo el canvas en pantallas táctiles, con el HUD debajo del gamepad.
+> **Revisión 1:** 2026-10-29 — carcasa más baja con el HUD cabiendo debajo, y HUD simplificado en táctil (solo PAUSA y selector de skin).
+> **Objetivo:** Sustituir los controles táctiles propios de cada juego por un único gamepad estilo Game Boy clásico (cruceta + botones A y B, sin SELECT ni START) que se muestra bajo el canvas en pantallas táctiles, con un HUD simplificado (solo PAUSA y selector de skin) justo debajo del gamepad.
 
 ## Por qué existe esta spec
 
@@ -30,6 +31,15 @@ El usuario confirmó el diseño: Game Boy clásico (DMG) sin SELECT ni START, ad
   - Los botones sin función se dibujan atenuados y desactivados (`aria-disabled`).
 - Visibilidad solo con `@media (pointer: coarse)`, igual que `.touch-controls` actual. En escritorio el gamepad no se renderiza visualmente y el HUD sigue arriba.
 - Reordenación solo en táctil: `.av-player` pasa a columna y `.player-hud` va debajo del gamepad (CSS `order`). En escritorio el orden no cambia.
+- Carcasa compacta (revisión 1): se reduce solo la altura de la carcasa; el tamaño de los botones no cambia (cruceta 52×52 px, A/B 56×56 px, mínimo 48×48 px).
+  - Altura objetivo de la carcasa: unos 176 px (hoy ≈ 248 px). Se logra recortando el relleno vertical, acercando A y B entre sí en vertical y sacando la rejilla del altavoz del flujo (posición absoluta en la esquina redondeada).
+  - La forma de la carcasa es rectangular con las esquinas redondeadas. Todas las esquinas tienen el mismo radio.
+  - El HUD queda inmediatamente debajo de la carcasa, con el menor margen posible entre ambos.
+- HUD simplificado solo en táctil (revisión 1): dentro de `@media (pointer: coarse)` el HUD muestra únicamente el botón PAUSA/REANUDAR y el selector de skin, en una sola fila.
+  - Se ocultan con CSS (sin cambiar el JSX ni la lógica): JUGADOR, PUNTUACIÓN, VIDAS, NIVEL, FIN y SALIR.
+  - Escritorio no cambia: el HUD completo sigue encima del canvas.
+  - Los juegos siguen emitiendo `onStats` y el modal de fin sigue mostrando la puntuación final; solo cambia qué se ve en el HUD táctil.
+  - Sin FIN ni SALIR en táctil, la partida termina al perder (`onGameOver`); para salir se usa el menú de navegación.
 - Eliminar los `*TouchControls` de los cuatro juegos y sus estilos (`.joystick`, `.joystick-knob`, `.fire-btn`, `.tt-*`, `.sn-*`, `.ak-launch`, `.snake-touch`, `.tetris-touch`) una vez migrados.
 - Asteroides: el motor ya acepta `left`, `right`, `thrust` y `fire` por `press`. Se elimina el uso de `aim` por joystick desde la UI; `GameInput.aim` se mantiene en el contrato sin uso táctil.
 - Estilos del gamepad en `app/globals.css` con prefijo `.gb-` (usar `/frontend-design`).
@@ -43,7 +53,9 @@ El usuario confirmó el diseño: Game Boy clásico (DMG) sin SELECT ni START, ad
 - Orientación horizontal con gamepad a los lados del canvas.
 - Gamepad físico (Gamepad API) y remapeo de teclas.
 - Mover el HUD bajo el canvas en escritorio.
-- Cambiar la lógica, el HUD, la pausa, el modal o la puntuación de cualquier juego.
+- Cambiar la lógica, la pausa, el modal o la puntuación de cualquier juego. El HUD solo cambia en lo que dice la revisión 1 (visibilidad en táctil).
+- Mostrar puntuación, vidas o nivel en otro lugar de la pantalla táctil.
+- Reubicar FIN y SALIR en táctil (por ejemplo, en un menú).
 - Nuevos botones de acción por juego (hiperespacio, etc.).
 - Tests automatizados.
 
@@ -90,6 +102,8 @@ Las claves de `press` son las que cada motor ya acepta en su `input.ts`. Antes d
 5. Reordenar en táctil: `.av-player` en columna con `.player-hud { order: 3 }` dentro de `@media (pointer: coarse)`. Verificar que escritorio no cambia.
 6. Borrar `TouchControls` del tipo de `REAL_GAMES`, los `*TouchControls` de los cuatro componentes, `TouchControlsProps` y los estilos sin uso.
 7. Pulido: 375 px y 768 px, `npx tsc --noEmit`, `npm run lint` y `npm run build` limpios.
+8. (Revisión 1) Carcasa compacta: en `.gb-*` reducir relleno vertical, acercar A y B en vertical (contenedor `.gb-actions` más bajo, botones iguales) y pasar `.gb-speaker` a posición absoluta sin ocupar alto. Medir la carcasa a 375 px: objetivo ≈ 176 px de alto. Botones sin cambios de tamaño.
+9. (Revisión 1) HUD simplificado en táctil: dentro de `@media (pointer: coarse)` ocultar `.hud-stat` (jugador, puntuación, vidas, nivel) y los botones FIN y SALIR del HUD; dejar PAUSA y el selector de skin en una fila; ajustar el margen entre carcasa y HUD. Verificar escritorio sin cambios y que a 375×667 el HUD queda visible bajo la carcasa (ver criterios).
 
 Cada paso deja la app arrancando con `npm run dev`.
 
@@ -106,8 +120,12 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [ ] Se pueden pulsar a la vez una dirección y A o B.
 - [ ] Soltar o cancelar el toque libera el botón: la nave no sigue girando ni la pala moviéndose.
 - [ ] Pulsar el gamepad no hace scroll, zoom ni abre menú contextual, y los botones no toman el foco.
-- [ ] A 375 px el gamepad cabe sin scroll horizontal y cada botón mide al menos 48×48 px.
-- [ ] Los botones PAUSA, FIN y SALIR del HUD siguen funcionando bajo el gamepad.
+- [ ] A 375 px el gamepad cabe sin scroll horizontal y cada botón mide al menos 48×48 px (cruceta 52×52 px y A/B 56×56 px, sin cambios).
+- [ ] A 375 px la carcasa del gamepad mide como máximo 176 px de alto y su aspecto de Game Boy se mantiene (esquina inferior derecha redondeada, altavoz visible).
+- [ ] En táctil el HUD queda inmediatamente debajo de la carcasa y se ve completo, sin scroll, a 375×812. A 375×667 se ve al menos su fila entera con un scroll mínimo (medido y anotado al verificar).
+- [ ] En táctil el HUD muestra solo PAUSA/REANUDAR y el selector de skin, en una fila. No aparecen JUGADOR, PUNTUACIÓN, VIDAS, NIVEL, FIN ni SALIR.
+- [ ] En escritorio el HUD sigue completo (jugador, puntuación, vidas, nivel, skin, PAUSA, FIN y SALIR) y encima del canvas.
+- [ ] El botón PAUSA/REANUDAR y el selector de skin siguen funcionando bajo el gamepad, y el cambio de skin se aplica a la partida.
 - [ ] Con el juego en pausa o terminado, el gamepad no altera la partida.
 - [ ] No quedan `*TouchControls`, `TouchControlsProps` ni estilos `.joystick`, `.fire-btn`, `.tt-*`, `.sn-*`, `.ak-launch` sin uso.
 - [ ] Teclado en escritorio, skins, pausa con `P`, modal de fin y guardado de puntuación siguen funcionando en los cuatro juegos.
@@ -125,6 +143,9 @@ Cada paso deja la app arrancando con `npm run dev`.
 - **Sí:** reemplazar `TouchControls` por `pad` en `REAL_GAMES`. **No:** mantener dos mecanismos en paralelo tras la migración.
 - **Sí:** prefijo `.gb-` para los estilos nuevos. **No:** reutilizar `.tt-*`.
 - **Sí:** el gamepad es independiente de las skins; no cambia con ellas.
+- **Sí (revisión 1):** carcasa más baja manteniendo el tamaño de los botones, para que el HUD quepa debajo. **No:** encoger los botones (el mínimo táctil de 48 px manda).
+- **Sí (revisión 1):** HUD táctil reducido a PAUSA y selector de skin, ocultando el resto con CSS en `pointer: coarse`. **No:** cambiar el JSX ni la lógica del HUD, ni tocar el HUD de escritorio.
+- **Sí (revisión 1):** aceptar que en táctil no se ven puntuación, vidas ni nivel durante la partida, y que no hay FIN ni SALIR. La puntuación final sigue saliendo en el modal de fin. **No:** reubicar esos datos en esta spec (queda para una spec propia si hace falta).
 
 ## Riesgos
 
@@ -138,6 +159,9 @@ Cada paso deja la app arrancando con `npm run dev`.
 | Reordenar con `order` rompe el foco o la lectura de pantalla | Verificar el orden de tabulación; el HUD sigue siendo un bloque contiguo. |
 | Borrar estilos `.tt-*` rompe algo en escritorio | Buscar usos con `grep` antes de borrar y verificar los cuatro juegos. |
 | Las claves de `press` difieren de las asumidas | Paso 1 las confirma en cada `*-game.tsx` antes de tocar nada. |
+| La cruceta (156 px) fija un mínimo de alto: la carcasa no baja mucho de ≈ 176 px | Se recorta relleno y se saca el altavoz del flujo; si a 375×667 el HUD aún no cabe entero, se anota y se decide en otra revisión (p. ej. acotar el canvas). |
+| Sin puntuación, vidas ni FIN/SALIR en táctil, el jugador no ve su progreso ni puede abandonar | Aceptado por el usuario. La puntuación final aparece en el modal. Si molesta, spec propia. |
+| Ocultar `.hud-stat` con CSS deja huecos o desalinea PAUSA y el selector | Verificar la fila a 375 px y 768 px en los cuatro juegos. |
 
 ## Lo que **no** está en esta spec
 
@@ -146,6 +170,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - Orientación horizontal con gamepad lateral.
 - Gamepad físico y teclas remapeables.
 - HUD bajo el canvas en escritorio.
+- Puntuación, vidas y nivel visibles en táctil, y FIN/SALIR reubicados.
 - Nuevas acciones por juego.
 - Tests automatizados.
 
