@@ -1,4 +1,5 @@
 import { CELL, COLS, ROWS, SPRITE_URL } from "./constants";
+import type { Skin } from "./skins";
 
 export interface Cell {
 	col: number;
@@ -56,17 +57,26 @@ export function loadSprites(): Promise<HTMLImageElement> {
 	});
 }
 
-const BOARD_LIGHT = "#aad751";
-const BOARD_DARK = "#a2d149";
-const SNAKE_BODY = "#4876ec";
-const SNAKE_HEAD = "#3a62d0";
-
-export function drawBoard(ctx: CanvasRenderingContext2D): void {
+export function drawBoard(ctx: CanvasRenderingContext2D, skin: Skin): void {
 	for (let row = 0; row < ROWS; row++) {
 		for (let col = 0; col < COLS; col++) {
-			ctx.fillStyle = (col + row) % 2 === 0 ? BOARD_LIGHT : BOARD_DARK;
+			ctx.fillStyle = (col + row) % 2 === 0 ? skin.boardLight : skin.boardDark;
 			ctx.fillRect(col * CELL, row * CELL, CELL, CELL);
 		}
+	}
+	if (skin.gridLine) {
+		ctx.strokeStyle = skin.gridLine;
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+		for (let col = 0; col <= COLS; col++) {
+			ctx.moveTo(col * CELL + 0.5, 0);
+			ctx.lineTo(col * CELL + 0.5, ROWS * CELL);
+		}
+		for (let row = 0; row <= ROWS; row++) {
+			ctx.moveTo(0, row * CELL + 0.5);
+			ctx.lineTo(COLS * CELL, row * CELL + 0.5);
+		}
+		ctx.stroke();
 	}
 }
 
@@ -85,15 +95,22 @@ function roundedRect(
 
 // body[0] es la cabeza. Los segmentos se unen rellenando el hueco con el vecino
 // (salvo al cruzar un borde, donde el vecino queda al otro lado del tablero).
-export function drawSnake(ctx: CanvasRenderingContext2D, body: readonly Cell[], dir: Direction): void {
-	const pad = 3;
+export function drawSnake(
+	ctx: CanvasRenderingContext2D,
+	skin: Skin,
+	body: readonly Cell[],
+	dir: Direction,
+): void {
+	const pad = skin.snakePad;
+	ctx.shadowColor = skin.snakeBody;
+	ctx.shadowBlur = skin.glow;
 	const size = CELL - pad * 2;
-	ctx.fillStyle = SNAKE_BODY;
+	ctx.fillStyle = skin.snakeBody;
 	for (let i = body.length - 1; i >= 0; i--) {
 		const c = body[i];
 		const x = c.col * CELL + pad;
 		const y = c.row * CELL + pad;
-		roundedRect(ctx, x, y, size, size, 8);
+		roundedRect(ctx, x, y, size, size, skin.bodyRadius);
 		const next = body[i - 1];
 		if (!next) continue;
 		const dc = next.col - c.col;
@@ -107,8 +124,11 @@ export function drawSnake(ctx: CanvasRenderingContext2D, body: readonly Cell[], 
 	const head = body[0];
 	const hx = head.col * CELL + CELL / 2;
 	const hy = head.row * CELL + CELL / 2;
-	ctx.fillStyle = SNAKE_HEAD;
-	roundedRect(ctx, head.col * CELL + pad, head.row * CELL + pad, size, size, 10);
+	ctx.shadowColor = skin.snakeHead;
+	ctx.fillStyle = skin.snakeHead;
+	roundedRect(ctx, head.col * CELL + pad, head.row * CELL + pad, size, size, skin.headRadius);
+	ctx.shadowBlur = 0;
+	ctx.shadowColor = "transparent";
 
 	// Ojos en el lado hacia el que mira.
 	const horizontal = dir === "left" || dir === "right";
@@ -117,11 +137,11 @@ export function drawSnake(ctx: CanvasRenderingContext2D, body: readonly Cell[], 
 	for (const s of [-1, 1]) {
 		const ex = hx + fx + (horizontal ? 0 : s * 7);
 		const ey = hy + fy + (horizontal ? s * 7 : 0);
-		ctx.fillStyle = "#fff";
+		ctx.fillStyle = skin.eyeWhite;
 		ctx.beginPath();
 		ctx.arc(ex, ey, 5, 0, Math.PI * 2);
 		ctx.fill();
-		ctx.fillStyle = "#111";
+		ctx.fillStyle = skin.eyePupil;
 		ctx.beginPath();
 		ctx.arc(ex + fx / 3, ey + fy / 3, 2.5, 0, Math.PI * 2);
 		ctx.fill();
@@ -131,6 +151,7 @@ export function drawSnake(ctx: CanvasRenderingContext2D, body: readonly Cell[], 
 // Dibuja la fruta dentro de su celda, sin deformar y centrada. `scale` anima el pulso al comerla.
 export function drawFruit(
 	ctx: CanvasRenderingContext2D,
+	skin: Skin,
 	img: HTMLImageElement | null,
 	fruit: Fruit,
 	scale = 1,
@@ -139,15 +160,25 @@ export function drawFruit(
 	const cx = fruit.cell.col * CELL + CELL / 2;
 	const cy = fruit.cell.row * CELL + CELL / 2;
 	const box = (CELL - 4) * scale;
+	if (skin.fruitStyle === "block") {
+		const s = box * 0.7;
+		ctx.fillStyle = skin.fruitBlock;
+		ctx.fillRect(cx - s / 2, cy - s / 2, s, s);
+		return;
+	}
+	ctx.shadowColor = skin.fruitGlow;
+	ctx.shadowBlur = skin.glow;
 	if (!img) {
 		ctx.fillStyle = sprite.color;
 		ctx.beginPath();
 		ctx.arc(cx, cy, box / 2, 0, Math.PI * 2);
 		ctx.fill();
-		return;
+	} else {
+		const k = Math.min(box / sprite.w, box / sprite.h);
+		const dw = sprite.w * k;
+		const dh = sprite.h * k;
+		ctx.drawImage(img, sprite.x, sprite.y, sprite.w, sprite.h, cx - dw / 2, cy - dh / 2, dw, dh);
 	}
-	const k = Math.min(box / sprite.w, box / sprite.h);
-	const dw = sprite.w * k;
-	const dh = sprite.h * k;
-	ctx.drawImage(img, sprite.x, sprite.y, sprite.w, sprite.h, cx - dw / 2, cy - dh / 2, dw, dh);
+	ctx.shadowBlur = 0;
+	ctx.shadowColor = "transparent";
 }

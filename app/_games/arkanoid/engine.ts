@@ -27,18 +27,19 @@ import {
 	type Explosion,
 	type Paddle,
 	EXPLOSION_FRAMES,
-	FALLBACK_COLORS,
 	drawFrame,
 	drawSprite,
 	loadSpritesheet,
 } from "./entities";
 import { createInput, type InputKey } from "./input";
 import { LEVELS, speedOf } from "./levels";
+import { DEFAULT_SKIN, SKINS, type SkinId } from "./skins";
 
 export interface EngineOptions {
 	canvas: HTMLCanvasElement;
 	onStats: (s: GameStats) => void;
 	onGameOver: (finalScore: number) => void;
+	skin?: SkinId;
 }
 
 export interface Engine {
@@ -46,6 +47,7 @@ export interface Engine {
 	stop(): void; // cancela rAF y quita listeners
 	setPaused(p: boolean): void;
 	setInput(k: InputKey, down: boolean): void; // táctil
+	setSkin(id: SkinId): void; // cambia la apariencia sin reiniciar
 }
 
 type State = "loading" | "serving" | "playing" | "finished";
@@ -56,6 +58,7 @@ export function createEngine(opts: EngineOptions): Engine {
 	if (!ctx) throw new Error("Canvas 2D no disponible");
 	const g: CanvasRenderingContext2D = ctx;
 	const input = createInput(canvas);
+	let skin = SKINS[opts.skin ?? DEFAULT_SKIN];
 
 	const paddle: Paddle = {
 		x: (W - PADDLE_W) / 2,
@@ -251,43 +254,70 @@ export function createEngine(opts: EngineOptions): Engine {
 	}
 
 	function draw() {
-		g.fillStyle = "#000";
+		g.fillStyle = skin.background;
 		g.fillRect(0, 0, W, H);
 		if (state === "loading") return;
 
+		const sprites = img !== null && skin.style === "sprite";
+		const inset = skin.blockInset;
+
+		if (skin.glow > 0) g.shadowBlur = skin.glow;
+
 		for (const b of blocks) {
-			if (img) drawSprite(g, img, `block_${b.color}`, b.x, b.y, b.w, b.h);
-			else {
-				g.fillStyle = FALLBACK_COLORS[b.color];
-				g.fillRect(b.x + 1, b.y + 1, b.w - 2, b.h - 2);
+			if (sprites && img) drawSprite(g, img, `block_${b.color}`, b.x, b.y, b.w, b.h);
+			else if (skin.style === "outline") {
+				const c = skin.blockColors[b.color];
+				g.shadowColor = c;
+				g.strokeStyle = c;
+				g.lineWidth = skin.lineWidth;
+				g.strokeRect(
+					b.x + inset,
+					b.y + inset,
+					b.w - inset * 2,
+					b.h - inset * 2,
+				);
+			} else {
+				g.fillStyle = skin.blockColors[b.color];
+				g.fillRect(b.x + inset, b.y + inset, b.w - inset * 2, b.h - inset * 2);
 			}
 		}
 
 		for (const e of explosions) {
 			const t = e.elapsed / EXPLOSION_MS;
-			if (img) {
+			if (sprites && img) {
 				const frames = EXPLOSION_FRAMES[e.color];
 				const i = Math.min(frames.length - 1, Math.floor(t * frames.length));
 				drawFrame(g, img, frames[i], e.x, e.y, e.w, e.h);
 			} else {
 				g.globalAlpha = 1 - t;
-				g.fillStyle = "#fff";
+				g.shadowColor = skin.explosion;
+				g.fillStyle = skin.explosion;
 				g.fillRect(e.x, e.y, e.w, e.h);
 				g.globalAlpha = 1;
 			}
 		}
 
-		if (img) {
+		if (sprites && img) {
 			drawSprite(g, img, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
 			drawSprite(g, img, "ball", ball.x, ball.y, ball.w, ball.h);
 		} else {
-			g.fillStyle = "#f5ff00";
+			g.shadowColor = skin.paddle;
+			g.fillStyle = skin.paddle;
 			g.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
-			g.fillStyle = "#fff";
-			g.beginPath();
-			g.arc(ball.x + ball.w / 2, ball.y + ball.h / 2, ball.w / 2, 0, Math.PI * 2);
-			g.fill();
+			g.shadowColor = skin.ball;
+			g.fillStyle = skin.ball;
+			if (skin.ballShape === "square") {
+				g.fillRect(ball.x, ball.y, ball.w, ball.h);
+			} else {
+				g.beginPath();
+				g.arc(ball.x + ball.w / 2, ball.y + ball.h / 2, ball.w / 2, 0, Math.PI * 2);
+				g.fill();
+			}
 		}
+
+		// Restaura el brillo para no contaminar otros dibujos
+		g.shadowBlur = 0;
+		g.shadowColor = "rgba(0,0,0,0)";
 	}
 
 	function loop(ts: number) {
@@ -346,6 +376,11 @@ export function createEngine(opts: EngineOptions): Engine {
 		},
 		setInput(k, down) {
 			if (!paused) input.set(k, down);
+		},
+		setSkin(id) {
+			skin = SKINS[id];
+			// En pausa o tras el fin el bucle no corre: se repinta una vez
+			if (!stopped && (paused || state === "finished")) draw();
 		},
 	};
 }

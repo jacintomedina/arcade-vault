@@ -29,7 +29,10 @@ import {
 	TetrisGame,
 	TetrisTouchControls,
 } from "./games/tetris-game";
-import { SKIN_IDS } from "../_games/tetris/skins";
+import { SKIN_IDS as TETRIS_SKIN_IDS } from "../_games/tetris/skins";
+import { SKIN_IDS as ASTEROIDES_SKIN_IDS } from "../_games/asteroides/skins";
+import { SKIN_IDS as SNAKE_SKIN_IDS } from "../_games/snake/skins";
+import { SKIN_IDS as ARKANOID_SKIN_IDS } from "../_games/arkanoid/skins";
 import type {
 	GameComponentProps,
 	GameStats,
@@ -65,24 +68,27 @@ const REAL_GAMES: Record<
 		Component: AsteroidesGame,
 		Controls: AsteroidesControlsHint,
 		TouchControls: AsteroidesTouchControls,
+		skins: ASTEROIDES_SKIN_IDS,
 	},
 	tetris: {
 		Component: TetrisGame,
 		Controls: TetrisControlsHint,
 		TouchControls: TetrisTouchControls,
 		initialLives: 1, // evita ver 3 corazones antes del primer onStats
-		skins: SKIN_IDS,
+		skins: TETRIS_SKIN_IDS,
 	},
 	arkanoid: {
 		Component: ArkanoidGame,
 		Controls: ArkanoidControlsHint,
 		TouchControls: ArkanoidTouchControls,
+		skins: ARKANOID_SKIN_IDS,
 	},
 	snake: {
 		Component: SnakeGame,
 		Controls: SnakeControlsHint,
 		TouchControls: SnakeTouchControls,
 		initialLives: 1, // sin vidas: evita ver 3 corazones antes del primer onStats
+		skins: SNAKE_SKIN_IDS,
 	},
 };
 
