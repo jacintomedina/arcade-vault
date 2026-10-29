@@ -4,6 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { createEngine, type Engine } from "../../_games/arkanoid/engine";
 import type { InputKey } from "../../_games/arkanoid/input";
 import { H, W } from "../../_games/arkanoid/constants";
+import { resolveSkin } from "../../_games/arkanoid/skins";
 import type { GameComponentProps, TouchControlsProps } from "./types";
 
 export function ArkanoidGame({
@@ -12,17 +13,20 @@ export function ArkanoidGame({
 	inputRef,
 	onStats,
 	onGameOver,
+	skin,
 }: GameComponentProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const engineRef = useRef<Engine | null>(null);
 	const onStatsRef = useRef(onStats);
 	const onGameOverRef = useRef(onGameOver);
 	const pausedRef = useRef(paused);
+	const skinRef = useRef(resolveSkin(skin));
 
 	useEffect(() => {
 		onStatsRef.current = onStats;
 		onGameOverRef.current = onGameOver;
 		pausedRef.current = paused;
+		skinRef.current = resolveSkin(skin);
 	});
 
 	useEffect(() => {
@@ -32,6 +36,7 @@ export function ArkanoidGame({
 			canvas,
 			onStats: (s) => onStatsRef.current(s),
 			onGameOver: (score) => onGameOverRef.current(score),
+			skin: skinRef.current,
 		});
 		engineRef.current = engine;
 		engine.setPaused(pausedRef.current);
@@ -46,6 +51,10 @@ export function ArkanoidGame({
 	useEffect(() => {
 		engineRef.current?.setPaused(paused);
 	}, [paused]);
+
+	useEffect(() => {
+		engineRef.current?.setSkin(resolveSkin(skin));
+	}, [skin]);
 
 	useEffect(() => {
 		inputRef.current = {

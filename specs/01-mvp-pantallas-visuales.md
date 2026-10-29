@@ -133,13 +133,13 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
-| Cache Components exige envolver en `Suspense` el acceso a datos dinámicos y a `params` | Leer docs en el paso 1. Usar `generateStaticParams` para `[id]`. |
-| Hidratación: `localStorage` no existe en servidor y la navbar cambia según sesión | Inicializar sesión en `useEffect`; renderizar estado "sin sesión" hasta montar. |
-| `localStorage` bloqueado o JSON corrupto | Envolver lecturas y escrituras en `try/catch` y caer a invitado. |
-| CSS global de 950 líneas choca con estilos de create-next-app | Reemplazar el contenido de `globals.css` en el paso 3 y revisar `app/page.tsx`. |
-| Cambios de API de Next 16 vs. conocimiento previo | Seguir `AGENTS.md`: consultar `node_modules/next/dist/docs/` antes de escribir código. |
+| Riesgo                                                                                 | Mitigación                                                                             |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Cache Components exige envolver en `Suspense` el acceso a datos dinámicos y a `params` | Leer docs en el paso 1. Usar `generateStaticParams` para `[id]`.                       |
+| Hidratación: `localStorage` no existe en servidor y la navbar cambia según sesión      | Inicializar sesión en `useEffect`; renderizar estado "sin sesión" hasta montar.        |
+| `localStorage` bloqueado o JSON corrupto                                               | Envolver lecturas y escrituras en `try/catch` y caer a invitado.                       |
+| CSS global de 950 líneas choca con estilos de create-next-app                          | Reemplazar el contenido de `globals.css` en el paso 3 y revisar `app/page.tsx`.        |
+| Cambios de API de Next 16 vs. conocimiento previo                                      | Seguir `AGENTS.md`: consultar `node_modules/next/dist/docs/` antes de escribir código. |
 
 ## Lo que **no** está en esta spec
 

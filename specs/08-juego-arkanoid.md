@@ -118,13 +118,13 @@ Archivos de `app/_games/arkanoid/`:
 
 Patrones de los niveles 6 a 10 (índices `col` 0–9, `row` 0–5; colores por fila con la paleta existente, fijados en `levels.ts`):
 
-| Nivel | Patrón | Regla | Bloques |
-| ----- | ------ | ----- | ------- |
-| 6 | Columnas alternas | `col` par, todas las filas | 30 |
-| 7 | Diagonales | todas las celdas salvo `(col + row) % 3 === 0` | 40 |
-| 8 | Pirámide invertida | fila `r` ocupa `col` de `r` a `9 − r`, para `r` de 0 a 4 | 30 |
-| 9 | Marco doble | marco exterior del nivel 5 más las filas 2 y 3 con `col` de 2 a 7 | 40 |
-| 10 | Parrilla con hueco | 10×6 completa sin las celdas `col` 4–5 de las filas 2–3 | 56 |
+| Nivel | Patrón             | Regla                                                             | Bloques |
+| ----- | ------------------ | ----------------------------------------------------------------- | ------- |
+| 6     | Columnas alternas  | `col` par, todas las filas                                        | 30      |
+| 7     | Diagonales         | todas las celdas salvo `(col + row) % 3 === 0`                    | 40      |
+| 8     | Pirámide invertida | fila `r` ocupa `col` de `r` a `9 − r`, para `r` de 0 a 4          | 30      |
+| 9     | Marco doble        | marco exterior del nivel 5 más las filas 2 y 3 con `col` de 2 a 7 | 40      |
+| 10    | Parrilla con hueco | 10×6 completa sin las celdas `col` 4–5 de las filas 2–3           | 56      |
 
 Los niveles 1 a 5 tienen 60, 40, 30, 39 y 39 bloques. Total de la partida completa: 404 bloques = 4040 puntos.
 
@@ -232,23 +232,23 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
-| React Strict Mode monta el efecto dos veces y duplica el bucle | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje. |
-| Módulos del motor evalúan `window`, `document` o `Image` en SSR | Nada a nivel superior; el motor y la carga del spritesheet se crean solo dentro de `useEffect`. |
-| Carga asíncrona del spritesheet con Strict Mode o `stop()` antes de terminar | El motor comprueba un flag `stopped` al resolver la carga y no arranca el bucle si ya se detuvo. |
-| Las flechas y `Espacio` hacen scroll | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll. |
-| El arrastre táctil sobre el canvas hace scroll de la página | `touch-action: none` en `.arkanoid-canvas` y `preventDefault` en `pointerdown`. |
-| Ratón desalineado con el canvas escalado por CSS | Conversión con `getBoundingClientRect()` a coordenadas lógicas; criterio de aceptación con el canvas escalado. |
-| `dt` enorme al volver de otra pestaña o al reanudar | Tope de 0,05 s (máximo 6 pasos por frame) y reinicio de `lastTime` al reanudar. |
-| Tunneling de la bola a ×2,36 | Pasos fijos de 1/120 s: 7,1 px por paso frente a 16 px de bola y 24 px de bloque. |
-| Bola atrapada en un bucle horizontal infinito (`vy` casi 0) | Ángulo limitado a 60° en la pala, así `vy` ≥ 0,5 × módulo en cada rebote de pala. |
-| La bola se queda en `serving` y el jugador no sabe cómo lanzar | El aviso de teclas indica `Espacio` / clic y el botón LANZAR es visible en táctil. |
-| Pausa durante `serving` o el lanzamiento con `Espacio` activa un botón enfocado | `preventDefault` de `Espacio` en `GamePlayer` y `tabIndex={-1}` en los botones táctiles, como en Tetris. |
-| Fallo de red al cargar el PNG | Fallback de formas simples; la partida sigue. |
-| La UI de `/hall`, `/games` o `GamePlayer` asume un número fijo de juegos o categorías | Verificar con tres juegos y la categoría ARCADE; corregir dentro de esta spec y anotarlo en Decisiones. |
-| Cambiar `REAL_GAMES` rompe Asteroides o Tetris | Solo se añade una entrada; criterio de aceptación sobre ambos. |
-| El tope de 1200 pts/s apenas frena a un bot | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño. |
+| Riesgo                                                                                | Mitigación                                                                                                               |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| React Strict Mode monta el efecto dos veces y duplica el bucle                        | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje. |
+| Módulos del motor evalúan `window`, `document` o `Image` en SSR                       | Nada a nivel superior; el motor y la carga del spritesheet se crean solo dentro de `useEffect`.                          |
+| Carga asíncrona del spritesheet con Strict Mode o `stop()` antes de terminar          | El motor comprueba un flag `stopped` al resolver la carga y no arranca el bucle si ya se detuvo.                         |
+| Las flechas y `Espacio` hacen scroll                                                  | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll.                          |
+| El arrastre táctil sobre el canvas hace scroll de la página                           | `touch-action: none` en `.arkanoid-canvas` y `preventDefault` en `pointerdown`.                                          |
+| Ratón desalineado con el canvas escalado por CSS                                      | Conversión con `getBoundingClientRect()` a coordenadas lógicas; criterio de aceptación con el canvas escalado.           |
+| `dt` enorme al volver de otra pestaña o al reanudar                                   | Tope de 0,05 s (máximo 6 pasos por frame) y reinicio de `lastTime` al reanudar.                                          |
+| Tunneling de la bola a ×2,36                                                          | Pasos fijos de 1/120 s: 7,1 px por paso frente a 16 px de bola y 24 px de bloque.                                        |
+| Bola atrapada en un bucle horizontal infinito (`vy` casi 0)                           | Ángulo limitado a 60° en la pala, así `vy` ≥ 0,5 × módulo en cada rebote de pala.                                        |
+| La bola se queda en `serving` y el jugador no sabe cómo lanzar                        | El aviso de teclas indica `Espacio` / clic y el botón LANZAR es visible en táctil.                                       |
+| Pausa durante `serving` o el lanzamiento con `Espacio` activa un botón enfocado       | `preventDefault` de `Espacio` en `GamePlayer` y `tabIndex={-1}` en los botones táctiles, como en Tetris.                 |
+| Fallo de red al cargar el PNG                                                         | Fallback de formas simples; la partida sigue.                                                                            |
+| La UI de `/hall`, `/games` o `GamePlayer` asume un número fijo de juegos o categorías | Verificar con tres juegos y la categoría ARCADE; corregir dentro de esta spec y anotarlo en Decisiones.                  |
+| Cambiar `REAL_GAMES` rompe Asteroides o Tetris                                        | Solo se añade una entrada; criterio de aceptación sobre ambos.                                                           |
+| El tope de 1200 pts/s apenas frena a un bot                                           | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño.                             |
 
 ## Lo que **no** está en esta spec
 

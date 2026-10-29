@@ -24,11 +24,13 @@ import {
 	loadSprites,
 } from "./entities";
 import { createInput, type InputKey } from "./input";
+import { DEFAULT_SKIN, SKINS, type Skin, type SkinId } from "./skins";
 
 export interface EngineOptions {
 	canvas: HTMLCanvasElement;
 	onStats: (s: GameStats) => void;
 	onGameOver: (finalScore: number) => void;
+	skin?: SkinId;
 }
 
 export interface Engine {
@@ -36,6 +38,7 @@ export interface Engine {
 	stop(): void; // cancela rAF y quita listeners
 	setPaused(p: boolean): void;
 	setInput(k: InputKey, down: boolean): void; // táctil
+	setSkin(id: SkinId): void; // cambia la apariencia sin reiniciar
 }
 
 type State = "loading" | "ready" | "playing" | "dying" | "finished";
@@ -64,6 +67,7 @@ export function createEngine(opts: EngineOptions): Engine {
 	if (!ctx) throw new Error("Canvas 2D no disponible");
 	const g: CanvasRenderingContext2D = ctx;
 	const input = createInput();
+	let skin: Skin = SKINS[opts.skin ?? DEFAULT_SKIN];
 
 	let body: Cell[] = []; // body[0] es la cabeza
 	let dir: Direction = "right";
@@ -206,22 +210,22 @@ export function createEngine(opts: EngineOptions): Engine {
 	}
 
 	function draw() {
-		g.fillStyle = "#000";
+		g.fillStyle = skin.background;
 		g.fillRect(0, 0, W, H);
 		if (state === "loading") return;
 
-		drawBoard(g);
+		drawBoard(g, skin);
 
 		if (eaten) {
 			const t = eaten.elapsed / EAT_MS;
 			g.globalAlpha = 1 - t;
-			drawFruit(g, img, eaten.fruit, 1 + 0.5 * t);
+			drawFruit(g, skin, img, eaten.fruit, 1 + 0.5 * t);
 			g.globalAlpha = 1;
 		}
-		if (state !== "finished" || body.length < COLS * ROWS) drawFruit(g, img, fruit);
+		if (state !== "finished" || body.length < COLS * ROWS) drawFruit(g, skin, img, fruit);
 
 		const blinkOff = state === "dying" && Math.floor(dyingElapsed / BLINK_MS) % 2 === 1;
-		if (!blinkOff) drawSnake(g, body, dir);
+		if (!blinkOff) drawSnake(g, skin, body, dir);
 	}
 
 	function loop(ts: number) {
@@ -278,6 +282,11 @@ export function createEngine(opts: EngineOptions): Engine {
 		},
 		setInput(k, down) {
 			if (!paused) input.set(k, down);
+		},
+		setSkin(id) {
+			skin = SKINS[id];
+			// En pausa el rAF está parado: se redibuja un frame para ver el cambio.
+			if (paused && !stopped && state !== "loading") draw();
 		},
 	};
 }

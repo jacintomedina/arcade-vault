@@ -88,12 +88,12 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
-| `styles.css` nuevo pisa estilos ya portados (SPEC 01) | Comparar con diff antes de fusionar; revisar las 5 pantallas tras el paso 3. |
-| Enlaces a `/` de SPEC 01 que significaban Biblioteca (Detalle, Reproductor) | Buscarlos con grep en el paso 2 y apuntarlos a `/games`. |
-| `IntersectionObserver` en SSR / hidratación | Hook solo cliente, con contenido visible si falla. |
-| Cache Components exige `Suspense` con datos dinámicos | Datos estáticos de `app/data/`; sin APIs dinámicas. |
+| Riesgo                                                                      | Mitigación                                                                   |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `styles.css` nuevo pisa estilos ya portados (SPEC 01)                       | Comparar con diff antes de fusionar; revisar las 5 pantallas tras el paso 3. |
+| Enlaces a `/` de SPEC 01 que significaban Biblioteca (Detalle, Reproductor) | Buscarlos con grep en el paso 2 y apuntarlos a `/games`.                     |
+| `IntersectionObserver` en SSR / hidratación                                 | Hook solo cliente, con contenido visible si falla.                           |
+| Cache Components exige `Suspense` con datos dinámicos                       | Datos estáticos de `app/data/`; sin APIs dinámicas.                          |
 
 ## Lo que **no** está en esta spec
 

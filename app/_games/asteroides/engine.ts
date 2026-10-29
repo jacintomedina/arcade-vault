@@ -15,12 +15,14 @@ import {
 	dist,
 	rand,
 } from "./entities";
+import { SKINS, type Skin, type SkinId } from "./skins";
 import { createInput, type InputKey } from "./input";
 
 export interface EngineOptions {
 	canvas: HTMLCanvasElement;
 	onStats: (s: GameStats) => void;
 	onGameOver: (finalScore: number) => void;
+	skin: SkinId;
 }
 
 export interface Engine {
@@ -29,12 +31,14 @@ export interface Engine {
 	setPaused(p: boolean): void;
 	setInput(k: InputKey, down: boolean): void; // táctil
 	setAim(angle: number | null): void; // joystick: rumbo absoluto en rad
+	setSkin(id: SkinId): void; // cambia la apariencia sin reiniciar
 }
 
 type State = "playing" | "dead" | "gameover";
 
 export function createEngine(opts: EngineOptions): Engine {
 	const { canvas, onStats, onGameOver } = opts;
+	let skin: Skin = SKINS[opts.skin];
 	const ctx = canvas.getContext("2d");
 	if (!ctx) throw new Error("Canvas 2D no disponible");
 	const g: CanvasRenderingContext2D = ctx;
@@ -205,14 +209,14 @@ export function createEngine(opts: EngineOptions): Engine {
 	}
 
 	function draw() {
-		g.fillStyle = "#000";
+		g.fillStyle = skin.background;
 		g.fillRect(0, 0, W, H);
 
-		particles.forEach((p) => p.draw(g));
-		asteroids.forEach((a) => a.draw(g));
-		powerUps.forEach((p) => p.draw(g));
-		bullets.forEach((b) => b.draw(g));
-		ship.draw(g);
+		particles.forEach((p) => p.draw(g, skin));
+		asteroids.forEach((a) => a.draw(g, skin));
+		powerUps.forEach((p) => p.draw(g, skin));
+		bullets.forEach((b) => b.draw(g, skin));
+		ship.draw(g, skin);
 	}
 
 	function loop(ts: number) {
@@ -265,6 +269,10 @@ export function createEngine(opts: EngineOptions): Engine {
 		},
 		setAim(angle) {
 			if (!paused) input.setAim(angle);
+		},
+		setSkin(id) {
+			skin = SKINS[id];
+			if (running) draw(); // repinta también en pausa
 		},
 	};
 }

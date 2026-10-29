@@ -4,6 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { createEngine, type Engine } from "../../_games/tetris/engine";
 import type { InputKey } from "../../_games/tetris/input";
 import { H, W } from "../../_games/tetris/constants";
+import { resolveSkin } from "../../_games/tetris/skins";
 import type { GameComponentProps, TouchControlsProps } from "./types";
 
 export function TetrisGame({
@@ -12,17 +13,20 @@ export function TetrisGame({
 	inputRef,
 	onStats,
 	onGameOver,
+	skin,
 }: GameComponentProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const engineRef = useRef<Engine | null>(null);
 	const onStatsRef = useRef(onStats);
 	const onGameOverRef = useRef(onGameOver);
 	const pausedRef = useRef(paused);
+	const skinRef = useRef(resolveSkin(skin));
 
 	useEffect(() => {
 		onStatsRef.current = onStats;
 		onGameOverRef.current = onGameOver;
 		pausedRef.current = paused;
+		skinRef.current = resolveSkin(skin);
 	});
 
 	useEffect(() => {
@@ -32,6 +36,7 @@ export function TetrisGame({
 			canvas,
 			onStats: (s) => onStatsRef.current(s),
 			onGameOver: (score) => onGameOverRef.current(score),
+			skin: skinRef.current,
 		});
 		engineRef.current = engine;
 		engine.setPaused(pausedRef.current);
@@ -46,6 +51,10 @@ export function TetrisGame({
 	useEffect(() => {
 		engineRef.current?.setPaused(paused);
 	}, [paused]);
+
+	useEffect(() => {
+		engineRef.current?.setSkin(resolveSkin(skin));
+	}, [skin]);
 
 	useEffect(() => {
 		inputRef.current = {

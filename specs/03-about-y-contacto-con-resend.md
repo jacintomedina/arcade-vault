@@ -106,12 +106,12 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo | Mitigación |
-| ------ | ---------- |
+| Riesgo                                                                | Mitigación                                                                                                                                                         |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `onboarding@resend.dev` solo entrega al correo de la cuenta de Resend | Usar como destinatario el correo de la cuenta de Resend (`jmedinalba@gmail.com`; Resend rechaza alias `+`) o verificar un dominio; documentarlo en `.env.example`. |
-| Cache Components y Server Actions | Leer docs en el paso 1; la acción no usa APIs dinámicas en el render de la página. |
-| CSS de about pisa estilos existentes (`.field`, `.btn`, `.shake`) | Comparar con diff antes de fusionar; revisar las pantallas existentes tras el paso 3. |
-| Secreto expuesto | Variable sin prefijo `NEXT_PUBLIC_`; acción solo en servidor. |
+| Cache Components y Server Actions                                     | Leer docs en el paso 1; la acción no usa APIs dinámicas en el render de la página.                                                                                 |
+| CSS de about pisa estilos existentes (`.field`, `.btn`, `.shake`)     | Comparar con diff antes de fusionar; revisar las pantallas existentes tras el paso 3.                                                                              |
+| Secreto expuesto                                                      | Variable sin prefijo `NEXT_PUBLIC_`; acción solo en servidor.                                                                                                      |
 
 ## Lo que **no** está en esta spec
 

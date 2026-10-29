@@ -22,12 +22,14 @@ import {
 	randomPiece,
 	rotateCW,
 } from "./entities";
+import { DEFAULT_SKIN, SKINS, type Skin, type SkinId } from "./skins";
 import { createInput, type InputKey } from "./input";
 
 export interface EngineOptions {
 	canvas: HTMLCanvasElement;
 	onStats: (s: GameStats) => void;
 	onGameOver: (finalScore: number) => void;
+	skin?: SkinId;
 }
 
 export interface Engine {
@@ -35,6 +37,7 @@ export interface Engine {
 	stop(): void; // cancela rAF y quita listeners
 	setPaused(p: boolean): void;
 	setInput(k: InputKey, down: boolean): void; // táctil
+	setSkin(id: SkinId): void; // cambia la apariencia sin reiniciar
 }
 
 type State = "playing" | "clearing" | "gameover";
@@ -49,6 +52,7 @@ export function createEngine(opts: EngineOptions): Engine {
 	if (!ctx) throw new Error("Canvas 2D no disponible");
 	const g: CanvasRenderingContext2D = ctx;
 	const input = createInput();
+	let skin: Skin = SKINS[opts.skin ?? DEFAULT_SKIN];
 
 	let board: Board = createBoard();
 	let current: Piece = randomPiece(1);
@@ -204,8 +208,8 @@ export function createEngine(opts: EngineOptions): Engine {
 	}
 
 	function drawGrid() {
-		g.strokeStyle = "rgba(255,255,255,0.06)";
-		g.lineWidth = 0.5;
+		g.strokeStyle = skin.grid;
+		g.lineWidth = skin.gridWidth;
 		g.beginPath();
 		for (let c = 1; c < COLS; c++) {
 			g.moveTo(BOARD_X + c * BLOCK, 0);
@@ -218,22 +222,36 @@ export function createEngine(opts: EngineOptions): Engine {
 		g.stroke();
 	}
 
+	function strokeFrame(color: string, x: number, y: number, w: number, h: number) {
+		g.strokeStyle = color;
+		g.lineWidth = 1;
+		g.shadowColor = color;
+		g.shadowBlur = skin.glow;
+		g.strokeRect(x, y, w, h);
+		g.shadowBlur = 0;
+		g.shadowColor = "transparent";
+	}
+
 	function drawPiece(piece: Piece, y: number, alpha: number) {
 		for (let r = 0; r < piece.shape.length; r++)
 			for (let c = 0; c < piece.shape[r].length; c++)
-				drawBlock(g, BOARD_X, 0, piece.x + c, y + r, piece.shape[r][c], alpha);
+				drawBlock(g, skin, BOARD_X, 0, piece.x + c, y + r, piece.shape[r][c], alpha);
 	}
 
 	function drawLabel(text: string, y: number) {
-		g.fillStyle = "rgba(255,255,255,0.6)";
+		g.fillStyle = skin.label;
 		g.font = "bold 14px monospace";
 		g.fillText(text, PANEL_CX, y);
 	}
 
 	function drawValue(text: string, y: number) {
-		g.fillStyle = "#fff";
+		g.fillStyle = skin.value;
 		g.font = "bold 28px monospace";
+		g.shadowColor = skin.value;
+		g.shadowBlur = skin.textGlow;
 		g.fillText(text, PANEL_CX, y);
+		g.shadowBlur = 0;
+		g.shadowColor = "transparent";
 	}
 
 	function drawSidePanel() {
@@ -248,9 +266,7 @@ export function createEngine(opts: EngineOptions): Engine {
 		drawLabel("SIGUIENTE", NEXT_Y - 12);
 		g.textAlign = "start";
 
-		g.strokeStyle = "rgba(255,255,255,0.25)";
-		g.lineWidth = 1;
-		g.strokeRect(NEXT_X, NEXT_Y, 4 * BLOCK, 4 * BLOCK);
+		strokeFrame(skin.panelFrame, NEXT_X, NEXT_Y, 4 * BLOCK, 4 * BLOCK);
 
 		// Centra la pieza por su caja real (la I, por ejemplo, ocupa una sola fila)
 		const shape = next.shape;
@@ -267,31 +283,29 @@ export function createEngine(opts: EngineOptions): Engine {
 		const offY = (4 - (maxR - minR + 1)) / 2 - minR;
 		for (let r = 0; r < shape.length; r++)
 			for (let c = 0; c < shape[r].length; c++)
-				drawBlock(g, NEXT_X, NEXT_Y, offX + c, offY + r, shape[r][c]);
+				drawBlock(g, skin, NEXT_X, NEXT_Y, offX + c, offY + r, shape[r][c]);
 	}
 
 	function draw() {
-		g.fillStyle = "#000";
+		g.fillStyle = skin.background;
 		g.fillRect(0, 0, W, H);
 
 		drawGrid();
-		g.strokeStyle = "rgba(255,255,255,0.25)";
-		g.lineWidth = 1;
-		g.strokeRect(BOARD_X, 0, COLS * BLOCK, ROWS * BLOCK);
+		strokeFrame(skin.frame, BOARD_X, 0, COLS * BLOCK, ROWS * BLOCK);
 
 		for (let r = 0; r < ROWS; r++)
 			for (let c = 0; c < COLS; c++)
-				drawBlock(g, BOARD_X, 0, c, r, board[r][c]);
+				drawBlock(g, skin, BOARD_X, 0, c, r, board[r][c]);
 
 		if (state === "clearing") {
 			// Parpadeo: las filas completas alternan con un destello blanco
 			if (Math.floor(clearTimer / BLINK_PERIOD) % 2 === 0) {
-				g.fillStyle = "#fff";
+				g.fillStyle = skin.flash;
 				for (const r of clearingRows)
 					g.fillRect(BOARD_X, r * BLOCK, COLS * BLOCK, BLOCK);
 			}
 		} else {
-			drawPiece(current, ghostY(), 0.2);
+			drawPiece(current, ghostY(), skin.ghostAlpha);
 			drawPiece(current, current.y, 1);
 		}
 
@@ -345,6 +359,10 @@ export function createEngine(opts: EngineOptions): Engine {
 		},
 		setInput(k, down) {
 			if (!paused) input.set(k, down);
+		},
+		setSkin(id) {
+			skin = SKINS[id];
+			if (running) draw(); // repinta también en pausa
 		},
 	};
 }
