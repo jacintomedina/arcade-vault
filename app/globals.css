@@ -2082,3 +2082,102 @@ a { color: inherit; text-decoration: none; }
   .skin-select select { flex: 1; min-height: 44px; }
 }
 .skin-wrap { flex-wrap: wrap; align-items: center; }
+
+/* ===== gamepad táctil estilo Game Boy (SPEC 10) ===== */
+.gb-pad { display: none; }
+@media (pointer: coarse) {
+  .gb-pad {
+    display: block;
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    margin: 14px auto 0;
+    padding: 22px 22px 54px;
+    /* esquina inferior derecha muy redondeada, como la carcasa DMG */
+    border-radius: 16px 16px 64px 16px;
+    background: linear-gradient(160deg, #1f1f2d, #14141e 70%);
+    border: 1px solid var(--line);
+    box-shadow:
+      0 0 18px rgba(0, 245, 255, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -6px 14px rgba(0, 0, 0, 0.45);
+  }
+}
+.gb-body {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.gb-btn {
+  touch-action: none;
+  user-select: none; -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.gb-btn[aria-disabled="true"] { opacity: 0.28; cursor: default; }
+
+/* cruceta */
+.gb-dpad {
+  display: grid;
+  grid-template: repeat(3, 52px) / repeat(3, 52px);
+}
+.gb-dir {
+  background: #07070c;
+  color: var(--cyan);
+  border: 1px solid rgba(0, 245, 255, 0.28);
+  box-shadow: inset 0 0 8px rgba(0, 245, 255, 0.1);
+}
+.gb-dir:active:not([aria-disabled="true"]) {
+  background: #101a22;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.6), inset 0 0 10px rgba(0, 245, 255, 0.35);
+}
+.gb-up { grid-area: 1 / 2; border-radius: 10px 10px 0 0; border-bottom: 0; }
+.gb-left { grid-area: 2 / 1; border-radius: 10px 0 0 10px; border-right: 0; }
+.gb-right { grid-area: 2 / 3; border-radius: 0 10px 10px 0; border-left: 0; }
+.gb-down { grid-area: 3 / 2; border-radius: 0 0 10px 10px; border-top: 0; }
+.gb-hub {
+  grid-area: 2 / 2;
+  background: #07070c;
+  border-top: 1px solid transparent;
+  box-shadow: inset 0 0 8px rgba(0, 245, 255, 0.1);
+}
+
+/* A y B en diagonal: B abajo a la izquierda, A arriba a la derecha */
+.gb-actions {
+  position: relative;
+  width: 124px; height: 104px;
+}
+.gb-act {
+  position: absolute;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  font-family: var(--pixel); font-size: 12px;
+  color: var(--magenta);
+  background: #0c0710;
+  border: 1px solid var(--magenta);
+  box-shadow: 0 0 10px rgba(255, 0, 110, 0.4), inset 0 0 8px rgba(255, 0, 110, 0.25);
+}
+.gb-a { right: 0; top: 0; }
+.gb-b { left: 0; bottom: 0; }
+.gb-act:active:not([aria-disabled="true"]) {
+  background: rgba(255, 0, 110, 0.35);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(255, 0, 110, 0.8), inset 0 0 10px rgba(255, 0, 110, 0.5);
+}
+
+/* rejilla del altavoz, inclinada en la esquina redondeada */
+.gb-speaker {
+  position: absolute;
+  right: 26px; bottom: 14px;
+  display: flex; gap: 7px;
+  transform: rotate(-30deg);
+  pointer-events: none;
+}
+.gb-speaker span {
+  width: 4px; height: 30px;
+  border-radius: 2px;
+  background: #07070c;
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.07);
+}
