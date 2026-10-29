@@ -86,3 +86,4 @@ Next 16.4.2 + React 19.3. Breaking changes vs. training data. Per `AGENTS.md`, r
 # Agents
 
 - `game-planner` — project subagent (`.claude/agents/game-planner.md`) that decides which game to add next and returns a brief for `/add-game`. Persistent memory (`memory: project`) in `.claude/agent-memory/game-planner/` (`MEMORY.md`, `decisions.md`, `criteria.md`), versioned; it logs every proposal, acceptance and rejection.
+- `game-jam` — project subagent (`.claude/agents/game-jam.md`). Input: a game name or short description. Writes 3 alternative specs (A faithful, B twist, C intense) in `specs/game-jam.agent/<game-id>/` for user review, modeled on SPEC 07/08/09. Autonomous (no questions), writes only there, never implements. The chosen variant is renumbered to `specs/NN-juego-<id>.md` and goes to `/spec-impl` or `/add-game`.
