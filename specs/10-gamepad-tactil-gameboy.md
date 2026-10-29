@@ -118,30 +118,30 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores ni advertencias de Cache Components.
-- [ ] En un dispositivo táctil (o emulación `pointer: coarse`) `/games/<id>/play` muestra, de arriba a abajo: canvas, gamepad, HUD.
-- [ ] En escritorio (`pointer: fine`) no se ve el gamepad y el HUD sigue encima del canvas, como antes.
-- [ ] El gamepad muestra cruceta, A y B, y no muestra SELECT ni START.
-- [ ] Asteroides: ◀ ▶ rotan la nave, ▲ propulsa, A dispara. ▼ y B salen atenuados y no hacen nada.
-- [ ] Tetris: ◀ ▶ mueven, ▼ baja, A rota, B hace caída instantánea. ▲ sale atenuado.
-- [ ] Arkanoid: ◀ ▶ mueven la pala, A lanza la bola.
-- [ ] Snake: las cuatro flechas giran la serpiente.
-- [ ] Se pueden pulsar a la vez una dirección y A o B.
-- [ ] Soltar o cancelar el toque libera el botón: la nave no sigue girando ni la pala moviéndose.
-- [ ] Pulsar el gamepad no hace scroll, zoom ni abre menú contextual, y los botones no toman el foco.
-- [ ] A 375 px el gamepad cabe sin scroll horizontal y cada botón mide al menos 48×48 px (cruceta 52×52 px y A/B 56×56 px, sin cambios).
-- [ ] A 375 px la carcasa del gamepad mide como máximo 176 px de alto y su aspecto de Game Boy se mantiene (rectángulo con las cuatro esquinas del mismo radio, altavoz visible).
-- [ ] En táctil el gamepad tiene el mismo ancho visible que el marco CRT, bordes incluidos: el borde izquierdo de `.gb-pad` coincide con el borde exterior izquierdo del anillo del marco (`.crt` − 7 px), y lo mismo en el derecho (±1 px), a 375 px y a 768 px, sin scroll horizontal.
-- [ ] En el móvil real (servidor de desarrollo por IP de la red local) la página hidrata y los cuatro juegos responden al gamepad, a PAUSA y al selector de skin.
-- [ ] Con el gamepad a todo el ancho, cruceta a la izquierda y A/B a la derecha siguen midiendo 52×52 y 56×56 px.
-- [ ] En táctil el HUD queda inmediatamente debajo de la carcasa y se ve completo, sin scroll, a 375×812. A 375×667 se ve al menos su fila entera con un scroll mínimo (medido y anotado al verificar).
-- [ ] En táctil el HUD muestra solo PAUSA/REANUDAR y el selector de skin, en una fila. No aparecen JUGADOR, PUNTUACIÓN, VIDAS, NIVEL, FIN ni SALIR.
-- [ ] En escritorio el HUD sigue completo (jugador, puntuación, vidas, nivel, skin, PAUSA, FIN y SALIR) y encima del canvas.
-- [ ] El botón PAUSA/REANUDAR y el selector de skin siguen funcionando bajo el gamepad, y el cambio de skin se aplica a la partida.
-- [ ] Con el juego en pausa o terminado, el gamepad no altera la partida.
-- [ ] No quedan `*TouchControls`, `TouchControlsProps` ni estilos `.joystick`, `.fire-btn`, `.tt-*`, `.sn-*`, `.ak-launch` sin uso.
-- [ ] Teclado en escritorio, skins, pausa con `P`, modal de fin y guardado de puntuación siguen funcionando en los cuatro juegos.
-- [ ] `scores.ts`, `app/_lib/` y `supabase/` no cambian.
+- [x] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores ni advertencias de Cache Components.
+- [x] En un dispositivo táctil (o emulación `pointer: coarse`) `/games/<id>/play` muestra, de arriba a abajo: canvas, gamepad, HUD.
+- [x] En escritorio (`pointer: fine`) no se ve el gamepad y el HUD sigue encima del canvas, como antes.
+- [x] El gamepad muestra cruceta, A y B, y no muestra SELECT ni START.
+- [x] Asteroides: ◀ ▶ rotan la nave, ▲ propulsa, A dispara. ▼ y B salen atenuados y no hacen nada.
+- [x] Tetris: ◀ ▶ mueven, ▼ baja, A rota, B hace caída instantánea. ▲ sale atenuado.
+- [x] Arkanoid: ◀ ▶ mueven la pala, A lanza la bola.
+- [x] Snake: las cuatro flechas giran la serpiente.
+- [x] Se pueden pulsar a la vez una dirección y A o B.
+- [x] Soltar o cancelar el toque libera el botón: la nave no sigue girando ni la pala moviéndose.
+- [x] Pulsar el gamepad no hace scroll, zoom ni abre menú contextual, y los botones no toman el foco.
+- [x] A 375 px el gamepad cabe sin scroll horizontal y cada botón mide al menos 48×48 px (cruceta 52×52 px y A/B 56×56 px, sin cambios).
+- [x] A 375 px la carcasa del gamepad mide como máximo 176 px de alto y su aspecto de Game Boy se mantiene (rectángulo con las cuatro esquinas del mismo radio, altavoz visible).
+- [x] En táctil el gamepad tiene el mismo ancho visible que el marco CRT, bordes incluidos: el borde izquierdo de `.gb-pad` coincide con el borde exterior izquierdo del anillo del marco (`.crt` − 7 px), y lo mismo en el derecho (±1 px), a 375 px y a 768 px, sin scroll horizontal.
+- [x] En el móvil real (servidor de desarrollo por IP de la red local) la página hidrata y los cuatro juegos responden al gamepad, a PAUSA y al selector de skin.
+- [x] Con el gamepad a todo el ancho, cruceta a la izquierda y A/B a la derecha siguen midiendo 52×52 y 56×56 px.
+- [x] En táctil el HUD queda inmediatamente debajo de la carcasa y se ve completo, sin scroll, a 375×812. A 375×667 se ve al menos su fila entera con un scroll mínimo (medido y anotado al verificar). _Medido: a 375×667 el HUD termina en y=686 (19 px de scroll); a 375×812 cabe entero._
+- [x] En táctil el HUD muestra solo PAUSA/REANUDAR y el selector de skin, en una fila. No aparecen JUGADOR, PUNTUACIÓN, VIDAS, NIVEL, FIN ni SALIR.
+- [x] En escritorio el HUD sigue completo (jugador, puntuación, vidas, nivel, skin, PAUSA, FIN y SALIR) y encima del canvas.
+- [x] El botón PAUSA/REANUDAR y el selector de skin siguen funcionando bajo el gamepad, y el cambio de skin se aplica a la partida.
+- [x] Con el juego en pausa o terminado, el gamepad no altera la partida.
+- [x] No quedan `*TouchControls`, `TouchControlsProps` ni estilos `.joystick`, `.fire-btn`, `.tt-*`, `.sn-*`, `.ak-launch` sin uso.
+- [x] Teclado en escritorio, skins, pausa con `P`, modal de fin y guardado de puntuación siguen funcionando en los cuatro juegos.
+- [x] `scores.ts`, `app/_lib/` y `supabase/` no cambian.
 
 ## Decisiones tomadas y descartadas
 
