@@ -5,10 +5,6 @@ export interface GameInput {
 	aim(angle: number | null): void; // rumbo absoluto en rad; null = suelto
 }
 
-export interface TouchControlsProps {
-	input: GameInput;
-}
-
 export interface GameStats {
 	score: number;
 	lives: number;

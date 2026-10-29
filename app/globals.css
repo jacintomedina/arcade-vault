@@ -762,7 +762,7 @@ a { color: inherit; text-decoration: none; }
   background: var(--green); box-shadow: 0 0 6px var(--green);
 }
 
-/* real games: canvas + touch controls */
+/* real games: canvas */
 .asteroides-canvas,
 .tetris-canvas,
 .arkanoid-canvas,
@@ -774,121 +774,6 @@ a { color: inherit; text-decoration: none; }
 }
 .arkanoid-canvas,
 .snake-canvas { touch-action: none; }
-.touch-controls { display: none; }
-@media (pointer: coarse) {
-  .touch-controls {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 14px; padding: 0 8px;
-  }
-}
-.joystick, .fire-btn {
-  touch-action: none;
-  user-select: none; -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
-}
-.joystick {
-  position: relative;
-  width: 124px; height: 124px;
-  border-radius: 50%;
-  border: 1px solid var(--cyan);
-  background: radial-gradient(circle, rgba(0,245,255,0.14), rgba(0,0,0,0.45) 70%);
-  box-shadow: 0 0 10px rgba(0,245,255,0.35), inset 0 0 12px rgba(0,245,255,0.2);
-  display: flex; align-items: center; justify-content: center;
-}
-.joystick-knob {
-  width: 52px; height: 52px;
-  border-radius: 50%;
-  background: rgba(0,245,255,0.3);
-  border: 1px solid var(--cyan);
-  box-shadow: 0 0 10px rgba(0,245,255,0.6);
-  pointer-events: none;
-}
-.fire-btn {
-  width: 92px; height: 92px;
-  border-radius: 50%;
-  font-family: var(--pixel); font-size: 11px;
-  color: var(--magenta);
-  background: rgba(0,0,0,0.45);
-  border: 1px solid var(--magenta);
-  box-shadow: 0 0 10px rgba(255,0,110,0.4), inset 0 0 8px rgba(255,0,110,0.25);
-}
-.fire-btn:active { background: rgba(255,0,110,0.3); }
-
-/* Tetris: cruceta de movimiento + acciones */
-.tt-btn {
-  touch-action: none;
-  user-select: none; -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
-  font-family: var(--pixel);
-  background: rgba(0,0,0,0.45);
-}
-.tt-pad { display: flex; gap: 8px; }
-.tt-move {
-  width: 56px; height: 56px;
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0;
-  color: var(--cyan);
-  border: 1px solid var(--cyan);
-  box-shadow: 0 0 8px rgba(0,245,255,0.35), inset 0 0 8px rgba(0,245,255,0.18);
-}
-.tt-move:active { background: rgba(0,245,255,0.28); }
-.tt-actions { display: flex; gap: 8px; }
-.tt-rotate, .tt-drop {
-  width: 66px; height: 66px;
-  border-radius: 50%;
-  font-size: 9px;
-}
-.tt-rotate {
-  color: var(--magenta);
-  border: 1px solid var(--magenta);
-  box-shadow: 0 0 10px rgba(255,0,110,0.4), inset 0 0 8px rgba(255,0,110,0.25);
-}
-.tt-rotate:active { background: rgba(255,0,110,0.3); }
-.tt-drop {
-  color: var(--yellow);
-  border: 1px solid var(--yellow);
-  box-shadow: 0 0 10px rgba(245,255,0,0.35), inset 0 0 8px rgba(245,255,0,0.2);
-}
-.tt-drop:active { background: rgba(245,255,0,0.25); }
-
-/* Snake: cruceta en cruz centrada */
-@media (pointer: coarse) {
-  .snake-touch { justify-content: center; }
-}
-.sn-pad {
-  display: grid;
-  grid-template: repeat(3, 64px) / repeat(3, 64px);
-  gap: 6px;
-}
-.sn-pad .tt-move { width: 64px; height: 64px; }
-.sn-up { grid-area: 1 / 2; }
-.sn-left { grid-area: 2 / 1; }
-.sn-hub {
-  grid-area: 2 / 2;
-  place-self: center;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: rgba(0,245,255,0.25);
-  box-shadow: 0 0 8px rgba(0,245,255,0.5);
-}
-.sn-right { grid-area: 2 / 3; }
-.sn-down { grid-area: 3 / 2; }
-
-/* Arkanoid: botón de saque */
-.ak-launch {
-  min-width: 120px; height: 56px;
-  padding: 0 20px;
-  border-radius: 28px;
-  font-size: 10px;
-  color: var(--yellow);
-  border: 1px solid var(--yellow);
-  box-shadow: 0 0 10px rgba(245,255,0,0.35), inset 0 0 8px rgba(245,255,0,0.2);
-}
-.ak-launch:active { background: rgba(245,255,0,0.25); }
-
 .controls-hint {
   display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px;
   margin: 14px 0 0;

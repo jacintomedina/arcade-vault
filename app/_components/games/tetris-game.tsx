@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import { createEngine, type Engine } from "../../_games/tetris/engine";
 import type { InputKey } from "../../_games/tetris/input";
 import { H, W } from "../../_games/tetris/constants";
 import { resolveSkin } from "../../_games/tetris/skins";
-import type { GameComponentProps, TouchControlsProps } from "./types";
+import type { GameComponentProps } from "./types";
 
 export function TetrisGame({
 	paused,
@@ -99,78 +99,5 @@ export function TetrisControlsHint() {
 				<kbd>P</kbd> pausa
 			</span>
 		</p>
-	);
-}
-
-function HoldButton({
-	input,
-	k,
-	className,
-	label,
-	children,
-}: {
-	input: TouchControlsProps["input"];
-	k: InputKey;
-	className: string;
-	label: string;
-	children: ReactNode;
-}) {
-	return (
-		<button
-			type="button"
-			tabIndex={-1}
-			className={`tt-btn ${className}`}
-			aria-label={label}
-			onPointerDown={(e) => {
-				e.preventDefault();
-				e.currentTarget.setPointerCapture(e.pointerId);
-				input.press(k, true);
-			}}
-			onPointerUp={() => input.press(k, false)}
-			onPointerCancel={() => input.press(k, false)}
-			onContextMenu={(e) => e.preventDefault()}
-		>
-			{children}
-		</button>
-	);
-}
-
-// El triángulo base apunta a la izquierda; rotate lo orienta.
-const Arrow = ({ rotate }: { rotate: number }) => (
-	<svg
-		width="22"
-		height="22"
-		viewBox="0 0 24 24"
-		fill="currentColor"
-		aria-hidden="true"
-		style={{ transform: `rotate(${rotate}deg)` }}
-	>
-		<polygon points="19,4 19,20 5,12" />
-	</svg>
-);
-
-export function TetrisTouchControls({ input }: TouchControlsProps) {
-	return (
-		<div className="touch-controls tetris-touch" aria-label="Controles táctiles">
-			<div className="tt-pad">
-				<HoldButton input={input} k="left" className="tt-move" label="Mover a la izquierda">
-					<Arrow rotate={0} />
-				</HoldButton>
-				<HoldButton input={input} k="down" className="tt-move" label="Bajar">
-					<Arrow rotate={-90} />
-				</HoldButton>
-				<HoldButton input={input} k="right" className="tt-move" label="Mover a la derecha">
-					<Arrow rotate={180} />
-				</HoldButton>
-			</div>
-			<div className="tt-actions">
-				<HoldButton input={input} k="drop" className="tt-drop" label="Caída instantánea">
-					CAÍDA
-				</HoldButton>
-				<HoldButton input={input} k="rotate" className="tt-rotate" label="Rotar">
-					ROTAR
-				</HoldButton>
-			</div>
-		</div>
 	);
 }
