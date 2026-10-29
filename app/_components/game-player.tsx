@@ -29,6 +29,7 @@ import {
 	TetrisGame,
 	TetrisTouchControls,
 } from "./games/tetris-game";
+import { SKIN_IDS } from "../_games/tetris/skins";
 import type {
 	GameComponentProps,
 	GameStats,
@@ -40,6 +41,13 @@ import { useSession } from "./session-provider";
 import { startGameSession, submitScore } from "../_actions/scores";
 
 const INITIAL_LIVES = 3;
+const SKIN_LABELS: Record<string, string> = {
+	clasico: "Clásico",
+	neon: "Neón",
+	retro: "Retro",
+};
+const DEFAULT_SKIN_ID = "clasico";
+
 const SAVE_ERROR = "No se pudo guardar la puntuación.";
 
 // Motor de cada juego del catálogo.
@@ -50,6 +58,7 @@ const REAL_GAMES: Record<
 		Controls?: ComponentType;
 		TouchControls?: ComponentType<TouchControlsProps>;
 		initialLives?: number; // por defecto INITIAL_LIVES
+		skins?: readonly string[]; // skins disponibles; sin ellas no hay selector
 	}
 > = {
 	asteroides: {
@@ -62,6 +71,7 @@ const REAL_GAMES: Record<
 		Controls: TetrisControlsHint,
 		TouchControls: TetrisTouchControls,
 		initialLives: 1, // evita ver 3 corazones antes del primer onStats
+		skins: SKIN_IDS,
 	},
 	arkanoid: {
 		Component: ArkanoidGame,
@@ -78,7 +88,7 @@ const REAL_GAMES: Record<
 
 export function GamePlayer({ game }: { game: Game }) {
 	const { user } = useSession();
-	const { Component, Controls, TouchControls, initialLives } =
+	const { Component, Controls, TouchControls, initialLives, skins } =
 		REAL_GAMES[game.id];
 	const startLives = initialLives ?? INITIAL_LIVES;
 	const [score, setScore] = useState(0);
@@ -94,6 +104,7 @@ export function GamePlayer({ game }: { game: Game }) {
 	const [runKey, setRunKey] = useState(0);
 	const [lives, setLives] = useState(startLives);
 	const [level, setLevel] = useState(1);
+	const [skin, setSkin] = useState(DEFAULT_SKIN_ID);
 
 	const inputRef = useRef<GameInput | null>(null);
 	const [touchInput] = useState<GameInput>(() => ({
@@ -112,6 +123,27 @@ export function GamePlayer({ game }: { game: Game }) {
 		setScore(finalScore);
 		setOver(true);
 	}, []);
+
+	// Skin guardada: se lee una sola vez tras montar (evita hydration mismatch).
+	useEffect(() => {
+		if (!skins) return;
+		try {
+			const saved = localStorage.getItem(`av_skin_${game.id}`);
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- lectura única tras montar, evita desajuste de hidratación
+			if (saved && skins.includes(saved)) setSkin(saved);
+		} catch {
+			// localStorage no disponible: se mantiene la skin por defecto
+		}
+	}, [game.id, skins]);
+
+	const changeSkin = (id: string) => {
+		setSkin(id);
+		try {
+			localStorage.setItem(`av_skin_${game.id}`, id);
+		} catch {
+			// sin persistencia
+		}
+	};
 
 	// Una sesión de partida del servidor por cada partida.
 	useEffect(() => {
@@ -223,7 +255,23 @@ export function GamePlayer({ game }: { game: Game }) {
 						<div className="v">{String(level).padStart(2, "0")}</div>
 					</div>
 				</div>
-				<div className="hud-actions">
+				<div className="hud-actions skin-wrap">
+					{skins && (
+						<label className="skin-select">
+							<span className="skin-select-l">Skin</span>
+							<select
+								value={skin}
+								onChange={(e) => changeSkin(e.target.value)}
+								aria-label="Skin del juego"
+							>
+								{skins.map((id) => (
+									<option key={id} value={id}>
+										{SKIN_LABELS[id] ?? id}
+									</option>
+								))}
+							</select>
+						</label>
+					)}
 					<button className="btn yellow" onClick={() => setPaused((p) => !p)}>
 						{paused ? "REANUDAR" : "PAUSA"}
 					</button>
@@ -244,6 +292,7 @@ export function GamePlayer({ game }: { game: Game }) {
 						inputRef={inputRef}
 						onStats={handleStats}
 						onGameOver={handleGameOver}
+						skin={skin}
 					/>
 					{paused && (
 						<div

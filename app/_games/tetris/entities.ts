@@ -1,4 +1,5 @@
-import { BLOCK, COLORS, COLS, NUT_MIN_LEVEL, PIECES, ROWS } from "./constants";
+import { BLOCK, COLS, NUT_MIN_LEVEL, PIECES, ROWS } from "./constants";
+import type { Skin } from "./skins";
 
 export type Board = number[][];
 
@@ -56,6 +57,7 @@ export function createBoard(): Board {
 /** Pinta una celda en coordenadas de celda; (ox, oy) es el origen en píxeles. */
 export function drawBlock(
 	ctx: CanvasRenderingContext2D,
+	skin: Skin,
 	ox: number,
 	oy: number,
 	x: number,
@@ -66,10 +68,28 @@ export function drawBlock(
 	if (!colorIndex) return;
 	const px = ox + x * BLOCK;
 	const py = oy + y * BLOCK;
+	const color = skin.pieceColors[colorIndex];
+	if (skin.blockStyle === "outline") {
+		ctx.globalAlpha = alpha * 0.18;
+		ctx.fillStyle = color;
+		ctx.fillRect(px + 2, py + 2, BLOCK - 4, BLOCK - 4);
+		ctx.globalAlpha = alpha;
+		ctx.strokeStyle = color;
+		ctx.lineWidth = 1.5;
+		ctx.shadowColor = color;
+		ctx.shadowBlur = skin.glow;
+		ctx.strokeRect(px + 2, py + 2, BLOCK - 4, BLOCK - 4);
+		ctx.shadowBlur = 0;
+		ctx.shadowColor = "transparent";
+		ctx.globalAlpha = 1;
+		return;
+	}
 	ctx.globalAlpha = alpha;
-	ctx.fillStyle = COLORS[colorIndex];
+	ctx.fillStyle = color;
 	ctx.fillRect(px + 1, py + 1, BLOCK - 2, BLOCK - 2);
-	ctx.fillStyle = "rgba(255,255,255,0.12)";
-	ctx.fillRect(px + 1, py + 1, BLOCK - 2, 4);
+	if (skin.blockHighlight) {
+		ctx.fillStyle = skin.blockHighlight;
+		ctx.fillRect(px + 1, py + 1, BLOCK - 2, 4);
+	}
 	ctx.globalAlpha = 1;
 }

@@ -21,4 +21,5 @@ export interface GameComponentProps {
 	inputRef: MutableRefObject<GameInput | null>; // GamePlayer envía aquí el input táctil
 	onStats: (s: GameStats) => void; // en cada cambio de score, lives o level
 	onGameOver: (finalScore: number) => void; // al perder la última vida
+	skin?: string; // apariencia; un valor desconocido cae en la skin por defecto
 }
