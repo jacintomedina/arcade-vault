@@ -1,6 +1,6 @@
 # SPEC 11 — HUD móvil menos saturado: datos sobre el canvas, controles bajo el gamepad
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 05, SPEC 10
 > **Fecha:** 2026-10-30
 > **Objetivo:** En pantallas táctiles, repartir el HUD en dos bloques (datos encima del canvas, controles debajo del gamepad), con un solo botón SALIR en lugar de FIN y SALIR, para que ya no sea una banda saturada de ocho elementos en dos líneas.
