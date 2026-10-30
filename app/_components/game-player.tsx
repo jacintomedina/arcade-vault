@@ -243,7 +243,7 @@ export function GamePlayer({ game }: { game: Game }) {
 	return (
 		<div className="av-player fade-in">
 			<div className="player-hud">
-				<div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+				<div className="hud-data">
 					<div className="hud-stat">
 						<div className="l">Jugador</div>
 						<div className="v" style={{ color: "var(--ink)" }}>
@@ -266,7 +266,10 @@ export function GamePlayer({ game }: { game: Game }) {
 					</div>
 					<div className="hud-stat level">
 						<div className="l">Nivel</div>
-						<div className="v">{String(level).padStart(2, "0")}</div>
+						<div className="v">
+							<span className="nv">NV </span>
+							{String(level).padStart(2, "0")}
+						</div>
 					</div>
 				</div>
 				<div className="hud-actions skin-wrap">
@@ -290,11 +293,8 @@ export function GamePlayer({ game }: { game: Game }) {
 						{paused ? "REANUDAR" : "PAUSA"}
 					</button>
 					<button className="btn magenta" onClick={() => setOver(true)}>
-						FIN
-					</button>
-					<Link className="btn ghost" href={`/games/${game.id}`}>
 						SALIR
-					</Link>
+					</button>
 				</div>
 			</div>
 
