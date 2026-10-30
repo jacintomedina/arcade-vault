@@ -3,6 +3,7 @@
 import {
 	useCallback,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 	type ComponentType,
@@ -12,22 +13,18 @@ import type { Game } from "../data/games";
 import {
 	AsteroidesControlsHint,
 	AsteroidesGame,
-	AsteroidesTouchControls,
 } from "./games/asteroides-game";
 import {
 	ArkanoidControlsHint,
 	ArkanoidGame,
-	ArkanoidTouchControls,
 } from "./games/arkanoid-game";
 import {
 	SnakeControlsHint,
 	SnakeGame,
-	SnakeTouchControls,
 } from "./games/snake-game";
 import {
 	TetrisControlsHint,
 	TetrisGame,
-	TetrisTouchControls,
 } from "./games/tetris-game";
 import { SKIN_IDS as TETRIS_SKIN_IDS } from "../_games/tetris/skins";
 import { SKIN_IDS as ASTEROIDES_SKIN_IDS } from "../_games/asteroides/skins";
@@ -37,8 +34,8 @@ import type {
 	GameComponentProps,
 	GameStats,
 	GameInput,
-	TouchControlsProps,
 } from "./games/types";
+import { GameBoyPad, type PadMapping } from "./gameboy-pad";
 import { HighlightIcon } from "./about/highlight-icon";
 import { useSession } from "./session-provider";
 import { startGameSession, submitScore } from "../_actions/scores";
@@ -59,7 +56,7 @@ const REAL_GAMES: Record<
 	{
 		Component: ComponentType<GameComponentProps>;
 		Controls?: ComponentType;
-		TouchControls?: ComponentType<TouchControlsProps>;
+		pad?: PadMapping; // mapeo del gamepad táctil; sin él no hay gamepad
 		initialLives?: number; // por defecto INITIAL_LIVES
 		skins?: readonly string[]; // skins disponibles; sin ellas no hay selector
 	}
@@ -67,26 +64,26 @@ const REAL_GAMES: Record<
 	asteroides: {
 		Component: AsteroidesGame,
 		Controls: AsteroidesControlsHint,
-		TouchControls: AsteroidesTouchControls,
+		pad: { left: "left", right: "right", up: "thrust", a: "fire" },
 		skins: ASTEROIDES_SKIN_IDS,
 	},
 	tetris: {
 		Component: TetrisGame,
 		Controls: TetrisControlsHint,
-		TouchControls: TetrisTouchControls,
+		pad: { left: "left", right: "right", down: "down", a: "rotate", b: "drop" },
 		initialLives: 1, // evita ver 3 corazones antes del primer onStats
 		skins: TETRIS_SKIN_IDS,
 	},
 	arkanoid: {
 		Component: ArkanoidGame,
 		Controls: ArkanoidControlsHint,
-		TouchControls: ArkanoidTouchControls,
+		pad: { left: "left", right: "right", a: "launch" },
 		skins: ARKANOID_SKIN_IDS,
 	},
 	snake: {
 		Component: SnakeGame,
 		Controls: SnakeControlsHint,
-		TouchControls: SnakeTouchControls,
+		pad: { up: "up", down: "down", left: "left", right: "right" },
 		initialLives: 1, // sin vidas: evita ver 3 corazones antes del primer onStats
 		skins: SNAKE_SKIN_IDS,
 	},
@@ -94,7 +91,7 @@ const REAL_GAMES: Record<
 
 export function GamePlayer({ game }: { game: Game }) {
 	const { user } = useSession();
-	const { Component, Controls, TouchControls, initialLives, skins } =
+	const { Component, Controls, pad, initialLives, skins } =
 		REAL_GAMES[game.id];
 	const startLives = initialLives ?? INITIAL_LIVES;
 	const [score, setScore] = useState(0);
@@ -117,6 +114,17 @@ export function GamePlayer({ game }: { game: Game }) {
 		press: (key, down) => inputRef.current?.press(key, down),
 		aim: (angle) => inputRef.current?.aim(angle),
 	}));
+	// Pausado o terminado no se aceptan pulsaciones nuevas; soltar siempre pasa.
+	const padInput = useMemo<GameInput>(
+		() => ({
+			press: (key, down) => {
+				if (down && (paused || over)) return;
+				touchInput.press(key, down);
+			},
+			aim: touchInput.aim,
+		}),
+		[touchInput, paused, over],
+	);
 	const name = nameEdit ?? user?.name ?? "PLAYER 1";
 
 	const handleStats = useCallback((s: GameStats) => {
@@ -235,7 +243,7 @@ export function GamePlayer({ game }: { game: Game }) {
 	return (
 		<div className="av-player fade-in">
 			<div className="player-hud">
-				<div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+				<div className="hud-data">
 					<div className="hud-stat">
 						<div className="l">Jugador</div>
 						<div className="v" style={{ color: "var(--ink)" }}>
@@ -258,7 +266,10 @@ export function GamePlayer({ game }: { game: Game }) {
 					</div>
 					<div className="hud-stat level">
 						<div className="l">Nivel</div>
-						<div className="v">{String(level).padStart(2, "0")}</div>
+						<div className="v">
+							<span className="nv">NV </span>
+							{String(level).padStart(2, "0")}
+						</div>
 					</div>
 				</div>
 				<div className="hud-actions skin-wrap">
@@ -282,11 +293,8 @@ export function GamePlayer({ game }: { game: Game }) {
 						{paused ? "REANUDAR" : "PAUSA"}
 					</button>
 					<button className="btn magenta" onClick={() => setOver(true)}>
-						FIN
-					</button>
-					<Link className="btn ghost" href={`/games/${game.id}`}>
 						SALIR
-					</Link>
+					</button>
 				</div>
 			</div>
 
@@ -330,7 +338,7 @@ export function GamePlayer({ game }: { game: Game }) {
 					<span>CARGA · 1MB</span>
 				</div>
 			</div>
-			{TouchControls && <TouchControls input={touchInput} />}
+			{pad && <GameBoyPad input={padInput} mapping={pad} />}
 			{Controls && <Controls />}
 
 			{over && (
