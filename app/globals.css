@@ -2070,7 +2070,7 @@ a { color: inherit; text-decoration: none; }
 
 /* táctil: orden datos, canvas, gamepad, controles (SPEC 11) */
 @media (pointer: coarse) {
-  .av-player { display: flex; flex-direction: column; }
+  .av-player { display: flex; flex-direction: column; margin-top: 18px; }
   /* .hud-data y .hud-actions pasan a ser hijos directos de .av-player */
   .player-hud { display: contents; }
   .hud-data, .hud-actions {
@@ -2080,15 +2080,16 @@ a { color: inherit; text-decoration: none; }
     min-width: 0;
   }
   .hud-data {
-    margin: 0 0 8px;
+    margin: 0 0 14px;
     flex-wrap: nowrap; align-items: flex-end; justify-content: space-between; gap: 8px;
   }
   .hud-stat { gap: 3px; min-width: 0; white-space: nowrap; }
   .hud-stat:first-child { flex: 1 1 0; }
   .hud-stat .l { font-size: 9px; letter-spacing: 0.06em; }
-  .hud-stat .v { font-size: 12px; overflow: hidden; text-overflow: ellipsis; }
-  .hud-stat:nth-child(2) .v { font-size: 14px; }
-  .hud-stat.lives .l, .hud-stat.level .l { display: none; }
+  .hud-stat .v { font-size: 12px; line-height: 16px; overflow: hidden; text-overflow: ellipsis; }
+  .hud-stat:nth-child(2) .v { font-size: 14px; line-height: 16px; }
+  /* sin etiqueta visible, pero conserva su altura para alinear los valores */
+  .hud-stat.lives .l, .hud-stat.level .l { visibility: hidden; }
   .hud-stat .nv { display: inline; }
   .hud-stat .hearts { min-height: 16px; gap: 2px; }
   .hud-stat .hearts .hl-icon { width: 14px; height: 14px; }

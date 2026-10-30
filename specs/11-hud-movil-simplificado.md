@@ -62,20 +62,20 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores ni advertencias de Cache Components.
-- [ ] En táctil (`pointer: coarse`) `/games/<id>/play` muestra, de arriba a abajo: datos, canvas, gamepad, controles, en los cuatro juegos.
-- [ ] En táctil la fila de datos muestra JUGADOR, PUNTUACIÓN, VIDAS y NIVEL en una sola línea, sin saltos, a 375 px y a 320 px; el nombre se recorta con puntos suspensivos si no cabe.
-- [ ] Los valores de la fila de datos miden al menos 12 px y sus etiquetas al menos 9 px; la puntuación destaca sobre el resto.
-- [ ] El nivel se ve como `NV 02` y las vidas sin la etiqueta larga «VIDAS»; la puntuación se actualiza durante la partida.
-- [ ] En táctil la fila de controles contiene, en una sola línea, el selector de skin (con su etiqueta «SKIN» encima del desplegable), PAUSA/REANUDAR y SALIR. En juegos sin skins solo PAUSA y SALIR.
-- [ ] En táctil, botones y selector miden al menos 44 px de alto, con fuente de al menos 10 px.
-- [ ] No existe un botón FIN ni un enlace SALIR a `/games/<id>` en ninguna resolución. Solo hay un botón SALIR.
-- [ ] SALIR abre el modal de fin con la puntuación; desde él se puede guardar y pulsar «VOLVER AL VAULT». Probado en táctil y en escritorio.
-- [ ] El gamepad conserva su ancho, altura y alineación con el marco CRT (sin cambios respecto a SPEC 10).
-- [ ] Sin scroll horizontal a 320, 375 y 768 px. La altura total a 375×812 cabe sin scroll vertical; a 375×667 se anota la medida real.
-- [ ] En escritorio el HUD sigue en una barra encima del canvas: datos a la izquierda; skin, PAUSA y SALIR a la derecha; sin gamepad.
-- [ ] PAUSA/REANUDAR y el cambio de skin siguen funcionando en táctil y en escritorio.
-- [ ] `scores.ts`, `app/_lib/`, `supabase/` y los motores `app/_games/` no cambian.
+- [x] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores ni advertencias de Cache Components.
+- [x] En táctil (`pointer: coarse`) `/games/<id>/play` muestra, de arriba a abajo: datos, canvas, gamepad, controles, en los cuatro juegos.
+- [x] En táctil la fila de datos muestra JUGADOR, PUNTUACIÓN, VIDAS y NIVEL en una sola línea, sin saltos, a 375 px y a 320 px; el nombre se recorta con puntos suspensivos si no cabe.
+- [x] Los valores de la fila de datos miden al menos 12 px y sus etiquetas al menos 9 px; la puntuación destaca sobre el resto.
+- [x] El nivel se ve como `NV 02` y las vidas sin la etiqueta larga «VIDAS»; la puntuación se actualiza durante la partida.
+- [x] En táctil la fila de controles contiene, en una sola línea, el selector de skin (con su etiqueta «SKIN» encima del desplegable), PAUSA/REANUDAR y SALIR. En juegos sin skins solo PAUSA y SALIR.
+- [x] En táctil, botones y selector miden al menos 44 px de alto, con fuente de al menos 10 px.
+- [x] No existe un botón FIN ni un enlace SALIR a `/games/<id>` en ninguna resolución. Solo hay un botón SALIR.
+- [x] SALIR abre el modal de fin con la puntuación; desde él se puede guardar y pulsar «VOLVER AL VAULT». Probado en táctil y en escritorio.
+- [x] El gamepad conserva su ancho, altura y alineación con el marco CRT (sin cambios respecto a SPEC 10).
+- [x] Sin scroll horizontal a 320, 375 y 768 px. La altura total a 375×812 cabe sin scroll vertical; a 375×667 se anota la medida real.
+- [x] En escritorio el HUD sigue en una barra encima del canvas: datos a la izquierda; skin, PAUSA y SALIR a la derecha; sin gamepad.
+- [x] PAUSA/REANUDAR y el cambio de skin siguen funcionando en táctil y en escritorio.
+- [x] `scores.ts`, `app/_lib/`, `supabase/` y los motores `app/_games/` no cambian.
 
 ## Decisiones tomadas y descartadas
 
