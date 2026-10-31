@@ -108,12 +108,6 @@ export function GameBoyPad({
 					<HoldButton {...props} button="a" className="gb-act gb-a" />
 				</div>
 			</div>
-			<div className="gb-speaker" aria-hidden="true">
-				<span />
-				<span />
-				<span />
-				<span />
-			</div>
 		</div>
 	);
 }
