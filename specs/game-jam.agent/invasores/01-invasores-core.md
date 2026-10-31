@@ -1,6 +1,6 @@
 # SPEC JAM invasores A — INVASORES (clásico fiel)
 
-> **Estado:** Borrador
+> **Estado:** Aprobado
 > **Variante:** Fiel. El Space Invaders de 1978 tal como se recuerda: formación de 11×5, marcha a pasos que se acelera, 4 escudos que se desgastan, platillo bonus y oleadas infinitas.
 > **Depende de:** SPEC 02, SPEC 05, SPEC 06, SPEC 07, SPEC 08, SPEC 09
 > **Fecha:** 2026-10-29
@@ -217,21 +217,21 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo                                                                  | Mitigación                                                                                                   |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| React Strict Mode monta el efecto dos veces y duplica el bucle          | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje. |
-| Módulos del motor evalúan `window` o `document` en SSR                  | Nada a nivel superior; el motor se crea solo dentro de `useEffect`.                                          |
-| `Math.random()` en render rompe la hidratación                          | Toda la aleatoriedad vive en el motor, que arranca tras el montaje.                                          |
-| Las flechas y `Espacio` hacen scroll                                    | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll.              |
-| `dt` enorme al volver de otra pestaña o al reanudar                     | Tope de 0,05 s (máximo 6 pasos por frame) y reinicio de `lastTime` al reanudar.                              |
-| Bala que atraviesa un invasor o una bala enemiga                        | Pasos fijos de 1/120 s: 5 px por paso frente a 14 px de bala y 24 px de invasor.                             |
-| Marcha de 0,03 s con pocos invasores se siente inconsistente en 60 fps  | La marcha avanza como máximo 1 tick por paso fijo, es decir 120 por segundo; el mínimo real de 0,03 s es alcanzable. |
-| Escudos pesados de pintar (4 × 352 celdas por frame)                    | Pintar por filas contiguas o cachear en un canvas fuera de pantalla creado en el motor; medir antes de optimizar. |
-| Oleadas altas imposibles                                                | Tope de dificultad en la oleada 9; el fin llega por derrota, no por desbordamiento de velocidad.             |
-| El tope de 1200 pts/s apenas frena a un bot                             | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño.                 |
-| FUEGO o `Espacio` activan un botón enfocado                             | `tabIndex={-1}` en los botones táctiles, como en Tetris, Arkanoid y Snake.                                   |
-| La UI de `/hall`, `/games` o `GamePlayer` asume un número fijo de juegos | Verificar con cinco juegos; corregir dentro de esta spec y anotarlo en Decisiones.                           |
-| Cambiar `REAL_GAMES` rompe otros juegos                                 | Solo se añade una entrada; criterio de aceptación sobre los cuatro juegos anteriores.                        |
+| Riesgo                                                                   | Mitigación                                                                                                               |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| React Strict Mode monta el efecto dos veces y duplica el bucle           | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje. |
+| Módulos del motor evalúan `window` o `document` en SSR                   | Nada a nivel superior; el motor se crea solo dentro de `useEffect`.                                                      |
+| `Math.random()` en render rompe la hidratación                           | Toda la aleatoriedad vive en el motor, que arranca tras el montaje.                                                      |
+| Las flechas y `Espacio` hacen scroll                                     | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll.                          |
+| `dt` enorme al volver de otra pestaña o al reanudar                      | Tope de 0,05 s (máximo 6 pasos por frame) y reinicio de `lastTime` al reanudar.                                          |
+| Bala que atraviesa un invasor o una bala enemiga                         | Pasos fijos de 1/120 s: 5 px por paso frente a 14 px de bala y 24 px de invasor.                                         |
+| Marcha de 0,03 s con pocos invasores se siente inconsistente en 60 fps   | La marcha avanza como máximo 1 tick por paso fijo, es decir 120 por segundo; el mínimo real de 0,03 s es alcanzable.     |
+| Escudos pesados de pintar (4 × 352 celdas por frame)                     | Pintar por filas contiguas o cachear en un canvas fuera de pantalla creado en el motor; medir antes de optimizar.        |
+| Oleadas altas imposibles                                                 | Tope de dificultad en la oleada 9; el fin llega por derrota, no por desbordamiento de velocidad.                         |
+| El tope de 1200 pts/s apenas frena a un bot                              | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño.                             |
+| FUEGO o `Espacio` activan un botón enfocado                              | `tabIndex={-1}` en los botones táctiles, como en Tetris, Arkanoid y Snake.                                               |
+| La UI de `/hall`, `/games` o `GamePlayer` asume un número fijo de juegos | Verificar con cinco juegos; corregir dentro de esta spec y anotarlo en Decisiones.                                       |
+| Cambiar `REAL_GAMES` rompe otros juegos                                  | Solo se añade una entrada; criterio de aceptación sobre los cuatro juegos anteriores.                                    |
 
 ## Lo que **no** está en esta spec
 

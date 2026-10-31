@@ -94,6 +94,7 @@ Una categoría nueva obtiene `green`. Una segunda categoría nueva requiere deci
 
 - `/add-game <carpeta de references/started-games | descripción>` — project skill (`.claude/skills/add-game/`) that turns a game into a real platform game: spec first, then engine, component, `REAL_GAMES` entry, Supabase migration and leaderboard. Support files: `integration-checklist.md`, `porting-guide.md`, `spec-template.md`, `migration-template.sql`.
 - `/spec` and `/spec-impl` — the spec-driven workflow. `specs/.spec-config.yml` has `AutoCreateBranch: true`, so `/spec-impl` creates `spec-NN-slug` on its own.
+- `/spec-impl-game <NN-juego-id>` — project skill (`.claude/skills/spec-impl-game/`). Reads and follows `/spec-impl` (phases 1–4, same rules, no auto-commit) for a game spec; when the last step is done, launches `skin-designer` and then `mobile-porter` on the game id, strictly one after the other (never parallel). Stops if the spec is not a game spec or `/spec-impl` stops.
 - Always use `/frontend-design` to design the user interface.
 
 # Agents
