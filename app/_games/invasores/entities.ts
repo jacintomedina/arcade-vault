@@ -268,6 +268,8 @@ export function createShield(x: number, y: number): Shield {
 /**
  * Primera celda viva que solapa el rectángulo (x, y, w, h), o null.
  * Devuelve el centro de esa celda en coordenadas del canvas.
+ * Recorre de arriba abajo (bala enemiga) o de abajo arriba con `fromBelow` (bala propia),
+ * para que la primera celda sea la que la bala alcanza antes.
  */
 export function shieldCollides(
 	shield: Shield,
@@ -275,12 +277,14 @@ export function shieldCollides(
 	y: number,
 	w: number,
 	h: number,
+	fromBelow = false,
 ): { x: number; y: number } | null {
 	const c0 = Math.max(0, Math.floor((x - shield.x) / SHIELD_CELL));
 	const c1 = Math.min(SHIELD_COLS - 1, Math.floor((x + w - 1 - shield.x) / SHIELD_CELL));
 	const r0 = Math.max(0, Math.floor((y - shield.y) / SHIELD_CELL));
 	const r1 = Math.min(SHIELD_ROWS - 1, Math.floor((y + h - 1 - shield.y) / SHIELD_CELL));
-	for (let r = r0; r <= r1; r++) {
+	for (let i = 0; i <= r1 - r0; i++) {
+		const r = fromBelow ? r1 - i : r0 + i;
 		for (let c = c0; c <= c1; c++) {
 			if (shield.cells[r * SHIELD_COLS + c]) {
 				return {
