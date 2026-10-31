@@ -34,6 +34,7 @@ import { SKIN_IDS as TETRIS_SKIN_IDS } from "../_games/tetris/skins";
 import { SKIN_IDS as ASTEROIDES_SKIN_IDS } from "../_games/asteroides/skins";
 import { SKIN_IDS as SNAKE_SKIN_IDS } from "../_games/snake/skins";
 import { SKIN_IDS as ARKANOID_SKIN_IDS } from "../_games/arkanoid/skins";
+import { SKIN_IDS as INVASORES_SKIN_IDS } from "../_games/invasores/skins";
 import type {
 	GameComponentProps,
 	GameStats,
@@ -95,6 +96,7 @@ const REAL_GAMES: Record<
 		Component: InvasoresGame,
 		Controls: InvasoresControlsHint,
 		pad: { left: "left", right: "right", a: "fire" },
+		skins: INVASORES_SKIN_IDS,
 	},
 };
 

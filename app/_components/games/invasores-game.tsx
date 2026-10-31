@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { createEngine, type Engine } from "../../_games/invasores/engine";
 import type { InputKey } from "../../_games/invasores/input";
+import { resolveSkin } from "../../_games/invasores/skins";
 import { H, W } from "../../_games/invasores/constants";
 import type { GameComponentProps } from "./types";
 
@@ -14,17 +15,20 @@ export function InvasoresGame({
 	inputRef,
 	onStats,
 	onGameOver,
+	skin,
 }: GameComponentProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const engineRef = useRef<Engine | null>(null);
 	const onStatsRef = useRef(onStats);
 	const onGameOverRef = useRef(onGameOver);
 	const pausedRef = useRef(paused);
+	const skinRef = useRef(resolveSkin(skin));
 
 	useEffect(() => {
 		onStatsRef.current = onStats;
 		onGameOverRef.current = onGameOver;
 		pausedRef.current = paused;
+		skinRef.current = resolveSkin(skin);
 	});
 
 	useEffect(() => {
@@ -34,6 +38,7 @@ export function InvasoresGame({
 			canvas,
 			onStats: (s) => onStatsRef.current(s),
 			onGameOver: (score) => onGameOverRef.current(score),
+			skin: skinRef.current,
 		});
 		engineRef.current = engine;
 		engine.setPaused(pausedRef.current);
@@ -48,6 +53,10 @@ export function InvasoresGame({
 	useEffect(() => {
 		engineRef.current?.setPaused(paused);
 	}, [paused]);
+
+	useEffect(() => {
+		engineRef.current?.setSkin(resolveSkin(skin));
+	}, [skin]);
 
 	useEffect(() => {
 		inputRef.current = {

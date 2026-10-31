@@ -11,6 +11,7 @@ import {
 	UFO_H,
 	UFO_W,
 } from "./constants";
+import type { Skin } from "./skins";
 
 // ───────────────────────── Tipos ─────────────────────────
 
@@ -164,18 +165,6 @@ export const ROW_SPRITE: readonly Frames[] = [
 	SPRITES.octopus,
 ];
 
-// Colores por defecto (la skin los puede sustituir más adelante).
-export const COLORS = {
-	rowColors: ["#ff4fd8", "#00f5ff", "#00f5ff", "#e8fbff", "#e8fbff"],
-	ship: "#00ff88",
-	shield: "#00ff88",
-	ufo: "#ff006e",
-	playerBullet: "#ffffff",
-	enemyBullet: "#f5ff00",
-	explosion: "#ffffff",
-	background: "#000000",
-} as const;
-
 // ───────────────────────── Dibujo ─────────────────────────
 
 /** Pinta un bitmap de texto con `fillRect`. (x, y) es la esquina superior izquierda. */
@@ -187,8 +176,13 @@ export function drawSprite(
 	cellW: number,
 	cellH: number,
 	color: string,
+	glow = 0,
 ): void {
 	ctx.fillStyle = color;
+	if (glow > 0) {
+		ctx.shadowColor = color;
+		ctx.shadowBlur = glow;
+	}
 	for (let r = 0; r < sprite.length; r++) {
 		const line = sprite[r];
 		let c = 0;
@@ -207,6 +201,13 @@ export function drawSprite(
 			);
 		}
 	}
+	if (glow > 0) resetGlow(ctx);
+}
+
+/** Restaura shadowBlur y shadowColor tras un dibujo con brillo. */
+export function resetGlow(ctx: CanvasRenderingContext2D): void {
+	ctx.shadowBlur = 0;
+	ctx.shadowColor = "transparent";
 }
 
 /** Invasor de la fila `row` en el frame 0/1. (x, y) es la esquina de su celda de 36×24. */
@@ -216,22 +217,28 @@ export function drawAlien(
 	frame: 0 | 1,
 	x: number,
 	y: number,
+	skin: Skin,
 ): void {
 	const sprite = ROW_SPRITE[row][frame];
 	// Sprite de 11×8 celdas de 3 px = 33×24, centrado en la celda de 36×24.
-	drawSprite(ctx, sprite, x + (ALIEN_W - 33) / 2, y, 3, ALIEN_H / 8, COLORS.rowColors[row]);
+	drawSprite(ctx, sprite, x + (ALIEN_W - 33) / 2, y, 3, ALIEN_H / 8, skin.rowColors[row], skin.glow);
 }
 
-export function drawExplosion(ctx: CanvasRenderingContext2D, x: number, y: number): void {
-	drawSprite(ctx, SPRITES.explosion, x + (ALIEN_W - 33) / 2, y, 3, ALIEN_H / 8, COLORS.explosion);
+export function drawExplosion(
+	ctx: CanvasRenderingContext2D,
+	x: number,
+	y: number,
+	skin: Skin,
+): void {
+	drawSprite(ctx, SPRITES.explosion, x + (ALIEN_W - 33) / 2, y, 3, ALIEN_H / 8, skin.explosion, skin.glow);
 }
 
-export function drawShip(ctx: CanvasRenderingContext2D, ship: Ship): void {
-	drawSprite(ctx, SPRITES.cannon, ship.x, SHIP_Y, SHIP_W / 11, SHIP_H / 5, COLORS.ship);
+export function drawShip(ctx: CanvasRenderingContext2D, ship: Ship, skin: Skin): void {
+	drawSprite(ctx, SPRITES.cannon, ship.x, SHIP_Y, SHIP_W / 11, SHIP_H / 5, skin.ship, skin.glow);
 }
 
-export function drawUfo(ctx: CanvasRenderingContext2D, ufo: Ufo, y: number): void {
-	drawSprite(ctx, SPRITES.ufo, ufo.x, y, UFO_W / 20, UFO_H / 6, COLORS.ufo);
+export function drawUfo(ctx: CanvasRenderingContext2D, ufo: Ufo, y: number, skin: Skin): void {
+	drawSprite(ctx, SPRITES.ufo, ufo.x, y, UFO_W / 20, UFO_H / 6, skin.ufo, skin.glow);
 }
 
 export function drawBullet(
@@ -240,9 +247,15 @@ export function drawBullet(
 	w: number,
 	h: number,
 	color: string,
+	glow = 0,
 ): void {
 	ctx.fillStyle = color;
+	if (glow > 0) {
+		ctx.shadowColor = color;
+		ctx.shadowBlur = glow;
+	}
 	ctx.fillRect(Math.round(b.x), Math.round(b.y), w, h);
+	if (glow > 0) resetGlow(ctx);
 }
 
 // ───────────────────────── Escudos ─────────────────────────
@@ -324,8 +337,12 @@ export function eraseShieldRect(shield: Shield, x: number, y: number, w: number,
 }
 
 /** Pinta el escudo por filas contiguas de celdas vivas. */
-export function drawShield(ctx: CanvasRenderingContext2D, shield: Shield): void {
-	ctx.fillStyle = COLORS.shield;
+export function drawShield(ctx: CanvasRenderingContext2D, shield: Shield, skin: Skin): void {
+	ctx.fillStyle = skin.shield;
+	if (skin.glow > 0) {
+		ctx.shadowColor = skin.shield;
+		ctx.shadowBlur = skin.glow * 0.5;
+	}
 	for (let r = 0; r < SHIELD_ROWS; r++) {
 		let c = 0;
 		while (c < SHIELD_COLS) {
@@ -343,4 +360,5 @@ export function drawShield(ctx: CanvasRenderingContext2D, shield: Shield): void 
 			);
 		}
 	}
+	if (skin.glow > 0) resetGlow(ctx);
 }

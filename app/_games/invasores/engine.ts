@@ -61,7 +61,6 @@ import {
 	type Shield,
 	type Ship,
 	type Ufo,
-	COLORS,
 	createShield,
 	drawAlien,
 	drawBullet,
@@ -73,6 +72,7 @@ import {
 	eraseShieldRect,
 	shieldCollides,
 } from "./entities";
+import { DEFAULT_SKIN, SKINS, type SkinId } from "./skins";
 import { createInput, type InputKey } from "./input";
 
 export type { InputKey };
@@ -81,6 +81,7 @@ export interface EngineOptions {
 	canvas: HTMLCanvasElement;
 	onStats: (s: GameStats) => void;
 	onGameOver: (finalScore: number) => void;
+	skin?: SkinId;
 }
 
 export interface Engine {
@@ -88,6 +89,7 @@ export interface Engine {
 	stop(): void; // cancela rAF y quita listeners
 	setPaused(p: boolean): void;
 	setInput(k: InputKey, down: boolean): void; // táctil
+	setSkin(id: SkinId): void; // cambia la apariencia sin reiniciar la partida
 }
 
 type State = "intro" | "playing" | "dying" | "clearing" | "finished";
@@ -121,6 +123,7 @@ export function createEngine(opts: EngineOptions): Engine {
 	if (!ctx) throw new Error("Canvas 2D no disponible");
 	const g: CanvasRenderingContext2D = ctx;
 	const input = createInput();
+	let skin = SKINS[opts.skin ?? DEFAULT_SKIN];
 
 	const ship: Ship = { x: (W - SHIP_W) / 2 };
 	let aliens: Alien[] = [];
@@ -492,30 +495,30 @@ export function createEngine(opts: EngineOptions): Engine {
 	// ───────────── Dibujo ─────────────
 
 	function draw() {
-		g.fillStyle = COLORS.background;
+		g.fillStyle = skin.background;
 		g.fillRect(0, 0, W, H);
 
-		g.fillStyle = COLORS.ship;
+		g.fillStyle = skin.ground;
 		g.fillRect(0, GROUND_Y, W, 2);
 
-		for (const s of shields) drawShield(g, s);
+		for (const s of shields) drawShield(g, s, skin);
 		for (const a of aliens) {
-			if (a.alive) drawAlien(g, a.row, frame, alienX(a), alienY(a));
+			if (a.alive) drawAlien(g, a.row, frame, alienX(a), alienY(a), skin);
 		}
-		for (const b of blasts) drawExplosion(g, b.x, b.y);
-		if (ufo) drawUfo(g, ufo, UFO_Y);
+		for (const b of blasts) drawExplosion(g, b.x, b.y, skin);
+		if (ufo) drawUfo(g, ufo, UFO_Y, skin);
 
 		if (state === "dying") {
 			// Parpadeo de la explosión del cañón.
 			if (Math.floor(stateTimer * 10) % 2 === 0) {
-				drawExplosion(g, ship.x + (SHIP_W - ALIEN_W) / 2, SHIP_Y - 2);
+				drawExplosion(g, ship.x + (SHIP_W - ALIEN_W) / 2, SHIP_Y - 2, skin);
 			}
 		} else if (lives > 0) {
-			drawShip(g, ship);
+			drawShip(g, ship, skin);
 		}
 
-		if (playerBullet) drawBullet(g, playerBullet, BULLET_W, BULLET_H, COLORS.playerBullet);
-		for (const e of enemyBullets) drawBullet(g, e, BULLET_W, BULLET_H, COLORS.enemyBullet);
+		if (playerBullet) drawBullet(g, playerBullet, BULLET_W, BULLET_H, skin.playerBullet, skin.glow);
+		for (const e of enemyBullets) drawBullet(g, e, BULLET_W, BULLET_H, skin.enemyBullet, skin.glow);
 	}
 
 	// ───────────── Bucle ─────────────
@@ -565,6 +568,11 @@ export function createEngine(opts: EngineOptions): Engine {
 			} else if (running) {
 				schedule();
 			}
+		},
+		setSkin(id) {
+			skin = SKINS[id];
+			// En pausa o ya terminada no hay bucle: se redibuja para ver el cambio al instante.
+			if (running && rafId === null) draw();
 		},
 		setInput(k, down) {
 			if (!paused) input.set(k, down);
