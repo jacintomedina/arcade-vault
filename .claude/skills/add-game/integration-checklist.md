@@ -4,7 +4,7 @@ Rutas reales del repo. Comprueba cada una contra el código actual antes de copi
 
 ## 1. Catálogo — `app/data/games.ts`
 
-- Añade la entrada a `GAMES`: `id`, `title`, `short`, `long`, `cat`, `cover`, `color`. Sin `best` ni `plays`.
+- Añade la entrada a `GAMES`: `id`, `title`, `short`, `long`, `cat`, `cover`, `color`. `color` según la categoría: `SHOOTER`=`cyan`, `PUZZLE`=`magenta`, `ARCADE`=`yellow`, categoría nueva=`green`. Sin `best` ni `plays`.
 - Categoría nueva: amplía `GameCategory` y `CATS`.
 - `id` en minúsculas y kebab-case. Es parte de la URL y de la FK de Supabase.
 - Las rutas `app/games/[id]/page.tsx` y `app/games/[id]/play/page.tsx` usan `GAMES` en `generateStaticParams`. No requieren cambios.

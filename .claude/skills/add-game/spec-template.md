@@ -15,7 +15,7 @@ Qué tiene de particular este juego frente a Asteroides (sin vidas, ratón, asse
 
 ## Alcance — Dentro
 
-- Entrada en `app/data/games.ts`: `id`, `title`, `cat`, `color`, `cover`, `short`, `long`. Sin `best` ni `plays` (salen de la BD).
+- Entrada en `app/data/games.ts`: `id`, `title`, `cat`, `color` (por categoría: SHOOTER=cyan, PUZZLE=magenta, ARCADE=yellow, nueva=green), `cover`, `short`, `long`. Sin `best` ni `plays` (salen de la BD).
 - `GameCategory` y `CATS` ampliados, solo si la categoría es nueva.
 - Portada `.cover-<id>` en `app/globals.css`, y `.<id>-canvas` si hace falta.
 - Port a TypeScript en `app/_games/<id>/` (`engine.ts`, `entities.ts`, `input.ts`, `constants.ts`), sin globals ni acceso a `document`/`window` fuera de funciones de montaje.

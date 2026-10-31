@@ -41,7 +41,7 @@ Escribe tres ficheros en `specs/game-jam.agent/<id>/`. Deben diferir de verdad e
 - `2-variante-<slug>.md` — **Con giro**: una mecánica nueva o modificada (niveles, power-ups, reglas, progresión), como la tuerca de Tetris o los 10 niveles de Arkanoid.
 - `3-variante-<slug>.md` — **Arcade intensa**, u otro eje justificado (ritmo, dificultad, controles, móvil primero).
 
-`<slug>` es una palabra corta que describe la variante. Cada variante puede cambiar `cat`, `color`, `initialLives`, controles y `max_score_per_second`.
+`<slug>` es una palabra corta que describe la variante. Cada variante puede cambiar `cat`, `initialLives`, controles y `max_score_per_second`. El `color` no es libre: se deriva de `cat` (SHOOTER=cyan, PUZZLE=magenta, ARCADE=yellow, categoría nueva=green; ver CLAUDE.md).
 
 ## Estructura de cada spec
 

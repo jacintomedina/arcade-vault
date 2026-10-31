@@ -55,7 +55,7 @@ Lee ahora el skill `/spec`: `~/.claude/skills/spec/SKILL.md` y `~/.claude/skills
 
 Preguntas propias de un juego que debes cubrir (no preguntes lo que la referencia o el código ya responden):
 
-- `id` kebab-case en minúsculas (parte de la URL), título visible en mayúsculas, categoría (si es nueva, se amplían `GameCategory` y `CATS`), color (`cyan`, `magenta`, `yellow`, `green`), textos `short` y `long` en español.
+- `id` kebab-case en minúsculas (parte de la URL), título visible en mayúsculas, categoría (si es nueva, se amplían `GameCategory` y `CATS`), color derivado de la categoría (`SHOOTER`=`cyan`, `PUZZLE`=`magenta`, `ARCADE`=`yellow`; categoría nueva=`green`), sin preguntarlo, textos `short` y `long` en español.
 - Mecánicas del original que se conservan, se cambian o se quitan. Si no hay vidas o niveles (p. ej. Tetris), cómo se muestran en el HUD.
 - Entrada: teclado, ratón, táctil. Qué controles táctiles hacen falta.
 - Sonido y assets: dentro o fuera de alcance. Los assets van a `public/games/<id>/`.

@@ -1,4 +1,5 @@
 export type GameCategory = "SHOOTER" | "PUZZLE" | "ARCADE";
+// Color por categoría: SHOOTER=cyan, PUZZLE=magenta, ARCADE=yellow. Categoría nueva=green.
 export type GameColor = "cyan" | "magenta" | "yellow" | "green";
 
 export interface Game {
@@ -46,7 +47,7 @@ export const GAMES: Game[] = [
     long: "Guía a la serpiente por el tablero y come la fruta que aparece para crecer. Las paredes no te detienen: sales por un lado y vuelves a entrar por el contrario. Cada 5 frutas subes de nivel y la serpiente va más rápido. Si te muerdes el cuerpo, se acabó.",
     cat: "ARCADE",
     cover: "cover-snake",
-    color: "cyan",
+    color: "yellow",
   },
 ];
 

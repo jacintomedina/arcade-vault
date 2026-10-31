@@ -41,6 +41,19 @@ Next 16.4.2 + React 19.3. Breaking changes vs. training data. Per `AGENTS.md`, r
 - `app/data/` — static catalog (`games.ts`: `GAMES`, `CATS`, `GameCategory`, `GameColor`) and landing copy (`home.ts`).
 - `specs/` specs + `.spec-config.yml`; `supabase/migrations/` SQL; `references/` source templates and the original vanilla games; `public/games/<id>/` game assets.
 
+### Color por categoría (regla fija)
+
+El `color` de cada juego en `GAMES` sale de su `cat`, no se elige libre:
+
+| `cat` | `color` |
+|---|---|
+| `SHOOTER` | `cyan` |
+| `PUZZLE` | `magenta` |
+| `ARCADE` | `yellow` |
+| categoría nueva (no listada) | `green` |
+
+Una categoría nueva obtiene `green`. Una segunda categoría nueva requiere decidir un color con el usuario y ampliar esta tabla.
+
 ### Config and styling
 
 - `next.config.ts` enables `cacheComponents`, `partialPrefetching`, `experimental.agentFeedback`, `experimental.agentUpgrade: "security"`. Cache Components changes data-fetching and caching semantics — check the docs before adding fetches or dynamic APIs.
@@ -94,3 +107,4 @@ Next 16.4.2 + React 19.3. Breaking changes vs. training data. Per `AGENTS.md`, r
   - Persists the choice in `localStorage` under `av_skin_<id>`, read once after mount. Never stores scores.
   - New CSS only with `.skin-` prefix. Never touches `scores.ts`, `app/_lib/`, `supabase/`, the `games` row, or other games.
   - Verifies with `npx tsc --noEmit` and `npm run lint`; no build/dev. Done without a spec — run `/spec` afterwards to document it.
+- `mobile-porter` — project subagent (`.claude/agents/mobile-porter.md`). Input: id of a game (`asteroides`, `tetris`, `arkanoid`, `snake` or a new one). Read-only audit of its touch/mobile version against SPEC 10 (Game Boy pad) and SPEC 11 (split HUD) and the already implemented games. Autonomous (no questions). Stops if the id is not in `GAMES`/`REAL_GAMES`. Never edits files, never runs dev/build/browser; code wins over specs when they differ. Reports in chat: verdict (`CUMPLE` / `CUMPLE CON AVISOS` / `NO CUMPLE`), checklist table with `file:line`, proposed fixes and pending manual checks. Apply fixes afterwards with `/spec` + `/spec-impl`.

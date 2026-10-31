@@ -25,10 +25,10 @@ Frente a los juegos ya implementados tiene seis particularidades:
 
 **Dentro:**
 
-- Entrada en `app/data/games.ts`: `id: "invasores"`, `title: "INVASORES"`, `cat: "SHOOTER"`, `color: "magenta"`, `cover: "cover-invasores"`, textos `short` y `long` en español. Sin `best` ni `plays`.
+- Entrada en `app/data/games.ts`: `id: "invasores"`, `title: "INVASORES"`, `cat: "SHOOTER"`, `color: "cyan"`, `cover: "cover-invasores"`, textos `short` y `long` en español. Sin `best` ni `plays`.
   - `short`: "Limpia diez oleadas de invasores y derriba a los dos jefes."
   - `long`: "Diez niveles con formaciones distintas, invasores blindados que aguantan dos disparos y un jefe en los niveles 5 y 10. Derriba el platillo para soltar una mejora: ráfaga, disparo doble o barrera. Tienes 3 vidas y los escudos se desgastan con cada impacto."
-- `GameCategory` y `CATS` no cambian: `SHOOTER` ya existe. Se elige `magenta` para distinguir la tarjeta de ASTEROIDES (cyan) y reservar `green` a la variante fiel.
+- `GameCategory` y `CATS` no cambian: `SHOOTER` ya existe. El color sale de la categoría (`SHOOTER` = `cyan`).
 - Portada `.cover-invasores` en `app/globals.css` (un jefe grande y una fila de invasores pixelados sobre fondo oscuro, tonos magenta) e `.invasores-canvas` junto a `.snake-canvas`.
 - Sin assets en `public/games/invasores/`: los sprites viven como datos en `entities.ts`.
 - Motor en TypeScript en `app/_games/invasores/` (`constants.ts`, `levels.ts`, `entities.ts`, `input.ts`, `engine.ts`), sin globals ni acceso a `document`/`window` fuera de funciones de montaje.
@@ -99,7 +99,7 @@ Entrada del catálogo:
 
 ```ts
 // app/data/games.ts
-{ id: "invasores", title: "INVASORES", cat: "SHOOTER", color: "magenta",
+{ id: "invasores", title: "INVASORES", cat: "SHOOTER", color: "cyan",
   cover: "cover-invasores", short: "...", long: "..." }
 ```
 
@@ -231,7 +231,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 - **Sí:** juego nuevo sin referencia de código; esta variante añade niveles y jefes al clásico. **No:** buscar un `game.js` en `references/started-games/`.
 - **Sí:** `id` `invasores` y título `INVASORES`. **No:** `space-invaders`.
-- **Sí:** `SHOOTER` y `magenta`. Evita ampliar `GameCategory` y distingue la tarjeta de ASTEROIDES (cyan). **No:** categoría nueva.
+- **Sí:** `SHOOTER` y `cyan` (color de la categoría). **No:** categoría nueva ni `green`.
 - **Sí:** la plataforma manda en HUD, pausa y modal. **No:** marcador ni texto GAME OVER en el canvas.
 - **Sí:** la barra de vida del jefe se pinta en el canvas, pegada a su sprite, porque es parte del objeto del mundo. **No:** mostrarla en el HUD de la plataforma (el contrato `GameStats` no la contempla).
 - **Sí:** registro por mapa en `REAL_GAMES`. **No:** `if (game.id === ...)`.
