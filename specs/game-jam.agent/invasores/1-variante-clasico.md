@@ -24,11 +24,11 @@ Frente a los juegos ya implementados tiene cinco particularidades:
 
 **Dentro:**
 
-- Entrada en `app/data/games.ts`: `id: "invasores"`, `title: "INVASORES"`, `cat: "SHOOTER"`, `color: "green"`, `cover: "cover-invasores"`, textos `short` y `long` en español. Sin `best` ni `plays`.
+- Entrada en `app/data/games.ts`: `id: "invasores"`, `title: "INVASORES"`, `cat: "SHOOTER"`, `color: "cyan"`, `cover: "cover-invasores"`, textos `short` y `long` en español. Sin `best` ni `plays`.
   - `short`: "Detén la marcha de los invasores antes de que lleguen al suelo."
   - `long`: "Una formación de 55 invasores baja paso a paso y cada vez más rápido. Dispara desde tu cañón, resguárdate tras los escudos, que se desgastan con cada impacto, y caza al platillo bonus. Tienes 3 vidas y las oleadas no se acaban."
-- `GameCategory` y `CATS` no cambian: `SHOOTER` ya existe. `green` es el único `GameColor` sin usar.
-- Portada `.cover-invasores` en `app/globals.css` (filas de invasores pixelados y un cañón sobre fondo oscuro, tonos green) y `.invasores-canvas` junto a `.snake-canvas`.
+- `GameCategory` y `CATS` no cambian: `SHOOTER` ya existe. El color sale de la categoría (`SHOOTER` = `cyan`); `green` queda libre para una categoría nueva.
+- Portada `.cover-invasores` en `app/globals.css` (filas de invasores pixelados y un cañón sobre fondo oscuro, tonos cyan) y `.invasores-canvas` junto a `.snake-canvas`.
 - Sin assets en `public/games/invasores/`: los sprites viven como datos en `entities.ts`.
 - Motor en TypeScript en `app/_games/invasores/` (`constants.ts`, `entities.ts`, `input.ts`, `engine.ts`), sin globals ni acceso a `document`/`window` fuera de funciones de montaje.
 - Componente cliente `app/_components/games/invasores-game.tsx` con `InvasoresGame`, `InvasoresControlsHint` y `InvasoresTouchControls`.
@@ -74,7 +74,7 @@ Entrada del catálogo:
 
 ```ts
 // app/data/games.ts
-{ id: "invasores", title: "INVASORES", cat: "SHOOTER", color: "green",
+{ id: "invasores", title: "INVASORES", cat: "SHOOTER", color: "cyan",
   cover: "cover-invasores", short: "...", long: "..." }
 ```
 
@@ -198,7 +198,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - **Sí:** juego nuevo sin referencia de código, con las reglas del arcade de 1978 de memoria. **No:** buscar un `game.js` en `references/started-games/`.
 - **Sí:** interpretar "Invasores (clon de Space Invaders)" como el clásico de un jugador, no variantes posteriores (Space Invaders Part II, Deluxe). **No:** inventar mecánicas.
 - **Sí:** `id` `invasores` y título `INVASORES`. Es el nombre pedido y el catálogo está en español. **No:** `space-invaders`.
-- **Sí:** `SHOOTER` y `green`. `SHOOTER` ya existe y `green` es el único color libre. **No:** categoría nueva ni repetir cyan, magenta o yellow.
+- **Sí:** `SHOOTER` y `cyan`. `SHOOTER` ya existe y su color por regla es `cyan`. **No:** categoría nueva ni `green`.
 - **Sí:** la plataforma manda en HUD, pausa y modal. **No:** marcador ni texto GAME OVER dentro del canvas, aunque el original lo pinta.
 - **Sí:** registro por mapa en `REAL_GAMES`. **No:** `if (game.id === ...)`.
 - **Sí:** 3 vidas, sin `initialLives`. **No:** vida extra a 1500 puntos (el HUD no está probado con más de 3 corazones).

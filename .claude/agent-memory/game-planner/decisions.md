@@ -10,7 +10,7 @@ Estados: `propuesto` / `aceptado` / `descartado` / `implementado`.
 
 - Candidatos: `invasores` (SHOOTER) 29/30; `2048` (PUZZLE) 25/30; `pong` (ARCADE) 23/30.
 - Elegido: `invasores` (clon genérico de Space Invaders). Estado: `propuesto`.
-- Razón: único con `green` (sin usar), equilibra categorías (SHOOTER solo tenía 1 y ARCADE 2), reutiliza pala de `arkanoid` y disparo/vidas de `asteroides`.
+- Razón: color `cyan` por regla de categoría (antes `green`), equilibra categorías (SHOOTER solo tenía 1 y ARCADE 2), reutiliza pala de `arkanoid` y disparo/vidas de `asteroides`.
 - No elegidos (siguen disponibles, no descartados): `2048` (sin tensión arcade, final natural menos claro, anti-cheat flojo), `pong` (demasiado cercano a `arkanoid`, sin puntuación creciente natural).
 
 ## 2026-10-29 — Ampliación a 21 candidatos

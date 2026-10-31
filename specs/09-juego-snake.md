@@ -21,8 +21,8 @@ Frente a los juegos anteriores tiene cinco particularidades:
 
 **Dentro:**
 
-- Entrada en `app/data/games.ts`: `id: "snake"`, `title: "SNAKE"`, `cat: "ARCADE"`, `color: "cyan"`, `cover: "cover-snake"`, textos `short` y `long` en español. Sin `best` ni `plays`.
-- Portada `.cover-snake` en `app/globals.css` (serpiente a cuadros y una fruta sobre fondo oscuro, tonos cyan) y `.snake-canvas` junto a `.arkanoid-canvas`, con `touch-action: none`.
+- Entrada en `app/data/games.ts`: `id: "snake"`, `title: "SNAKE"`, `cat: "ARCADE"`, `color: "yellow"`, `cover: "cover-snake"`, textos `short` y `long` en español. Sin `best` ni `plays`.
+- Portada `.cover-snake` en `app/globals.css` (serpiente a cuadros y una fruta sobre fondo oscuro, tonos yellow) y `.snake-canvas` junto a `.arkanoid-canvas`, con `touch-action: none`.
 - Assets en `public/games/snake/`: `fruits.png`, copiado de la referencia sin cambios.
 - Motor en TypeScript en `app/_games/snake/` (`constants.ts`, `entities.ts`, `input.ts`, `engine.ts`), sin globals ni acceso a `document`/`window` fuera de funciones de montaje.
 - Atlas de frutas tipado en `entities.ts`, portado de `sprites.js`, con las 22 frutas y sus recortes `{ x, y, w, h }`.
@@ -66,7 +66,7 @@ Entrada del catálogo:
 
 ```ts
 // app/data/games.ts
-{ id: "snake", title: "SNAKE", cat: "ARCADE", color: "cyan",
+{ id: "snake", title: "SNAKE", cat: "ARCADE", color: "yellow",
   cover: "cover-snake", short: "...", long: "..." }
 ```
 
@@ -190,7 +190,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - **Sí:** port a motor TypeScript con componente cliente. **No:** `iframe`.
 - **Sí:** la plataforma manda en HUD, pausa y modal. **No:** HUD ni overlay propios en el motor.
 - **Sí:** registro por mapa en `REAL_GAMES`. **No:** `if (game.id === ...)`.
-- **Sí:** `id` `snake`, `ARCADE` y `cyan` (petición del usuario). Evita ampliar `GameCategory`. **No:** categoría nueva ni `green`.
+- **Sí:** `id` `snake`, `ARCADE` y `yellow` (color de la categoría, ver regla en CLAUDE.md; antes `cyan`). Evita ampliar `GameCategory`. **No:** categoría nueva ni `green`.
 - **Sí:** rejilla 20×15 de 40 px sobre 800×600. Es 4:3 exacto y encaja con `.crt-screen`. **No:** 17×15 de Google Snake (obliga a letterbox) ni 30×22.
 - **Sí:** las paredes se atraviesan (petición del usuario). Solo mata el cuerpo propio. **No:** muerte por pared ni 3 vidas.
 - **Sí:** `initialLives: 1` y nivel por frutas (5 por nivel, tope 9). Mismo patrón que Tetris. **No:** 3 vidas ni nivel fijo.

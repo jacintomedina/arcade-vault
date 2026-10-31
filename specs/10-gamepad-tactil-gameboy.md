@@ -1,6 +1,6 @@
 # SPEC 10 — Gamepad táctil estilo Game Boy bajo el canvas
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 05, SPEC 07, SPEC 08, SPEC 09
 > **Fecha:** 2026-10-29
 > **Revisión 1:** 2026-10-29 — carcasa más baja con el HUD cabiendo debajo, y HUD simplificado en táctil (solo PAUSA y selector de skin). _(HUD simplificado sustituido por la revisión 5.)_

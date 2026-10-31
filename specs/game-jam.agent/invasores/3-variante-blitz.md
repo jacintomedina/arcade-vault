@@ -26,10 +26,10 @@ Frente a los juegos ya implementados tiene cinco particularidades:
 
 **Dentro:**
 
-- Entrada en `app/data/games.ts`: `id: "invasores"`, `title: "INVASORES"`, `cat: "SHOOTER"`, `color: "yellow"`, `cover: "cover-invasores"`, textos `short` y `long` en español. Sin `best` ni `plays`.
+- Entrada en `app/data/games.ts`: `id: "invasores"`, `title: "INVASORES"`, `cat: "SHOOTER"`, `color: "cyan"`, `cover: "cover-invasores"`, textos `short` y `long` en español. Sin `best` ni `plays`.
   - `short`: "Una vida, disparo automático y una racha que no puedes romper."
   - `long`: "Tu cañón dispara solo: tú esquivas, apuntas y decides cuándo soltar la bomba. Cada acierto seguido sube el multiplicador hasta ×8, pero una bala perdida lo reinicia. Una sola vida y oleadas que no se acaban. Se juega con un dedo."
-- `GameCategory` y `CATS` no cambian: `SHOOTER` ya existe. Se elige `yellow` por el tono de alerta y el contraste sobre el fondo CRT.
+- `GameCategory` y `CATS` no cambian: `SHOOTER` ya existe. El color sale de la categoría (`SHOOTER` = `cyan`).
 - Portada `.cover-invasores` en `app/globals.css` (invasores grandes pixelados con una estela de balas y un cañón sobre fondo oscuro, tonos yellow) e `.invasores-canvas` junto a `.snake-canvas`, con `touch-action: none`.
 - Sin assets en `public/games/invasores/`: los sprites viven como datos en `entities.ts`.
 - Motor en TypeScript en `app/_games/invasores/` (`constants.ts`, `entities.ts`, `input.ts`, `engine.ts`), sin globals ni acceso a `document`/`window` fuera de funciones de montaje.
@@ -75,7 +75,7 @@ Entrada del catálogo:
 
 ```ts
 // app/data/games.ts
-{ id: "invasores", title: "INVASORES", cat: "SHOOTER", color: "yellow",
+{ id: "invasores", title: "INVASORES", cat: "SHOOTER", color: "cyan",
   cover: "cover-invasores", short: "...", long: "..." }
 ```
 
@@ -204,7 +204,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 - **Sí:** juego nuevo sin referencia de código, con el móvil como eje. **No:** buscar un `game.js` en `references/started-games/`.
 - **Sí:** `id` `invasores` y título `INVASORES`. **No:** `space-invaders`.
-- **Sí:** `SHOOTER` y `yellow`. Evita ampliar `GameCategory`. **No:** categoría nueva.
+- **Sí:** `SHOOTER` y `cyan` (color de la categoría). **No:** categoría nueva ni `green`.
 - **Sí:** la plataforma manda en HUD, pausa y modal. **No:** marcador, multiplicador ni texto GAME OVER en el canvas; el multiplicador se comunica con el anillo del cañón y los puntos flotantes (elementos del mundo).
 - **Sí:** registro por mapa en `REAL_GAMES` con `initialLives: 1`. **No:** `if (game.id === ...)` ni 3 vidas.
 - **Sí:** una sola vida. Sube la tensión y encaja con partidas cortas de móvil. **No:** 3 vidas ni vida extra.

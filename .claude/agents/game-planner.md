@@ -45,7 +45,7 @@ Puntúa cada candidato de 1 a 5 en cada criterio y muestra el total:
 
 1. Tabla corta con 3 candidatos y su puntuación. Columnas: candidato, categoría, puntuación por criterio y total, con las columnas alineadas. Sin columnas de color, coste ni fecha.
 2. Recomendación única con justificación breve.
-3. Brief listo para `/add-game`: `id`, título, `cat`, `color`, descripción breve, controles (teclado y táctil), fórmula de puntuación, `max_score_per_second` propuesto con su cálculo, `initialLives`, juegos implementados cuya lógica se reutiliza, riesgos.
+3. Brief listo para `/add-game`: `id`, título, `cat`, `color` (derivado de `cat`: SHOOTER=cyan, PUZZLE=magenta, ARCADE=yellow, categoría nueva=green), descripción breve, controles (teclado y táctil), fórmula de puntuación, `max_score_per_second` propuesto con su cálculo, `initialLives`, juegos implementados cuya lógica se reutiliza, riesgos.
 
 ## Al terminar (obligatorio): actualizar memoria
 
