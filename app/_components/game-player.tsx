@@ -91,10 +91,10 @@ const REAL_GAMES: Record<
 		initialLives: 1, // sin vidas: evita ver 3 corazones antes del primer onStats
 		skins: SNAKE_SKIN_IDS,
 	},
-	// Sin `pad` hasta el Paso 10 (gamepad táctil).
 	invasores: {
 		Component: InvasoresGame,
 		Controls: InvasoresControlsHint,
+		pad: { left: "left", right: "right", a: "fire" },
 	},
 };
 
