@@ -19,6 +19,10 @@ import {
 	ArkanoidGame,
 } from "./games/arkanoid-game";
 import {
+	InvasoresControlsHint,
+	InvasoresGame,
+} from "./games/invasores-game";
+import {
 	SnakeControlsHint,
 	SnakeGame,
 } from "./games/snake-game";
@@ -30,6 +34,7 @@ import { SKIN_IDS as TETRIS_SKIN_IDS } from "../_games/tetris/skins";
 import { SKIN_IDS as ASTEROIDES_SKIN_IDS } from "../_games/asteroides/skins";
 import { SKIN_IDS as SNAKE_SKIN_IDS } from "../_games/snake/skins";
 import { SKIN_IDS as ARKANOID_SKIN_IDS } from "../_games/arkanoid/skins";
+import { SKIN_IDS as INVASORES_SKIN_IDS } from "../_games/invasores/skins";
 import type {
 	GameComponentProps,
 	GameStats,
@@ -86,6 +91,12 @@ const REAL_GAMES: Record<
 		pad: { up: "up", down: "down", left: "left", right: "right" },
 		initialLives: 1, // sin vidas: evita ver 3 corazones antes del primer onStats
 		skins: SNAKE_SKIN_IDS,
+	},
+	invasores: {
+		Component: InvasoresGame,
+		Controls: InvasoresControlsHint,
+		pad: { left: "left", right: "right", a: "fire" },
+		skins: INVASORES_SKIN_IDS,
 	},
 };
 

@@ -1,6 +1,6 @@
 # SPEC JAM invasores A — INVASORES (clásico fiel)
 
-> **Estado:** Borrador
+> **Estado:** Aprobado
 > **Variante:** Fiel. El Space Invaders de 1978 tal como se recuerda: formación de 11×5, marcha a pasos que se acelera, 4 escudos que se desgastan, platillo bonus y oleadas infinitas.
 > **Depende de:** SPEC 02, SPEC 05, SPEC 06, SPEC 07, SPEC 08, SPEC 09
 > **Fecha:** 2026-10-29
@@ -158,40 +158,40 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` termina sin errores.
-- [ ] `npm run build` termina sin errores ni advertencias de Cache Components.
-- [ ] `/games` muestra la tarjeta INVASORES con su portada `cover-invasores`, y los otros cuatro juegos siguen igual.
-- [ ] `/games/invasores` muestra la ficha y su botón de jugar lleva a `/games/invasores/play`.
-- [ ] `/games/invasores/play` muestra una formación de 11×5 invasores, 4 escudos y el cañón, y ni HUD ni texto de fin pintados en el canvas.
-- [ ] `←` y `→` mueven el cañón a 300 px/s y no lo sacan de `[20, 736]` px lógicos.
-- [ ] `Espacio` dispara; con una bala en pantalla no sale otra, y mantener `Espacio` dispara cada 0,25 s como mínimo.
-- [ ] La formación se mueve 8 px por tick, baja 24 px y cambia de sentido al tocar el margen de 20 px, y alterna el frame de los sprites.
+- [x] `npm run lint` termina sin errores.
+- [x] `npm run build` termina sin errores ni advertencias de Cache Components.
+- [x] `/games` muestra la tarjeta INVASORES con su portada `cover-invasores`, y los otros cuatro juegos siguen igual.
+- [x] `/games/invasores` muestra la ficha y su botón de jugar lleva a `/games/invasores/play`.
+- [x] `/games/invasores/play` muestra una formación de 11×5 invasores, 4 escudos y el cañón, y ni HUD ni texto de fin pintados en el canvas.
+- [x] `←` y `→` mueven el cañón a 300 px/s y no lo sacan de `[20, 736]` px lógicos.
+- [x] `Espacio` dispara; con una bala en pantalla no sale otra, y mantener `Espacio` dispara cada 0,25 s como mínimo.
+- [x] La formación se mueve 8 px por tick, baja 24 px y cambia de sentido al tocar el margen de 20 px, y alterna el frame de los sprites.
 - [ ] El intervalo de marcha es 0,63 s con 55 invasores y 0,03 s con 1 en la oleada 1, y baja más en oleadas superiores hasta la 9.
-- [ ] Destruir un calamar suma 30, un cangrejo 20 y un pulpo 10 puntos, exactamente.
-- [ ] Nunca hay más de 3 balas enemigas a la vez, y salen solo de invasores sin otro invasor debajo en su columna.
-- [ ] Una bala propia y una enemiga que se cruzan desaparecen sin sumar puntos.
-- [ ] Cada impacto en un escudo, propio o enemigo, borra celdas en un radio de 2 y consume la bala; un escudo agotado deja pasar las balas.
-- [ ] Un invasor que cruza un escudo borra las celdas que toca.
+- [x] Destruir un calamar suma 30, un cangrejo 20 y un pulpo 10 puntos, exactamente.
+- [x] Nunca hay más de 3 balas enemigas a la vez, y salen solo de invasores sin otro invasor debajo en su columna.
+- [x] Una bala propia y una enemiga que se cruzan desaparecen sin sumar puntos.
+- [x] Cada impacto en un escudo, propio o enemigo, borra celdas en un radio de 2 y consume la bala; un escudo agotado deja pasar las balas.
+- [x] Un invasor que cruza un escudo borra las celdas que toca.
 - [ ] El platillo cruza en `y = 50` a 140 px/s, solo con 8 o más invasores vivos, y da 50, 100, 150 o 300 puntos.
-- [ ] A la velocidad de bala de 600 px/s la bala no atraviesa invasores ni el platillo.
-- [ ] Un impacto enemigo resta una vida, congela la partida 1,2 s, borra las balas y recoloca el cañón.
-- [ ] Un invasor que llega a `y = 500` termina la partida aunque queden vidas.
-- [ ] Destruir los 55 invasores sube la oleada tras 1,2 s, restaura los escudos y baja la formación 24 px más (hasta 96 px).
-- [ ] El HUD de la plataforma refleja puntuación, vidas (3 a 0) y oleada como nivel en tiempo real.
-- [ ] PAUSA y la tecla `P` congelan el juego, incluidos marcha y platillo; al reanudar no hay salto de movimiento.
-- [ ] Al terminar se abre el modal "FIN DEL JUEGO" con la puntuación final.
+- [x] A la velocidad de bala de 600 px/s la bala no atraviesa invasores ni el platillo.
+- [x] Un impacto enemigo resta una vida, congela la partida 1,2 s, borra las balas y recoloca el cañón.
+- [x] Un invasor que llega a `y = 500` termina la partida aunque queden vidas.
+- [x] Destruir los 55 invasores sube la oleada tras 1,2 s, restaura los escudos y baja la formación 24 px más (hasta 96 px).
+- [x] El HUD de la plataforma refleja puntuación, vidas (3 a 0) y oleada como nivel en tiempo real.
+- [x] PAUSA y la tecla `P` congelan el juego, incluidos marcha y platillo; al reanudar no hay salto de movimiento.
+- [x] Al terminar se abre el modal "FIN DEL JUEGO" con la puntuación final.
 - [ ] GUARDAR PUNTUACIÓN inserta una fila en `scores` con `game_id = 'invasores'` y el modal muestra `#NN`.
-- [ ] "JUGAR DE NUEVO" reinicia con puntuación 0, 3 vidas y oleada 1, y abre una sesión nueva.
-- [ ] `startGameSession('invasores')` devuelve `sessionId`.
-- [ ] `execute_sql` muestra la fila `invasores` con `max_score_per_second = 1200`.
-- [ ] `list_tables` muestra RLS activo y `get_advisors` no reporta problemas nuevos.
-- [ ] `/hall` muestra la pestaña INVASORES con estado vacío "SÉ EL PRIMERO" si no hay marcas, y las pestañas de los otros juegos siguen funcionando.
-- [ ] Tarjeta y ficha muestran la mejor marca y las partidas reales de Invasores (0 sin marcas).
-- [ ] La biblioteca `/games` ofrece el filtro SHOOTER y muestra ASTEROIDES e INVASORES en él.
-- [ ] Con las flechas y `Espacio` la página no hace scroll durante la partida.
-- [ ] Al salir de `/games/invasores/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad).
-- [ ] A 375px el canvas ocupa el ancho del marco, sin scroll horizontal, y ◀ ▶ y FUEGO controlan el cañón.
-- [ ] `/games/asteroides/play`, `/games/tetris/play`, `/games/arkanoid/play`, `/games/snake/play` y las rutas de SPEC 01 a 09 siguen funcionando.
+- [x] "JUGAR DE NUEVO" reinicia con puntuación 0, 3 vidas y oleada 1, y abre una sesión nueva.
+- [x] `startGameSession('invasores')` devuelve `sessionId`.
+- [x] `execute_sql` muestra la fila `invasores` con `max_score_per_second = 1200`.
+- [x] `list_tables` muestra RLS activo y `get_advisors` no reporta problemas nuevos.
+- [x] `/hall` muestra la pestaña INVASORES con estado vacío "SÉ EL PRIMERO" si no hay marcas, y las pestañas de los otros juegos siguen funcionando.
+- [x] Tarjeta y ficha muestran la mejor marca y las partidas reales de Invasores (0 sin marcas).
+- [x] La biblioteca `/games` ofrece el filtro SHOOTER y muestra ASTEROIDES e INVASORES en él.
+- [x] Con las flechas y `Espacio` la página no hace scroll durante la partida.
+- [x] Al salir de `/games/invasores/play` no quedan listeners ni `requestAnimationFrame` activos (un segundo montaje no duplica la velocidad).
+- [x] A 375px el canvas ocupa el ancho del marco, sin scroll horizontal, y ◀ ▶ y FUEGO controlan el cañón.
+- [x] `/games/asteroides/play`, `/games/tetris/play`, `/games/arkanoid/play`, `/games/snake/play` y las rutas de SPEC 01 a 09 siguen funcionando.
 
 ## Decisiones tomadas y descartadas
 
@@ -217,21 +217,21 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Riesgos
 
-| Riesgo                                                                  | Mitigación                                                                                                   |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| React Strict Mode monta el efecto dos veces y duplica el bucle          | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje. |
-| Módulos del motor evalúan `window` o `document` en SSR                  | Nada a nivel superior; el motor se crea solo dentro de `useEffect`.                                          |
-| `Math.random()` en render rompe la hidratación                          | Toda la aleatoriedad vive en el motor, que arranca tras el montaje.                                          |
-| Las flechas y `Espacio` hacen scroll                                    | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll.              |
-| `dt` enorme al volver de otra pestaña o al reanudar                     | Tope de 0,05 s (máximo 6 pasos por frame) y reinicio de `lastTime` al reanudar.                              |
-| Bala que atraviesa un invasor o una bala enemiga                        | Pasos fijos de 1/120 s: 5 px por paso frente a 14 px de bala y 24 px de invasor.                             |
-| Marcha de 0,03 s con pocos invasores se siente inconsistente en 60 fps  | La marcha avanza como máximo 1 tick por paso fijo, es decir 120 por segundo; el mínimo real de 0,03 s es alcanzable. |
-| Escudos pesados de pintar (4 × 352 celdas por frame)                    | Pintar por filas contiguas o cachear en un canvas fuera de pantalla creado en el motor; medir antes de optimizar. |
-| Oleadas altas imposibles                                                | Tope de dificultad en la oleada 9; el fin llega por derrota, no por desbordamiento de velocidad.             |
-| El tope de 1200 pts/s apenas frena a un bot                             | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño.                 |
-| FUEGO o `Espacio` activan un botón enfocado                             | `tabIndex={-1}` en los botones táctiles, como en Tetris, Arkanoid y Snake.                                   |
-| La UI de `/hall`, `/games` o `GamePlayer` asume un número fijo de juegos | Verificar con cinco juegos; corregir dentro de esta spec y anotarlo en Decisiones.                           |
-| Cambiar `REAL_GAMES` rompe otros juegos                                 | Solo se añade una entrada; criterio de aceptación sobre los cuatro juegos anteriores.                        |
+| Riesgo                                                                   | Mitigación                                                                                                               |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| React Strict Mode monta el efecto dos veces y duplica el bucle           | `createEngine` devuelve `stop()`, que el `useEffect` llama en la limpieza. Criterio de aceptación de un segundo montaje. |
+| Módulos del motor evalúan `window` o `document` en SSR                   | Nada a nivel superior; el motor se crea solo dentro de `useEffect`.                                                      |
+| `Math.random()` en render rompe la hidratación                           | Toda la aleatoriedad vive en el motor, que arranca tras el montaje.                                                      |
+| Las flechas y `Espacio` hacen scroll                                     | Ya están en las teclas con `preventDefault` de `GamePlayer`; criterio de aceptación sin scroll.                          |
+| `dt` enorme al volver de otra pestaña o al reanudar                      | Tope de 0,05 s (máximo 6 pasos por frame) y reinicio de `lastTime` al reanudar.                                          |
+| Bala que atraviesa un invasor o una bala enemiga                         | Pasos fijos de 1/120 s: 5 px por paso frente a 14 px de bala y 24 px de invasor.                                         |
+| Marcha de 0,03 s con pocos invasores se siente inconsistente en 60 fps   | La marcha avanza como máximo 1 tick por paso fijo, es decir 120 por segundo; el mínimo real de 0,03 s es alcanzable.     |
+| Escudos pesados de pintar (4 × 352 celdas por frame)                     | Pintar por filas contiguas o cachear en un canvas fuera de pantalla creado en el motor; medir antes de optimizar.        |
+| Oleadas altas imposibles                                                 | Tope de dificultad en la oleada 9; el fin llega por derrota, no por desbordamiento de velocidad.                         |
+| El tope de 1200 pts/s apenas frena a un bot                              | Límite aceptado en SPEC 06. El uso único de la sesión y el tope por segundo limitan el daño.                             |
+| FUEGO o `Espacio` activan un botón enfocado                              | `tabIndex={-1}` en los botones táctiles, como en Tetris, Arkanoid y Snake.                                               |
+| La UI de `/hall`, `/games` o `GamePlayer` asume un número fijo de juegos | Verificar con cinco juegos; corregir dentro de esta spec y anotarlo en Decisiones.                                       |
+| Cambiar `REAL_GAMES` rompe otros juegos                                  | Solo se añade una entrada; criterio de aceptación sobre los cuatro juegos anteriores.                                    |
 
 ## Lo que **no** está en esta spec
 

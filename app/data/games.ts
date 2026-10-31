@@ -49,6 +49,15 @@ export const GAMES: Game[] = [
     cover: "cover-snake",
     color: "yellow",
   },
+  {
+    id: "invasores",
+    title: "INVASORES",
+    short: "Detén la marcha de los invasores antes de que lleguen al suelo.",
+    long: "Una formación de 55 invasores baja paso a paso y cada vez más rápido. Dispara desde tu cañón, resguárdate tras los escudos, que se desgastan con cada impacto, y caza al platillo bonus. Tienes 3 vidas y las oleadas no se acaban.",
+    cat: "SHOOTER",
+    cover: "cover-invasores",
+    color: "cyan",
+  },
 ];
 
 export const CATS: ("TODOS" | GameCategory)[] = ["TODOS", "SHOOTER", "PUZZLE", "ARCADE"];
