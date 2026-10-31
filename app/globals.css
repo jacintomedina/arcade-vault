@@ -764,18 +764,34 @@ a { color: inherit; text-decoration: none; }
   background: var(--green); box-shadow: 0 0 6px var(--green);
 }
 
+.cover-invasores { background: radial-gradient(circle at 50% 100%, #002a33, #05050f); }
+.cover-invasores::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,245,255,0.05) 0 1px, transparent 1px 4px);
+}
+.cover-invasores::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 120' shape-rendering='crispEdges'%3E%3Cdefs%3E%3Cpath id='a' d='M3 0h5v1h-5zM2 1h7v1h-7zM0 2h11v1h-11zM0 3h3v1h-3zM5 3h1v1h-1zM8 3h3v1h-3zM0 4h11v1h-11zM2 5h2v1h-2zM7 5h2v1h-2zM1 6h2v1h-2zM4 6h3v1h-3zM8 6h2v1h-2zM0 7h2v1h-2zM9 7h2v1h-2z'/%3E%3Cpath id='b' d='M2 0h1v1h-1zM8 0h1v1h-1zM3 1h1v1h-1zM7 1h1v1h-1zM2 2h7v1h-7zM1 3h2v1h-2zM4 3h3v1h-3zM8 3h2v1h-2zM0 4h11v1h-11zM0 5h1v1h-1zM2 5h7v1h-7zM10 5h1v1h-1zM0 6h1v1h-1zM2 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM3 7h2v1h-2zM6 7h2v1h-2z'/%3E%3Cpath id='c' d='M4 0h1v1h-1zM3 1h3v1h-3zM0 2h9v1h-9zM0 3h9v1h-9z'/%3E%3C/defs%3E%3Cg fill='%237dfcff'%3E%3Cuse href='%23a' transform='translate(15 10) scale(1.6)'/%3E%3Cuse href='%23a' transform='translate(43 10) scale(1.6)'/%3E%3Cuse href='%23a' transform='translate(71 10) scale(1.6)'/%3E%3Cuse href='%23a' transform='translate(99 10) scale(1.6)'/%3E%3Cuse href='%23a' transform='translate(127 10) scale(1.6)'/%3E%3C/g%3E%3Cg fill='%2300f5ff'%3E%3Cuse href='%23b' transform='translate(15 32) scale(1.6)'/%3E%3Cuse href='%23b' transform='translate(43 32) scale(1.6)'/%3E%3Cuse href='%23b' transform='translate(71 32) scale(1.6)'/%3E%3Cuse href='%23b' transform='translate(99 32) scale(1.6)'/%3E%3Cuse href='%23b' transform='translate(127 32) scale(1.6)'/%3E%3C/g%3E%3Cg fill='%2300c4cc'%3E%3Cuse href='%23b' transform='translate(15 54) scale(1.6)'/%3E%3Cuse href='%23b' transform='translate(43 54) scale(1.6)'/%3E%3Cuse href='%23b' transform='translate(71 54) scale(1.6)'/%3E%3Cuse href='%23b' transform='translate(99 54) scale(1.6)'/%3E%3Cuse href='%23b' transform='translate(127 54) scale(1.6)'/%3E%3C/g%3E%3Crect x='79' y='78' width='2.4' height='9' fill='%23fff'/%3E%3Cuse href='%23c' fill='%2300f5ff' transform='translate(70 96) scale(2.2)'/%3E%3C/svg%3E") center/cover no-repeat;
+  filter: drop-shadow(0 0 6px rgba(0,245,255,0.6));
+  image-rendering: pixelated;
+}
+
 /* real games: canvas */
 .asteroides-canvas,
 .tetris-canvas,
 .arkanoid-canvas,
-.snake-canvas {
+.snake-canvas,
+.invasores-canvas {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   display: block;
   background: #000;
 }
 .arkanoid-canvas,
-.snake-canvas { touch-action: none; }
+.snake-canvas,
+.invasores-canvas { touch-action: none; }
 .controls-hint {
   display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px;
   margin: 14px 0 0;
