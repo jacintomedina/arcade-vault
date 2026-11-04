@@ -165,29 +165,29 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores ni advertencias de Cache Components.
-- [ ] La migración existe en `supabase/migrations/`, está aplicada, `profiles` tiene RLS activo y `get_advisors` no reporta avisos de seguridad nuevos.
+- [x] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores ni advertencias de Cache Components.
+- [x] La migración existe en `supabase/migrations/`, está aplicada, `profiles` tiene RLS activo y `get_advisors` no reporta avisos de seguridad nuevos.
 - [ ] Registrarse con email, contraseña (≥ 8) y username válido crea el usuario, muestra «Revisa tu correo» y **no** inicia sesión hasta confirmar.
 - [ ] El enlace del correo de confirmación pasa por `/auth/callback`, inicia sesión y deja un perfil con el username elegido.
 - [ ] Iniciar sesión sin confirmar el correo falla con un mensaje claro; con credenciales erróneas muestra «Credenciales incorrectas» sin distinguir entre email inexistente y contraseña mala.
-- [ ] Un username ya usado (comparado sin mayúsculas) o con caracteres no permitidos se rechaza en el registro con mensaje de campo; el índice único impide duplicados aunque se salte la comprobación previa.
-- [ ] Iniciar sesión con email y contraseña correctos deja la sesión activa; recargar la página la mantiene (cookie refrescada por `proxy.ts`).
+- [x] Un username ya usado (comparado sin mayúsculas) o con caracteres no permitidos se rechaza en el registro con mensaje de campo; el índice único impide duplicados aunque se salte la comprobación previa.
+- [x] Iniciar sesión con email y contraseña correctos deja la sesión activa; recargar la página la mantiene (cookie refrescada por `proxy.ts`).
 - [ ] Google y GitHub inician el flujo OAuth y vuelven a la app con sesión. Si el perfil no tiene username, se redirige a `/access/username` y no se puede salir de ahí sin elegir uno válido y único.
 - [ ] `/access/forgot` muestra siempre el mismo mensaje exista o no el email; el correo lleva a `/access/reset` con sesión de recuperación y permite fijar una nueva contraseña; entrar a `/access/reset` sin esa sesión muestra el aviso y el enlace a `/access/forgot`.
 - [ ] `/profile` sin sesión redirige a `/access`. Con sesión permite cambiar el username (único, mismas reglas) y la contraseña; la sección de contraseña no aparece en cuentas solo-OAuth.
 - [ ] `next` en `/auth/callback` solo acepta rutas internas: `?next=https://evil.com` y `?next=//evil.com` redirigen a `/`.
-- [ ] El `Nav` muestra el username y CERRAR SESIÓN con cuenta; cerrar sesión borra la sesión de Supabase y el `Nav` vuelve a «Iniciar Sesión»; el invitado conserva su comportamiento actual.
-- [ ] «JUGAR COMO INVITADO» sigue funcionando: un invitado juega los cinco juegos, usa SALIR/FIN y ve su puntuación final.
-- [ ] El modal de fin de un invitado no tiene campo de nombre ni botón de guardar; muestra el aviso con enlace a `/access` y «VOLVER AL VAULT».
-- [ ] Con cuenta y username, el modal muestra el username precargado y de solo lectura, y la puntuación aparece en el leaderboard con ese nombre en mayúsculas.
-- [ ] Con cuenta sin username, el modal muestra aviso con enlace a `/access/username` y no permite guardar.
-- [ ] Llamar a `submitScore` sin sesión (sin cookie) devuelve `{ ok: false }` con el mensaje de inicio de sesión, no inserta fila en `scores` y **no** marca `consumed_at` de la sesión de juego (verificado con `execute_sql`).
+- [x] El `Nav` muestra el username y CERRAR SESIÓN con cuenta; cerrar sesión borra la sesión de Supabase y el `Nav` vuelve a «Iniciar Sesión»; el invitado conserva su comportamiento actual.
+- [x] «JUGAR COMO INVITADO» sigue funcionando: un invitado juega los cinco juegos, usa SALIR/FIN y ve su puntuación final.
+- [x] El modal de fin de un invitado no tiene campo de nombre ni botón de guardar; muestra el aviso con enlace a `/access` y «VOLVER AL VAULT».
+- [x] Con cuenta y username, el modal muestra el username precargado y de solo lectura, y la puntuación aparece en el leaderboard con ese nombre en mayúsculas.
+- [x] Con cuenta sin username, el modal muestra aviso con enlace a `/access/username` y no permite guardar.
+- [x] Llamar a `submitScore` sin sesión (sin cookie) devuelve `{ ok: false }` con el mensaje de inicio de sesión, no inserta fila en `scores` y **no** marca `consumed_at` de la sesión de juego (verificado con `execute_sql`).
 - [ ] Llamar a `submitScore` con sesión pero enviando otro nombre guarda el username de la cuenta, no el enviado.
-- [ ] Tras guardar, `updateTag("leaderboard")` y las `revalidatePath` siguen funcionando: `/hall`, `/games` y `/games/<id>` muestran la nueva puntuación.
-- [ ] Primer render sin desajuste de hidratación (sin avisos en consola) con y sin sesión.
+- [x] Tras guardar, `updateTag("leaderboard")` y las `revalidatePath` siguen funcionando: `/hall`, `/games` y `/games/<id>` muestran la nueva puntuación.
+- [x] Primer render sin desajuste de hidratación (sin avisos en consola) con y sin sesión.
 - [ ] Ningún mensaje de error ni respuesta de las Server Actions filtra claves, contraseñas ni detalles internos de Supabase.
-- [ ] `leaderboard.ts`, las migraciones previas y los motores de `app/_games/` no cambian; en `scores.ts` solo cambia lo descrito en la revisión 1.
-- [ ] `README.md` documenta la configuración del dashboard y `CLAUDE.md` refleja las rutas y el `SessionProvider` nuevos. Ningún archivo versionado contiene secretos de Google, GitHub ni claves de Supabase.
+- [x] `leaderboard.ts`, las migraciones previas y los motores de `app/_games/` no cambian; en `scores.ts` solo cambia lo descrito en la revisión 1.
+- [x] `README.md` documenta la configuración del dashboard y `CLAUDE.md` refleja las rutas y el `SessionProvider` nuevos. Ningún archivo versionado contiene secretos de Google, GitHub ni claves de Supabase.
 
 ## Decisiones tomadas y descartadas
 

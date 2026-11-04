@@ -8,12 +8,23 @@ import { updatePassword } from "../access/actions";
  * Nueva contraseña (reset y perfil). Con `redirectTo` navega al terminar;
  * sin él muestra la confirmación en el sitio.
  */
-export function PasswordForm({ redirectTo }: { redirectTo?: string }) {
+export function PasswordForm({
+  redirectTo,
+  saved,
+  onSavedChange,
+}: {
+  redirectTo?: string;
+  /** Opcional: el padre controla el aviso «guardado» (varios formularios en una página). */
+  saved?: boolean;
+  onSavedChange?: (saved: boolean) => void;
+}) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
+  const [localDone, setLocalDone] = useState(false);
+  const done = saved ?? localDone;
+  const setDone = onSavedChange ?? setLocalDone;
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

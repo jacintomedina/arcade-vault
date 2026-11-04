@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { AuthShell } from "../../_components/auth-shell";
 import { PasswordForm } from "../../_components/password-form";
@@ -11,6 +12,8 @@ export const metadata: Metadata = {
 };
 
 async function hasSession(): Promise<boolean> {
+  // Lectura de sesión: siempre en petición, nunca prerenderizada (Date.now del JWT).
+  await connection();
   try {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();

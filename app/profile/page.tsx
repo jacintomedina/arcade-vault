@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { AuthShell } from "../_components/auth-shell";
-import { PasswordForm } from "../_components/password-form";
-import { UsernameForm } from "../_components/username-form";
+import { ProfileForms } from "../_components/profile-forms";
 import { createClient } from "../_lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -18,6 +18,8 @@ interface ProfileData {
 }
 
 async function loadProfile(): Promise<ProfileData | null> {
+  // Lectura de sesión: siempre en petición, nunca prerenderizada (Date.now del JWT).
+  await connection();
   try {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
@@ -46,19 +48,10 @@ async function ProfileContent() {
 
   return (
     <AuthShell title="TU PERFIL" subtitle={profile.email}>
-      <section className="auth-section" aria-labelledby="profile-user">
-        <h2 id="profile-user">Nombre de usuario</h2>
-        <UsernameForm
-          initialUsername={profile.username ?? ""}
-          submitLabel="GUARDAR USUARIO"
-        />
-      </section>
-      {profile.hasPassword && (
-        <section className="auth-section" aria-labelledby="profile-pass">
-          <h2 id="profile-pass">Cambiar contraseña</h2>
-          <PasswordForm />
-        </section>
-      )}
+      <ProfileForms
+        initialUsername={profile.username ?? ""}
+        hasPassword={profile.hasPassword}
+      />
     </AuthShell>
   );
 }

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { AuthShell } from "../../_components/auth-shell";
 import { UsernameForm } from "../../_components/username-form";
@@ -13,6 +14,8 @@ export const metadata: Metadata = {
 type Check = "anon" | "needs-username" | "has-username";
 
 async function checkProfile(): Promise<Check> {
+  // Lectura de sesión: siempre en petición, nunca prerenderizada (Date.now del JWT).
+  await connection();
   try {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();

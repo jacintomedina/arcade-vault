@@ -13,17 +13,24 @@ export function UsernameForm({
   initialUsername = "",
   redirectTo,
   submitLabel = "GUARDAR USUARIO",
+  saved,
+  onSavedChange,
 }: {
   initialUsername?: string;
   redirectTo?: string;
   submitLabel?: string;
+  /** Opcional: el padre controla el aviso «guardado» (varios formularios en una página). */
+  saved?: boolean;
+  onSavedChange?: (saved: boolean) => void;
 }) {
   const router = useRouter();
   const { refresh } = useSession();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
+  const [localDone, setLocalDone] = useState(false);
+  const done = saved ?? localDone;
+  const setDone = onSavedChange ?? setLocalDone;
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
