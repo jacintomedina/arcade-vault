@@ -136,11 +136,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     // Las cookies de sesión las borra el servidor; después se limpia el
     // estado local del cliente de navegador.
-    await signOutAction();
-    try {
-      await createClient().auth.signOut({ scope: "local" });
-    } catch {
-      // ya cerrada en el servidor
+    if (account) {
+      await signOutAction();
+      try {
+        await createClient().auth.signOut({ scope: "local" });
+      } catch {
+        // ya cerrada en el servidor
+      }
     }
     setAccount(null);
     setGuest(null);
@@ -149,7 +151,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     } catch {
       // sin persistencia
     }
-  }, []);
+  }, [account]);
 
   const refresh = useCallback(async () => {
     setAccount(await readAccount());
