@@ -29,7 +29,7 @@ Next 16.4.2 + React 19.3. Breaking changes vs. training data. Per `AGENTS.md`, r
 
 ### Routes (App Router only)
 
-- `/` landing, `/games` library (see `references/implemented-games.md` whenever you need to check which games are implemented and how to implement new ones), `/games/[id]` game detail, `/games/[id]/play` player, `/hall` hall of fame, `/about` about + contact, `/access` guest login.
+- `/` landing, `/games` library (see `references/implemented-games.md` whenever you need to check which games are implemented and how to implement new ones), `/games/[id]` game detail, `/games/[id]/play` player, `/hall` hall of fame, `/about` about + contact, `/access` sign in / sign up / guest, `/access/forgot`, `/access/reset`, `/access/username`, `/profile`, and the `/auth/callback` Route Handler (no UI).
 - `generateStaticParams` + `generateMetadata` over `GAMES` in the `[id]` routes; unknown id → `notFound()`.
 - Global type helpers `LayoutProps<"/">` and `PageProps<"/games/[id]">` (no import needed).
 - Root layout loads `Press_Start_2P`, `JetBrains_Mono` and `Courier_Prime` from `next/font/google`, and wraps everything in `SessionProvider` + `Nav` / `Footer`.
@@ -42,6 +42,7 @@ Next 16.4.2 + React 19.3. Breaking changes vs. training data. Per `AGENTS.md`, r
 - `app/_games/<id>/` — canvas engine in TypeScript: `engine.ts`, `entities.ts`, `input.ts`, `constants.ts`, `skins.ts` (plus `levels.ts` in arkanoid).
 - `app/_lib/` — `leaderboard.ts` (cached reads) and `supabase/` (`client.ts` browser, `server.ts` server, `admin.ts` service role, `proxy.ts` session refresh, `database.types.ts` generated).
 - `app/_actions/scores.ts` — Server Actions `startGameSession` / `submitScore`.
+- `app/access/actions.ts` — auth Server Actions (`signUp`, `signIn`, `signInWithProvider`, `signOutAction`, `requestPasswordReset`, `updatePassword`, `setUsername`, `checkUsernameAvailable`). `app/auth/callback/route.ts` exchanges the PKCE `code` for a session.
 - `app/about/actions.ts` — `sendContactMessage` Server Action.
 - `app/data/` — static catalog (`games.ts`: `GAMES`, `CATS`, `GameCategory`, `GameColor`) and landing copy (`home.ts`).
 - `specs/` specs + `.spec-config.yml` (+ `game-jam.agent/` variants); `supabase/migrations/` SQL; `public/games/<id>/` game assets.
@@ -80,7 +81,7 @@ Una categoría nueva obtiene `green`. Una segunda categoría nueva requiere deci
 ## Leaderboard and anti-cheat
 
 - Scores only enter through `startGameSession` and `submitScore` in `app/_actions/scores.ts`. Never from the client directly, never via `localStorage`.
-- Flow: `startGameSession` inserts a row in `game_sessions`; `submitScore` validates the UUID, the name (`/^[\p{L}\p{N}_ ]{1,10}$/u`, uppercased), a positive safe integer score, a session TTL of 2 h, and the cap `score <= floor(elapsedSeconds * games.max_score_per_second)`. A conditional `UPDATE` on `consumed_at` makes the session single-use; a failed insert releases it again.
+- Flow: `startGameSession` inserts a row in `game_sessions`; `submitScore(sessionId, score)` first requires a signed-in user (`auth.getUser()`, not `getSession()`) with a `profiles.username`, **before** consuming the game session, and saves with that username uppercased (the client never sends a name). It then validates the UUID, a positive safe integer score, a session TTL of 2 h, and the cap `score <= floor(elapsedSeconds * games.max_score_per_second)`. A conditional `UPDATE` on `consumed_at` makes the session single-use; a failed insert releases it again.
 - Reads live in `app/_lib/leaderboard.ts` with `"use cache"` + `cacheTag("leaderboard")` + `cacheLife("hours")`, through a cookie-less client with the publishable key (RLS authorizes public reads; `cookies()` is unavailable inside `use cache`).
 - After a save, `submitScore` calls `updateTag("leaderboard")` **and** `revalidatePath` on `/hall`, `/games`, `/games/<id>` — without the paths the client router cache keeps serving the old list.
 - A new game needs a row in `games` with a justified `max_score_per_second`. It must never reject a legitimate run.
@@ -94,7 +95,9 @@ Una categoría nueva obtiene `green`. Una segunda categoría nueva requiere deci
 
 ## Session and contact
 
-- `SessionProvider` is a guest-only session: a name in `localStorage` under `av_user`, read once after mount to avoid a hydration mismatch. No Supabase Auth yet.
+- Auth is Supabase Auth (email + password with email confirmation, Google, GitHub). Table `profiles` (`id` → `auth.users`, unique `lower(username)`, ASCII `[A-Za-z0-9_ ]{1,10}`) is created by the `handle_new_user` trigger; the username is public. Only accounts with a username can save scores; guests can still play.
+- `SessionProvider` (Client Component) exposes `user: { name } | null`, `account`, `status: "loading" | "ready"`, `login` (guest only), async `logout` and `refresh`. First render has no user; after mount it reads the guest from `localStorage` (`av_user`) and the account with `getUser()` + `profiles`, and subscribes to `onAuthStateChange`. With an account the guest is ignored (not deleted). Reading cookies in pages (`/access`, `/access/reset`, `/access/username`, `/profile`) happens inside `Suspense`.
+- Dashboard setup (Site URL, Redirect URLs, Confirm email, Google/GitHub) is documented in `README.md`.
 - `/about` contact form posts to the `sendContactMessage` Server Action, which sends through Resend to `jmedinalba@gmail.com`, with a honeypot field and length/format validation.
 
 # Skills
