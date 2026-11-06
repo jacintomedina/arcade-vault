@@ -976,7 +976,7 @@ a { color: inherit; text-decoration: none; }
 }
 .field-error { margin: 0; color: var(--magenta); font-size: 12px; line-height: 1.4; }
 .field-hint { margin: 0; color: var(--ink-faint); font-size: 12px; line-height: 1.4; }
-.pw-checks { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 3px; }
+.pw-checks { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 3px; }
 .pw-checks li { display: flex; gap: 8px; font-size: 12px; line-height: 1.4; color: var(--ink-dim); }
 .pw-checks li span[aria-hidden] { width: 1em; flex: none; text-align: center; }
 .pw-checks li.ok { color: var(--green); }
