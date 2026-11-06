@@ -3,6 +3,12 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { updatePassword } from "../access/actions";
+import { PasswordChecklist } from "./password-checklist";
+import {
+  MAX_PASSWORD,
+  PASSWORD_ERROR,
+  isStrongPassword,
+} from "../_lib/password";
 
 /**
  * Nueva contraseña (reset y perfil). Con `redirectTo` navega al terminar;
@@ -23,6 +29,8 @@ export function PasswordForm({
   const [error, setError] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [localDone, setLocalDone] = useState(false);
+  const [password, setPassword] = useState("");
+  const [touched, setTouched] = useState(false);
   const done = saved ?? localDone;
   const setDone = onSavedChange ?? setLocalDone;
 
@@ -31,10 +39,16 @@ export function PasswordForm({
     if (pending) return;
     const form = e.currentTarget;
     const formData = new FormData(form);
-    setPending(true);
     setError(null);
     setFieldError(null);
     setDone(false);
+    // Ayuda de UX: la Server Action vuelve a validar. Evita la llamada si falta algún requisito.
+    if (!isStrongPassword(password)) {
+      setTouched(true);
+      setFieldError(PASSWORD_ERROR);
+      return;
+    }
+    setPending(true);
     try {
       const result = await updatePassword(formData);
       if (!result.ok) {
@@ -47,6 +61,8 @@ export function PasswordForm({
         router.refresh();
       } else {
         form.reset();
+        setPassword("");
+        setTouched(false);
         setDone(true);
       }
     } catch {
@@ -75,19 +91,35 @@ export function PasswordForm({
           name="password"
           type="password"
           autoComplete="new-password"
-          minLength={8}
-          maxLength={72}
+          maxLength={MAX_PASSWORD}
           placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.currentTarget.value)}
+          onFocus={() => setTouched(true)}
           aria-invalid={fieldError ? true : undefined}
-          aria-describedby={fieldError ? "pw-new-err" : undefined}
+          aria-describedby={
+            [
+              fieldError ? "pw-new-err" : null,
+              touched || password ? "pw-new-checks" : null,
+            ]
+              .filter(Boolean)
+              .join(" ") || undefined
+          }
           required
         />
-        {fieldError ? (
+        {fieldError && (
           <p className="field-error" id="pw-new-err">
             {fieldError}
           </p>
+        )}
+        {touched || password ? (
+          <PasswordChecklist password={password} id="pw-new-checks" />
         ) : (
-          <p className="field-hint">Mínimo 8 caracteres.</p>
+          !fieldError && (
+            <p className="field-hint">
+              Mínimo 8 caracteres, con minúscula, mayúscula, número y símbolo.
+            </p>
+          )
         )}
       </div>
       <div className="field">

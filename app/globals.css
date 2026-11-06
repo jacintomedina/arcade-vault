@@ -976,6 +976,14 @@ a { color: inherit; text-decoration: none; }
 }
 .field-error { margin: 0; color: var(--magenta); font-size: 12px; line-height: 1.4; }
 .field-hint { margin: 0; color: var(--ink-faint); font-size: 12px; line-height: 1.4; }
+.pw-checks { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 3px; }
+.pw-checks li { display: flex; gap: 8px; font-size: 12px; line-height: 1.4; color: var(--ink-dim); }
+.pw-checks li span[aria-hidden] { width: 1em; flex: none; text-align: center; }
+.pw-checks li.ok { color: var(--green); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
 .auth-link {
   display: inline-block; margin: -4px 0 8px;
   font-family: var(--mono); font-size: 12px; color: var(--ink-dim);

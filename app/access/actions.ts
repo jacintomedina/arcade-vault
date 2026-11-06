@@ -2,6 +2,11 @@
 
 import { headers } from "next/headers";
 import { createClient } from "../_lib/supabase/server";
+import {
+  MAX_PASSWORD,
+  PASSWORD_ERROR,
+  isStrongPassword,
+} from "../_lib/password";
 
 export type AuthResult =
   | { ok: true }
@@ -15,9 +20,6 @@ export type OAuthProvider = "google" | "github";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_EMAIL = 254;
-const MIN_PASSWORD = 8;
-// bcrypt ignora lo que pasa de 72 bytes: se limita para no aceptar contraseñas truncadas.
-const MAX_PASSWORD = 72;
 // Debe coincidir con el `check` de profiles.username (SQL, solo ASCII).
 // Se duplica a propósito: "use server" solo permite exportar funciones async,
 // así que no se puede importar NAME_RE de scores.ts sin acoplar.
@@ -25,7 +27,7 @@ const USERNAME_RE = /^[A-Za-z0-9_ ]{1,10}$/;
 
 const ERR_GENERIC = "No se pudo completar la operación. Inténtalo de nuevo.";
 const ERR_EMAIL = "Introduce un correo electrónico válido.";
-const ERR_PASSWORD = `La contraseña debe tener entre ${MIN_PASSWORD} y ${MAX_PASSWORD} caracteres.`;
+const ERR_PASSWORD = PASSWORD_ERROR;
 const ERR_USERNAME =
   "El usuario admite 1-10 caracteres: letras, números, guion bajo y espacios.";
 const ERR_USERNAME_TAKEN = "Ese nombre de usuario ya está en uso.";
@@ -41,7 +43,7 @@ function validEmail(email: string): boolean {
 }
 
 function validPassword(password: string): boolean {
-  return password.length >= MIN_PASSWORD && password.length <= MAX_PASSWORD;
+  return isStrongPassword(password);
 }
 
 async function getOrigin(): Promise<string> {
@@ -118,7 +120,12 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
   });
   // Con "Confirm email" activo, un email ya registrado no devuelve error:
   // misma respuesta que un alta nueva, para no permitir enumerar cuentas.
-  if (error) return { ok: false, error: "No se pudo crear la cuenta. Revisa los datos e inténtalo de nuevo." };
+  if (error) {
+    if (error.code === "weak_password") {
+      return { ok: false, error: ERR_PASSWORD, field: "password" };
+    }
+    return { ok: false, error: "No se pudo crear la cuenta. Revisa los datos e inténtalo de nuevo." };
+  }
   return { ok: true };
 }
 
@@ -202,6 +209,9 @@ export async function updatePassword(formData: FormData): Promise<AuthResult> {
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) {
+    if (error.code === "weak_password") {
+      return { ok: false, error: ERR_PASSWORD, field: "password" };
+    }
     if (error.code === "same_password") {
       return {
         ok: false,

@@ -64,6 +64,7 @@ Una categoría nueva obtiene `green`. Una segunda categoría nueva requiere deci
 ### Config and styling
 
 - `next.config.ts` enables `cacheComponents`, `partialPrefetching`, `experimental.agentFeedback`, `experimental.agentUpgrade: "security"`, plus `allowedDevOrigins` (LAN IPs for testing on a phone). Cache Components changes data-fetching and caching semantics — check the docs before adding fetches or dynamic APIs.
+- `next.config.ts` also sets security headers on every route via `headers()` (`nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, HSTS without `preload`, `Permissions-Policy` for camera/microphone/geolocation). No CSP. Do not add iframes or camera/mic/geolocation features without revisiting them.
 - Tailwind v4 via the `@tailwindcss/turbopack` loader rule in `next.config.ts` (not PostCSS). Theme tokens in `app/globals.css` (`@theme inline` + `:root`): `--cyan`, `--magenta`, `--yellow`, `--green`, `--gold`/`--silver`/`--bronze`, `--font-pixel`, `--font-mono`. Dark CRT aesthetic only — no light theme.
 - `app/globals.css` is one big hand-written stylesheet (~2000 lines): `.crt-screen` (4:3 frame), `.cover-<id>` covers drawn in pure CSS, `.av-bg` / `.av-noise`.
 
@@ -91,11 +92,13 @@ Una categoría nueva obtiene `green`. Una segunda categoría nueva requiere deci
 - Env vars in `.env.template` → copy to `.env.local` (not versioned): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server only, bypasses RLS — never log it or expose it to the client), `SUPABASE_DB_PASSWORD`, `RESEND_API_KEY`, `CONTACT_FROM_EMAIL`.
 - Schema: `games`, `game_sessions`, `scores`, and the `leaderboard` view (`security_invoker = true`, top-10 rank per game).
 - Migrations are SQL files in `supabase/migrations/` (`<timestamp>_<slug>.sql`), applied to the remote project with the Supabase MCP (`apply_migration`). Show the SQL and ask for confirmation first; afterwards verify with `list_tables`, `get_advisors`, `execute_sql`, and regenerate `app/_lib/supabase/database.types.ts` with `generate_typescript_types`.
+- RLS is on in every table. `game_sessions` has **no policies on purpose** (service role only), so the `rls_enabled_no_policy` INFO advisor is accepted; do not add policies to silence it. The `auth_leaked_password_protection` WARN is accepted too (needs the Pro plan). Auth settings (min password length, password requirements, sign-up rate limit) are dashboard-only; see `README.md` → Seguridad.
 - MCP config: `.mcp.json` (git-ignored, from `.mcp.json.example` with your `project_ref`). Playwright MCP is also used for browser checks.
 
 ## Session and contact
 
 - Auth is Supabase Auth (email + password with email confirmation, Google, GitHub). Table `profiles` (`id` → `auth.users`, unique `lower(username)`, ASCII `[A-Za-z0-9_ ]{1,10}`) is created by the `handle_new_user` trigger; the username is public. Only accounts with a username can save scores; guests can still play.
+- Password policy lives only in `app/_lib/password.ts` (8–72 chars with lowercase, uppercase, digit and symbol; ASCII symbol set identical to Supabase's). `signUp` and `updatePassword` enforce it and `PasswordChecklist` shows it live in `auth-form.tsx` and `password-form.tsx`. `signIn` must not validate composition. Never duplicate the regex.
 - `SessionProvider` (Client Component) exposes `user: { name } | null`, `account`, `status: "loading" | "ready"`, `login` (guest only), async `logout` and `refresh`. First render has no user; after mount it reads the guest from `localStorage` (`av_user`) and the account with `getUser()` + `profiles`, and subscribes to `onAuthStateChange`. With an account the guest is ignored (not deleted). Reading cookies in pages (`/access`, `/access/reset`, `/access/username`, `/profile`) happens inside `Suspense`.
 - Dashboard setup (Site URL, Redirect URLs, Confirm email, Google/GitHub) is documented in `README.md`.
 - `/about` contact form posts to the `sendContactMessage` Server Action, which sends through Resend to `jmedinalba@gmail.com`, with a honeypot field and length/format validation.
@@ -123,3 +126,4 @@ Project (`.claude/agents/<name>.md`):
 - `game-jam` — writes 3 spec variants (A faithful, B twist, C intense) in `specs/game-jam.agent/<game-id>/`; never implements.
 - `skin-designer` — adds the `clasico`/`neon`/`retro` skins to an implemented game; checks with `tsc` + `lint`.
 - `mobile-porter` — read-only mobile audit of a game against SPEC 10/11; reports a verdict and checklist in chat.
+- `security-auditor` — read-only security audit of Supabase (RLS, policies, advisors, `security definer`) and the app (secrets, `submitScore`, auth actions, callback, headers) against SPEC 12/13. Scope: `completa` | `bd` | `app` | `diff`. Versioned memory in `.claude/agent-memory/security-auditor/` (accepted warnings, findings history).
