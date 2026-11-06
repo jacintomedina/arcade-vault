@@ -12,6 +12,12 @@ import {
   type OAuthProvider,
 } from "../access/actions";
 import { useSession } from "./session-provider";
+import { PasswordChecklist } from "./password-checklist";
+import {
+  MAX_PASSWORD,
+  PASSWORD_ERROR,
+  isStrongPassword,
+} from "../_lib/password";
 
 type Tab = "in" | "up";
 type FieldName = "email" | "password" | "username";
@@ -32,11 +38,15 @@ export function AuthForm({ callbackError = false }: { callbackError?: boolean })
     Partial<Record<FieldName, string>>
   >({});
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [passwordTouched, setPasswordTouched] = useState(false);
 
   const switchTab = (next: Tab) => {
     setTab(next);
     setError(null);
     setFieldErrors({});
+    setPassword("");
+    setPasswordTouched(false);
   };
 
   const fail = (result: Extract<AuthResult, { ok: false }>) => {
@@ -52,9 +62,15 @@ export function AuthForm({ callbackError = false }: { callbackError?: boolean })
     if (pending) return;
     const form = e.currentTarget;
     const formData = new FormData(form);
-    setPending(true);
     setError(null);
     setFieldErrors({});
+    // Ayuda de UX: la Server Action vuelve a validar. Evita la llamada si falta algún requisito.
+    if (tab === "up" && !isStrongPassword(password)) {
+      setPasswordTouched(true);
+      setFieldErrors({ password: PASSWORD_ERROR });
+      return;
+    }
+    setPending(true);
     try {
       if (tab === "in") {
         const result = await signIn(formData);
@@ -227,9 +243,21 @@ export function AuthForm({ callbackError = false }: { callbackError?: boolean })
                   type="password"
                   autoComplete={tab === "in" ? "current-password" : "new-password"}
                   placeholder="••••••••"
-                  minLength={tab === "up" ? 8 : undefined}
+                  maxLength={MAX_PASSWORD}
+                  value={password}
+                  onChange={(e) => setPassword(e.currentTarget.value)}
+                  onFocus={() => setPasswordTouched(true)}
                   aria-invalid={err("password") ? true : undefined}
-                  aria-describedby={err("password") ? "auth-pass-err" : undefined}
+                  aria-describedby={
+                    [
+                      err("password") ? "auth-pass-err" : null,
+                      tab === "up" && (passwordTouched || password)
+                        ? "auth-pass-checks"
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" ") || undefined
+                  }
                   required
                 />
                 {err("password") && (
@@ -237,9 +265,20 @@ export function AuthForm({ callbackError = false }: { callbackError?: boolean })
                     {err("password")}
                   </p>
                 )}
-                {tab === "up" && !err("password") && (
-                  <p className="field-hint">Mínimo 8 caracteres.</p>
-                )}
+                {tab === "up" &&
+                  (passwordTouched || password ? (
+                    <PasswordChecklist
+                      password={password}
+                      id="auth-pass-checks"
+                    />
+                  ) : (
+                    !err("password") && (
+                      <p className="field-hint">
+                        Mínimo 8 caracteres, con minúscula, mayúscula, número y
+                        símbolo.
+                      </p>
+                    )
+                  ))}
               </div>
 
               {tab === "in" && (
