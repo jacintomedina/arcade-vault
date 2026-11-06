@@ -67,6 +67,42 @@ Se hace a mano; los secretos viven solo en el dashboard, nunca en el repo.
 
 Los correos (confirmación y recuperación) salen del SMTP integrado de Supabase, pensado para desarrollo: pocos envíos por hora y, en proyectos nuevos, solo a miembros del equipo del proyecto. Si bloquea las pruebas o la producción, configura un SMTP propio (por ejemplo Resend) en una spec aparte.
 
+## Seguridad
+
+Medidas básicas de la SPEC 13.
+
+### Headers HTTP
+
+`next.config.ts` añade a todas las rutas (`source: "/(.*)"`):
+
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: DENY`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains` (sin `preload`; los navegadores la ignoran en `http://localhost`)
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+
+No hay `Content-Security-Policy`: con `next/font/google`, Supabase y canvas exige nonces y puede romper los juegos. Va en una spec aparte. Comprobación: `curl -I http://localhost:3000/`.
+
+### Contraseña
+
+Mínimo 8 y máximo 72 caracteres, con minúscula, mayúscula, número y símbolo. La regla vive en `app/_lib/password.ts` y la usan `signUp` y `updatePassword` (registro, `/access/reset` y `/profile`) y los formularios, que muestran un checklist en vivo. El inicio de sesión no valida la composición, para que las cuentas antiguas puedan entrar. El conjunto de símbolos coincide con el de Supabase: ``!@#$%^&*()_+-=[]{};':"\|<>?,./`~``.
+
+### Ajustes de Auth en el dashboard
+
+Se hacen a mano; el MCP de Supabase no los expone.
+
+1. **Authentication → Sign In / Providers → Email**: «Minimum password length» = `8` y «Password Requirements» = minúsculas, mayúsculas, dígitos y símbolos. Es la barrera real si alguien llama a `auth.signUp` sin pasar por la app.
+2. **Authentication → Rate Limits**: «Rate limit for sign-ups and sign-ins» a ~`10` por hora y por IP (por defecto 30). Es anti-bot; súbelo si una red compartida (colegio, oficina) se queda bloqueada.
+3. **Leaked password protection** (Authentication → Attack Protection): **aplazado**. Exige plan Pro. Mientras tanto `get_advisors` seguirá avisando `auth_leaked_password_protection`; está aceptado. Actívalo al pasar a Pro.
+
+### Row Level Security
+
+RLS está activo en `games`, `scores`, `profiles` y `game_sessions`.
+
+- `games`, `scores` y `profiles`: lectura pública. `profiles` permite además `UPDATE` del propio perfil. No hay políticas de escritura en `games` ni `scores`: solo se escribe desde Server Actions con el service role.
+- `game_sessions` **no tiene políticas a propósito**: nadie accede con la clave pública, solo el service role (que ignora RLS). El aviso INFO `rls_enabled_no_policy` de `get_advisors` está aceptado.
+- `anon` y `authenticated` conservan los `GRANT` por defecto de Supabase sobre las tablas; RLS es la barrera. No desactives RLS en ninguna tabla.
+
 ## Skills usadas
 
 ```bash
