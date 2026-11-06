@@ -18,13 +18,10 @@ function safeNext(raw: string | null, base: string): string {
 }
 
 function getBaseUrl(request: NextRequest): string {
-  const { origin } = request.nextUrl;
-  if (process.env.NODE_ENV === "development") return origin;
-  // Detrás de un balanceador el origen interno no es el público.
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  if (!forwardedHost) return origin;
-  const proto = request.headers.get("x-forwarded-proto") ?? "https";
-  return `${proto}://${forwardedHost}`;
+  // Producción: SITE_URL fijo, sin fiarse de x-forwarded-host.
+  const fixed = process.env.SITE_URL?.trim().replace(/\/+$/, "");
+  if (fixed) return fixed;
+  return request.nextUrl.origin;
 }
 
 export async function GET(request: NextRequest) {

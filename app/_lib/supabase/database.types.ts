@@ -19,18 +19,21 @@ export type Database = {
           consumed_at: string | null
           game_id: string
           id: string
+          ip_hash: string | null
           started_at: string
         }
         Insert: {
           consumed_at?: string | null
           game_id: string
           id?: string
+          ip_hash?: string | null
           started_at?: string
         }
         Update: {
           consumed_at?: string | null
           game_id?: string
           id?: string
+          ip_hash?: string | null
           started_at?: string
         }
         Relationships: [
@@ -87,6 +90,7 @@ export type Database = {
           player_name: string
           score: number
           session_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -95,6 +99,7 @@ export type Database = {
           player_name: string
           score: number
           session_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -103,6 +108,7 @@ export type Database = {
           player_name?: string
           score?: number
           session_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
