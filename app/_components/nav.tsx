@@ -70,7 +70,7 @@ export function Nav() {
               {accountName}
             </Link>
             <button className="btn ghost nav-logout" onClick={handleLogout}>
-              CERRAR SESIÓN
+              Cerrar Sesión
             </button>
           </>
         ) : user ? (

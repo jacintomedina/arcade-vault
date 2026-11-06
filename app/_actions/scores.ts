@@ -3,16 +3,19 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { createAdminClient } from "../_lib/supabase/admin";
 import { createClient } from "../_lib/supabase/server";
+import { getIpHash } from "../_lib/client-ip";
 
 export type StartSessionResult =
   | { ok: true; sessionId: string }
   | { ok: false; error: string };
 
 export type SubmitScoreResult =
-  | { ok: true; rank: number }
+  | { ok: true; rank: number | null }
   | { ok: false; error: string };
 
 const SESSION_TTL_MS = 2 * 60 * 60 * 1000;
+// Máximo de sesiones nuevas por IP (hash) y minuto.
+const MAX_SESSIONS_PER_MINUTE = 20;
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -30,9 +33,9 @@ export async function startGameSession(
     return { ok: false, error: ERR_START };
   }
 
-  const supabase = createAdminClient();
-
-  const { data: game } = await supabase
+  // `games` es de lectura pública (RLS): no hace falta service_role para leerla.
+  const publicClient = await createClient();
+  const { data: game } = await publicClient
     .from("games")
     .select("max_score_per_second")
     .eq("id", gameId)
@@ -41,9 +44,33 @@ export async function startGameSession(
     return { ok: false, error: ERR_START };
   }
 
+  // Solo el insert necesita service_role (game_sessions no tiene policies).
+  const supabase = createAdminClient();
+
+  const ipHash = await getIpHash();
+  if (ipHash) {
+    const since = new Date(Date.now() - 60_000).toISOString();
+    const { count } = await supabase
+      .from("game_sessions")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash)
+      .gte("started_at", since);
+    if ((count ?? 0) >= MAX_SESSIONS_PER_MINUTE) {
+      return { ok: false, error: ERR_START };
+    }
+  }
+
+  // Limpieza: las sesiones sin consumir y caducadas ya no se pueden usar.
+  // Las consumidas se conservan (scores.session_id apunta a ellas).
+  await supabase
+    .from("game_sessions")
+    .delete()
+    .is("consumed_at", null)
+    .lt("started_at", new Date(Date.now() - SESSION_TTL_MS).toISOString());
+
   const { data: session, error } = await supabase
     .from("game_sessions")
-    .insert({ game_id: gameId })
+    .insert({ game_id: gameId, ip_hash: ipHash })
     .select("id")
     .single();
   if (error || !session) return { ok: false, error: ERR_START };
@@ -111,19 +138,40 @@ export async function submitScore(
     return { ok: false, error: ERR_SESSION };
   }
 
-  const { error: insertError } = await supabase.from("scores").insert({
-    game_id: session.game_id,
-    session_id: sessionId,
-    player_name: playerName,
-    score,
-  });
-  if (insertError) {
+  const { data: inserted, error: insertError } = await supabase
+    .from("scores")
+    .insert({
+      game_id: session.game_id,
+      session_id: sessionId,
+      player_name: playerName,
+      user_id: authData.user.id,
+      score,
+    })
+    .select("id")
+    .single();
+  if (insertError || !inserted) {
     // Libera la sesión para que el jugador pueda reintentar.
     await supabase
       .from("game_sessions")
       .update({ consumed_at: null })
       .eq("id", sessionId);
     return { ok: false, error: ERR_SAVE };
+  }
+
+  // Sesiones secuenciales por usuario y juego: si ya hay una puntuación suya
+  // guardada después de empezar esta sesión, la partida se solapaba con otra
+  // (sesiones abiertas en paralelo). Se comprueba tras insertar, ordenando por
+  // id, para que dos envíos simultáneos no pasen ambos. La sesión queda consumida.
+  const { count: overlapping } = await supabase
+    .from("scores")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", authData.user.id)
+    .eq("game_id", session.game_id)
+    .gte("created_at", session.started_at)
+    .lt("id", inserted.id);
+  if (overlapping === null || overlapping > 0) {
+    await supabase.from("scores").delete().eq("id", inserted.id);
+    return { ok: false, error: ERR_SESSION };
   }
 
   const { count, error: rankError } = await supabase
@@ -139,6 +187,8 @@ export async function submitScore(
   revalidatePath("/games");
   revalidatePath(`/games/${session.game_id}`);
 
-  if (rankError || count === null) return { ok: false, error: ERR_SAVE };
-  return { ok: true, rank: count + 1 };
+  // La puntuación ya está guardada y la sesión consumida: un fallo al calcular
+  // el rango no debe presentarse como fallo de guardado (el reintento daría
+  // "sesión no válida" y el jugador creería haber perdido la puntuación).
+  return { ok: true, rank: rankError || count === null ? null : count + 1 };
 }

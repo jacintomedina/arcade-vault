@@ -1,11 +1,12 @@
 "use server";
 
-import { headers } from "next/headers";
 import { createClient } from "../_lib/supabase/server";
+import { getSiteUrl } from "../_lib/site-url";
 import {
-  MAX_PASSWORD,
   PASSWORD_ERROR,
   isStrongPassword,
+  passwordBytes,
+  MAX_PASSWORD,
 } from "../_lib/password";
 
 export type AuthResult =
@@ -44,15 +45,6 @@ function validEmail(email: string): boolean {
 
 function validPassword(password: string): boolean {
   return isStrongPassword(password);
-}
-
-async function getOrigin(): Promise<string> {
-  const h = await headers();
-  const origin = h.get("origin");
-  if (origin) return origin;
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
 }
 
 async function isUsernameTaken(
@@ -109,7 +101,8 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
     return { ok: false, error: ERR_USERNAME_TAKEN, field: "username" };
   }
 
-  const origin = await getOrigin();
+  const origin = await getSiteUrl();
+  if (!origin) return { ok: false, error: ERR_GENERIC };
   const { error } = await supabase.auth.signUp({
     email,
     password,
@@ -133,7 +126,7 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
   const email = field(formData, "email").trim();
   const password = field(formData, "password");
 
-  if (!validEmail(email) || password.length === 0 || password.length > MAX_PASSWORD) {
+  if (!validEmail(email) || password.length === 0 || passwordBytes(password) > MAX_PASSWORD) {
     return { ok: false, error: "Credenciales incorrectas." };
   }
 
@@ -158,7 +151,8 @@ export async function signInWithProvider(
     return { ok: false, error: ERR_GENERIC };
   }
   const supabase = await createClient();
-  const origin = await getOrigin();
+  const origin = await getSiteUrl();
+  if (!origin) return { ok: false, error: ERR_GENERIC };
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
@@ -184,7 +178,8 @@ export async function requestPasswordReset(
   if (!validEmail(email)) return { ok: false, error: ERR_EMAIL, field: "email" };
 
   const supabase = await createClient();
-  const origin = await getOrigin();
+  const origin = await getSiteUrl();
+  if (!origin) return { ok: false, error: ERR_GENERIC };
   // Se ignora el resultado: misma respuesta exista o no el email.
   await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/auth/callback?next=/access/reset`,

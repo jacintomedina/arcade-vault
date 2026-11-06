@@ -9,8 +9,13 @@ export const MAX_PASSWORD = 72;
 
 const SYMBOLS = `!@#$%^&*()_+\\-=\\[\\]{};':"\\\\|<>?,./\`~`;
 
+// Longitud en bytes UTF-8 (lo que cuenta bcrypt), no en caracteres.
+export function passwordBytes(password: string): number {
+  return new TextEncoder().encode(password).length;
+}
+
 export const PASSWORD_RE = new RegExp(
-  `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[${SYMBOLS}]).{${MIN_PASSWORD},${MAX_PASSWORD}}$`,
+  `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[${SYMBOLS}]).{${MIN_PASSWORD},}$`,
 );
 
 export const PASSWORD_ERROR = `La contraseña debe tener mínimo ${MIN_PASSWORD} caracteres, con minúscula, mayúscula, número y símbolo.`;
@@ -28,7 +33,7 @@ const SYMBOL_RE = new RegExp(`[${SYMBOLS}]`);
 export function passwordChecks(password: string): PasswordChecks {
   return {
     length:
-      password.length >= MIN_PASSWORD && password.length <= MAX_PASSWORD,
+      password.length >= MIN_PASSWORD && passwordBytes(password) <= MAX_PASSWORD,
     lower: /[a-z]/.test(password),
     upper: /[A-Z]/.test(password),
     digit: /\d/.test(password),
@@ -37,5 +42,5 @@ export function passwordChecks(password: string): PasswordChecks {
 }
 
 export function isStrongPassword(password: string): boolean {
-  return PASSWORD_RE.test(password);
+  return passwordBytes(password) <= MAX_PASSWORD && PASSWORD_RE.test(password);
 }
