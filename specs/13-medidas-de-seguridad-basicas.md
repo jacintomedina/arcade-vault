@@ -1,6 +1,6 @@
 # SPEC 13 — Medidas de seguridad básicas: headers HTTP, contraseña fuerte, Auth endurecido y verificación de RLS
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 04, SPEC 06, SPEC 12
 > **Fecha:** 2026-11-06
 > **Revisión 1:** 2026-11-06 — la contraseña debe cumplir una regex (minúscula, mayúscula, dígito, símbolo y mínimo 8) validada en servidor, con checklist en vivo y mensaje de error en la UI.
@@ -133,22 +133,22 @@ Cada paso deja la app arrancando con `npm run dev`.
 
 ## Criterios de aceptación
 
-- [ ] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores ni advertencias de Cache Components.
-- [ ] `curl -I` a `/`, `/games`, `/access` y `/api/health/supabase` devuelve las cinco cabeceras con los valores indicados.
-- [ ] `execute_sql` confirma RLS activo en `games`, `scores`, `profiles` y `game_sessions`, y que no existen políticas de escritura salvo `profiles` (`UPDATE` del propio perfil).
-- [ ] Con la clave pública (`anon`), un `insert` en `scores` y en `games` es rechazado por RLS.
-- [ ] En el dashboard, la longitud mínima de contraseña es 8, Password Requirements exige minúscula, mayúscula, dígitos y símbolos, y una contraseña de 7 caracteres o sin alguno de esos tipos es rechazada por Supabase Auth aunque se llame a `auth.signUp` sin pasar por la Server Action.
-- [ ] (Rev. 1) `signUp` rechaza con `field: "password"` y mensaje en español una contraseña que incumpla cualquiera de estos requisitos, probado uno por uno: menos de 8 caracteres, sin minúscula, sin mayúscula, sin dígito, sin símbolo. `Abcdef1!` es aceptada.
-- [ ] (Rev. 1) `updatePassword` aplica la misma regla en `/access/reset` y `/profile`.
-- [ ] (Rev. 1) `signIn` no valida composición: una cuenta existente con contraseña antigua y débil sigue pudiendo entrar.
-- [ ] (Rev. 1) En CREAR CUENTA, `/access/reset` y `/profile` aparece el checklist con cinco requisitos que se marcan en vivo al escribir; al enviar sin cumplirlos se ve el mensaje de error bajo el campo y no se llama a Supabase. El estado de cada requisito no depende solo del color y no hay avisos de hidratación en consola.
-- [ ] (Rev. 1) La regex vive solo en `app/_lib/password.ts`; servidor y cliente la importan, sin duplicados.
-- [ ] El límite de registros e inicios de sesión por IP está en ~10/hora.
-- [ ] `get_advisors` (seguridad) reporta únicamente `rls_enabled_no_policy` de `game_sessions` y `auth_leaked_password_protection`, ambos documentados como aceptados.
-- [ ] Landing, login, un juego completo con guardado de puntuación y el formulario de contacto funcionan con los headers activos y sin errores en consola.
-- [ ] `README.md` tiene la sección «Seguridad» y `CLAUDE.md` refleja los headers y la nota de `game_sessions`.
-- [ ] `references/security/security-checklist.md` marca los puntos hechos y anota que leaked password protection queda aplazado por el plan Free.
-- [ ] Ningún archivo versionado contiene claves ni secretos.
+- [x] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores ni advertencias de Cache Components.
+- [x] `curl -I` a `/`, `/games`, `/access` y `/api/health/supabase` devuelve las cinco cabeceras con los valores indicados.
+- [x] `execute_sql` confirma RLS activo en `games`, `scores`, `profiles` y `game_sessions`, y que no existen políticas de escritura salvo `profiles` (`UPDATE` del propio perfil).
+- [x] Con la clave pública (`anon`), un `insert` en `scores` y en `games` es rechazado por RLS.
+- [x] En el dashboard, la longitud mínima de contraseña es 8, Password Requirements exige minúscula, mayúscula, dígitos y símbolos, y una contraseña de 7 caracteres o sin alguno de esos tipos es rechazada por Supabase Auth aunque se llame a `auth.signUp` sin pasar por la Server Action.
+- [x] (Rev. 1) `signUp` rechaza con `field: "password"` y mensaje en español una contraseña que incumpla cualquiera de estos requisitos, probado uno por uno: menos de 8 caracteres, sin minúscula, sin mayúscula, sin dígito, sin símbolo. `Abcdef1!` es aceptada.
+- [x] (Rev. 1) `updatePassword` aplica la misma regla en `/access/reset` y `/profile`.
+- [x] (Rev. 1) `signIn` no valida composición: una cuenta existente con contraseña antigua y débil sigue pudiendo entrar.
+- [x] (Rev. 1) En CREAR CUENTA, `/access/reset` y `/profile` aparece el checklist con cinco requisitos que se marcan en vivo al escribir; al enviar sin cumplirlos se ve el mensaje de error bajo el campo y no se llama a Supabase. El estado de cada requisito no depende solo del color y no hay avisos de hidratación en consola.
+- [x] (Rev. 1) La regex vive solo en `app/_lib/password.ts`; servidor y cliente la importan, sin duplicados.
+- [x] El límite de registros e inicios de sesión por IP está en ~10/hora.
+- [x] `get_advisors` (seguridad) reporta únicamente `rls_enabled_no_policy` de `game_sessions` y `auth_leaked_password_protection`, ambos documentados como aceptados.
+- [x] Landing, login, un juego completo con guardado de puntuación y el formulario de contacto funcionan con los headers activos y sin errores en consola.
+- [x] `README.md` tiene la sección «Seguridad» y `CLAUDE.md` refleja los headers y la nota de `game_sessions`.
+- [x] `references/security/security-checklist.md` marca los puntos hechos y anota que leaked password protection queda aplazado por el plan Free.
+- [x] Ningún archivo versionado contiene claves ni secretos.
 
 ## Decisiones tomadas y descartadas
 

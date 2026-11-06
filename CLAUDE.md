@@ -126,3 +126,4 @@ Project (`.claude/agents/<name>.md`):
 - `game-jam` — writes 3 spec variants (A faithful, B twist, C intense) in `specs/game-jam.agent/<game-id>/`; never implements.
 - `skin-designer` — adds the `clasico`/`neon`/`retro` skins to an implemented game; checks with `tsc` + `lint`.
 - `mobile-porter` — read-only mobile audit of a game against SPEC 10/11; reports a verdict and checklist in chat.
+- `security-auditor` — read-only security audit of Supabase (RLS, policies, advisors, `security definer`) and the app (secrets, `submitScore`, auth actions, callback, headers) against SPEC 12/13. Scope: `completa` | `bd` | `app` | `diff`. Versioned memory in `.claude/agent-memory/security-auditor/` (accepted warnings, findings history).

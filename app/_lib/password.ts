@@ -13,7 +13,7 @@ export const PASSWORD_RE = new RegExp(
   `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[${SYMBOLS}]).{${MIN_PASSWORD},${MAX_PASSWORD}}$`,
 );
 
-export const PASSWORD_ERROR = `La contraseña debe tener entre ${MIN_PASSWORD} y ${MAX_PASSWORD} caracteres, con minúscula, mayúscula, número y símbolo.`;
+export const PASSWORD_ERROR = `La contraseña debe tener mínimo ${MIN_PASSWORD} caracteres, con minúscula, mayúscula, número y símbolo.`;
 
 export interface PasswordChecks {
   length: boolean;

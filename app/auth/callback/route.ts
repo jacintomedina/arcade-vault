@@ -1,11 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "../../_lib/supabase/server";
 
-// Solo rutas internas: empieza por "/" y no por "//" ni "/\" (los navegadores
-// tratan "/\" como "//" y saltarían a otro origen).
-function safeNext(raw: string | null): string {
-  if (!raw) return "/";
-  if (!raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/\\")) {
+// Solo rutas internas: empieza por "/", no por "//" ni "/\" y sin barras
+// invertidas ni caracteres de control (el parser de URL elimina tab, CR y LF,
+// así que "/\t/evil.com" saltaría a otro origen).
+const SAFE_NEXT = /^\/(?![/\\])[^\\\x00-\x1f\x7f]*$/;
+
+function safeNext(raw: string | null, base: string): string {
+  if (!raw || !SAFE_NEXT.test(raw)) return "/";
+  // Defensa en profundidad: el destino resuelto debe ser del mismo origen.
+  try {
+    if (new URL(raw, base).origin !== new URL(base).origin) return "/";
+  } catch {
     return "/";
   }
   return raw;
@@ -25,7 +31,7 @@ export async function GET(request: NextRequest) {
   const base = getBaseUrl(request);
   const { searchParams } = request.nextUrl;
   const code = searchParams.get("code");
-  const next = safeNext(searchParams.get("next"));
+  const next = safeNext(searchParams.get("next"), base);
   const fail = NextResponse.redirect(new URL("/access?error=callback", base));
 
   // Confirmación de correo, OAuth y recuperación llegan con ?code= (PKCE).

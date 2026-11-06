@@ -1,0 +1,2 @@
+- [Avisos aceptados](accepted.md) — avisos y decisiones de seguridad que no son hallazgos
+- [Historial de hallazgos](findings.md) — hallazgos por fecha, severidad y estado
