@@ -2,6 +2,7 @@
 
 import { revalidatePath, updateTag } from "next/cache";
 import { createAdminClient } from "../_lib/supabase/admin";
+import { createClient } from "../_lib/supabase/server";
 
 export type StartSessionResult =
   | { ok: true; sessionId: string }
@@ -14,11 +15,11 @@ export type SubmitScoreResult =
 const SESSION_TTL_MS = 2 * 60 * 60 * 1000;
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const NAME_RE = /^[\p{L}\p{N}_ ]{1,10}$/u;
 
 const ERR_START = "No se pudo iniciar la partida.";
 const ERR_SESSION = "Sesión de partida no válida.";
-const ERR_NAME = "Nombre no válido.";
+const ERR_LOGIN = "Inicia sesión para guardar tu puntuación.";
+const ERR_USERNAME = "Elige un nombre de usuario para guardar tu puntuación.";
 const ERR_SCORE = "Puntuación no válida.";
 const ERR_SAVE = "No se pudo guardar la puntuación.";
 
@@ -52,18 +53,28 @@ export async function startGameSession(
 
 export async function submitScore(
   sessionId: string,
-  name: string,
   score: number,
 ): Promise<SubmitScoreResult> {
   if (typeof sessionId !== "string" || !UUID_RE.test(sessionId)) {
     return { ok: false, error: ERR_SESSION };
   }
-  if (typeof name !== "string") return { ok: false, error: ERR_NAME };
-  const playerName = name.trim().toUpperCase();
-  if (!NAME_RE.test(playerName)) return { ok: false, error: ERR_NAME };
   if (!Number.isSafeInteger(score) || score < 1) {
     return { ok: false, error: ERR_SCORE };
   }
+
+  // Cuenta y username se comprueban ANTES de consumir la sesión de juego:
+  // un rechazo por falta de cuenta no quema la partida. El nombre sale del
+  // perfil en servidor, nunca del cliente. getUser valida el JWT (no getSession).
+  const authClient = await createClient();
+  const { data: authData } = await authClient.auth.getUser();
+  if (!authData.user) return { ok: false, error: ERR_LOGIN };
+  const { data: profile } = await authClient
+    .from("profiles")
+    .select("username")
+    .eq("id", authData.user.id)
+    .maybeSingle();
+  if (!profile?.username) return { ok: false, error: ERR_USERNAME };
+  const playerName = profile.username.toUpperCase();
 
   const supabase = createAdminClient();
 

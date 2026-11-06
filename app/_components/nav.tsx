@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "./session-provider";
 
 export function Nav() {
   const pathname = usePathname();
-  const { user, logout } = useSession();
+  const router = useRouter();
+  const { user, account, status, logout } = useSession();
   const [openPath, setOpenPath] = useState<string | null>(null);
 
   // El panel móvil se cierra solo al cambiar de ruta.
@@ -22,6 +23,15 @@ export function Nav() {
   const isHall = pathname === "/hall";
   const isAbout = pathname === "/about";
   const isAccess = pathname === "/access";
+  const isProfile = pathname === "/profile";
+  const accountName = user?.name ?? "PERFIL";
+
+  const handleLogout = async () => {
+    closeMenu();
+    await logout();
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <>
@@ -51,10 +61,27 @@ export function Nav() {
           <span className="coin"></span>
           <span>CRÉDITOS · 03</span>
         </div>
-        {user ? (
+        {account ? (
+          <>
+            <Link
+              className={"btn ghost auth-btn" + (isProfile ? " active" : "")}
+              href="/profile"
+            >
+              {accountName}
+            </Link>
+            <button className="btn ghost nav-logout" onClick={handleLogout}>
+              CERRAR SESIÓN
+            </button>
+          </>
+        ) : user ? (
           <button className="btn ghost auth-btn" onClick={logout}>
             {user.name} ▾
           </button>
+        ) : status === "loading" ? (
+          // Reserva el hueco hasta leer la sesión: sin parpadeo de «Iniciar Sesión».
+          <span className="btn auth-btn auth-btn-placeholder" aria-hidden="true">
+            Iniciar Sesión
+          </span>
         ) : (
           <Link className="btn auth-btn" href="/access">
             Iniciar Sesión
@@ -89,9 +116,20 @@ export function Nav() {
         <Link className={isAbout ? "active" : ""} href="/about" onClick={closeMenu}>
           Acerca de
         </Link>
-        <Link className={isAccess ? "active" : ""} href="/access" onClick={closeMenu}>
-          {user ? "Cuenta" : "Iniciar Sesión"}
-        </Link>
+        {account ? (
+          <>
+            <Link className={isProfile ? "active" : ""} href="/profile" onClick={closeMenu}>
+              Perfil
+            </Link>
+            <button type="button" className="panel-logout" onClick={handleLogout}>
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <Link className={isAccess ? "active" : ""} href="/access" onClick={closeMenu}>
+            {user ? "Cuenta" : "Iniciar Sesión"}
+          </Link>
+        )}
         <div style={{ flex: 1 }}></div>
         <div
           className="pixel"

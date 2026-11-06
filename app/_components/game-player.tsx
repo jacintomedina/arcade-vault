@@ -101,14 +101,13 @@ const REAL_GAMES: Record<
 };
 
 export function GamePlayer({ game }: { game: Game }) {
-	const { user } = useSession();
+	const { user, account, status } = useSession();
 	const { Component, Controls, pad, initialLives, skins } =
 		REAL_GAMES[game.id];
 	const startLives = initialLives ?? INITIAL_LIVES;
 	const [score, setScore] = useState(0);
 	const [paused, setPaused] = useState(false);
 	const [over, setOver] = useState(false);
-	const [nameEdit, setNameEdit] = useState<string | null>(null);
 	const [saved, setSaved] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [rank, setRank] = useState<number | null>(null);
@@ -136,7 +135,9 @@ export function GamePlayer({ game }: { game: Game }) {
 		}),
 		[touchInput, paused, over],
 	);
-	const name = nameEdit ?? user?.name ?? "PLAYER 1";
+	const name = user?.name ?? "PLAYER 1";
+	// Guardar exige cuenta con username (el servidor lo vuelve a comprobar).
+	const canSave = status === "ready" && !!account?.username;
 
 	const handleStats = useCallback((s: GameStats) => {
 		setScore(s.score);
@@ -233,11 +234,11 @@ export function GamePlayer({ game }: { game: Game }) {
 	};
 
 	const save = async () => {
-		if (!sessionId || saving) return;
+		if (!sessionId || saving || !canSave) return;
 		setSaving(true);
 		setSaveError(null);
 		try {
-			const r = await submitScore(sessionId, name, score);
+			const r = await submitScore(sessionId, score);
 			if (r.ok) {
 				setRank(r.rank);
 				setSaved(true);
@@ -359,32 +360,41 @@ export function GamePlayer({ game }: { game: Game }) {
 						<div className="final-label">PUNTUACIÓN FINAL</div>
 						<div className="final">{score.toLocaleString("es-ES")}</div>
 						{!saved ? (
-							<>
-								<div className="input-row">
-									<input
-										value={name}
-										onChange={(e) =>
-											setNameEdit(e.target.value.toUpperCase().slice(0, 10))
-										}
-										placeholder="NOMBRE"
-										aria-label="Nombre"
-									/>
-									<button
-										className="btn yellow"
-										onClick={save}
-										disabled={!sessionId || saving}
-									>
-										{saving ? "GUARDANDO…" : "GUARDAR PUNTUACIÓN"}
-									</button>
-								</div>
-								{(sessionFailed || saveError) && (
-									<p className="save-error" role="alert">
-										{sessionFailed
-											? "No se pudo iniciar la partida en el servidor."
-											: saveError}
-									</p>
-								)}
-							</>
+							canSave ? (
+								<>
+									<div className="input-row">
+										<input
+											value={name}
+											readOnly
+											aria-label="Nombre de usuario"
+										/>
+										<button
+											className="btn yellow"
+											onClick={save}
+											disabled={!sessionId || saving}
+										>
+											{saving ? "GUARDANDO…" : "GUARDAR PUNTUACIÓN"}
+										</button>
+									</div>
+									{(sessionFailed || saveError) && (
+										<p className="save-error" role="alert">
+											{sessionFailed
+												? "No se pudo iniciar la partida en el servidor."
+												: saveError}
+										</p>
+									)}
+								</>
+							) : status === "ready" && account ? (
+								<p className="save-error save-hint" role="status">
+									Elige un nombre de usuario para guardar tu puntuación.{" "}
+									<Link href="/access/username">Elegir usuario</Link>
+								</p>
+							) : (
+								<p className="save-error save-hint" role="status">
+									<Link href="/access">Inicia sesión o crea una cuenta</Link>{" "}
+									para guardarla.
+								</p>
+							)
 						) : (
 							<>
 								<div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>

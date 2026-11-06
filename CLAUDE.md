@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Arcade Vault: online arcade platform where players compete for the highest score. Spanish-language UI; answer and write user-facing copy in Spanish.
 
-Four playable games (`asteroides`, `tetris`, `arkanoid`, `snake`), a real leaderboard in Supabase, a landing page, a library, a hall of fame, a contact form via Resend, and a local guest session. Specs 01–09 in `specs/` are all `Implementado`.
+Five playable games (`asteroides`, `tetris`, `arkanoid`, `snake`, `invasores`), each with 3 skins and a shared Game Boy touch pad, a real leaderboard in Supabase, a landing page, a library, a hall of fame, a contact form via Resend, and a local guest session. Specs 01–11 in `specs/` are all `Implementado`. `invasores` comes from the game-jam spec `specs/game-jam.agent/invasores/01-invasores-core.md` (not renumbered).
 
 Development is spec-driven: `/spec` writes the spec, `/spec-impl` implements it (user-level skills from `Klerith/fernando-skills`, `npx skills@latest add Klerith/fernando-skills`). No code without an approved spec.
 
@@ -23,9 +23,13 @@ Next 16.4.2 + React 19.3. Breaking changes vs. training data. Per `AGENTS.md`, r
 
 ## Architecture
 
+### Specs
+
+`specs/` holds the spec-driven design history, plus `specs/game-jam/` for thematic jams.
+
 ### Routes (App Router only)
 
-- `/` landing, `/games` library (see `references/implemented-games.md` whenever you need to check which gamer are implemented and how to implement new ones), `/games/[id]` game detail, `/games/[id]/play` player, `/hall` hall of fame, `/about` about + contact, `/access` guest login.
+- `/` landing, `/games` library (see `references/implemented-games.md` whenever you need to check which games are implemented and how to implement new ones), `/games/[id]` game detail, `/games/[id]/play` player, `/hall` hall of fame, `/about` about + contact, `/access` sign in / sign up / guest, `/access/forgot`, `/access/reset`, `/access/username`, `/profile`, and the `/auth/callback` Route Handler (no UI).
 - `generateStaticParams` + `generateMetadata` over `GAMES` in the `[id]` routes; unknown id → `notFound()`.
 - Global type helpers `LayoutProps<"/">` and `PageProps<"/games/[id]">` (no import needed).
 - Root layout loads `Press_Start_2P`, `JetBrains_Mono` and `Courier_Prime` from `next/font/google`, and wraps everything in `SessionProvider` + `Nav` / `Footer`.
@@ -34,46 +38,50 @@ Next 16.4.2 + React 19.3. Breaking changes vs. training data. Per `AGENTS.md`, r
 
 ### Directory layout
 
-- `app/_components/` — UI. `games/` holds one client component per game plus the shared contract in `games/types.ts`.
-- `app/_games/<id>/` — canvas engine in TypeScript: `engine.ts`, `entities.ts`, `input.ts`, `constants.ts` (plus `levels.ts` in arkanoid).
+- `app/_components/` — UI. `game-player.tsx` (player, `REAL_GAMES`), `gameboy-pad.tsx` (`GameBoyPad`, `PadMapping`). `games/` holds one client component per game plus the shared contract in `games/types.ts`.
+- `app/_games/<id>/` — canvas engine in TypeScript: `engine.ts`, `entities.ts`, `input.ts`, `constants.ts`, `skins.ts` (plus `levels.ts` in arkanoid).
 - `app/_lib/` — `leaderboard.ts` (cached reads) and `supabase/` (`client.ts` browser, `server.ts` server, `admin.ts` service role, `proxy.ts` session refresh, `database.types.ts` generated).
 - `app/_actions/scores.ts` — Server Actions `startGameSession` / `submitScore`.
+- `app/access/actions.ts` — auth Server Actions (`signUp`, `signIn`, `signInWithProvider`, `signOutAction`, `requestPasswordReset`, `updatePassword`, `setUsername`, `checkUsernameAvailable`). `app/auth/callback/route.ts` exchanges the PKCE `code` for a session.
+- `app/about/actions.ts` — `sendContactMessage` Server Action.
 - `app/data/` — static catalog (`games.ts`: `GAMES`, `CATS`, `GameCategory`, `GameColor`) and landing copy (`home.ts`).
-- `specs/` specs + `.spec-config.yml`; `supabase/migrations/` SQL; `references/` source templates and the original vanilla games; `public/games/<id>/` game assets.
+- `specs/` specs + `.spec-config.yml` (+ `game-jam.agent/` variants); `supabase/migrations/` SQL; `public/games/<id>/` game assets.
+- `references/` — `started-games/` (original vanilla games), `templates/` (visual templates), `source-assets/`, `implemented-games.md`, `game-suggestions-todo.md`.
 
 ### Color por categoría (regla fija)
 
 El `color` de cada juego en `GAMES` sale de su `cat`, no se elige libre:
 
-| `cat` | `color` |
-|---|---|
-| `SHOOTER` | `cyan` |
-| `PUZZLE` | `magenta` |
-| `ARCADE` | `yellow` |
-| categoría nueva (no listada) | `green` |
+| `cat`                        | `color`   |
+| ---------------------------- | --------- |
+| `SHOOTER`                    | `cyan`    |
+| `PUZZLE`                     | `magenta` |
+| `ARCADE`                     | `yellow`  |
+| categoría nueva (no listada) | `green`   |
 
 Una categoría nueva obtiene `green`. Una segunda categoría nueva requiere decidir un color con el usuario y ampliar esta tabla.
 
 ### Config and styling
 
-- `next.config.ts` enables `cacheComponents`, `partialPrefetching`, `experimental.agentFeedback`, `experimental.agentUpgrade: "security"`. Cache Components changes data-fetching and caching semantics — check the docs before adding fetches or dynamic APIs.
+- `next.config.ts` enables `cacheComponents`, `partialPrefetching`, `experimental.agentFeedback`, `experimental.agentUpgrade: "security"`, plus `allowedDevOrigins` (LAN IPs for testing on a phone). Cache Components changes data-fetching and caching semantics — check the docs before adding fetches or dynamic APIs.
 - Tailwind v4 via the `@tailwindcss/turbopack` loader rule in `next.config.ts` (not PostCSS). Theme tokens in `app/globals.css` (`@theme inline` + `:root`): `--cyan`, `--magenta`, `--yellow`, `--green`, `--gold`/`--silver`/`--bronze`, `--font-pixel`, `--font-mono`. Dark CRT aesthetic only — no light theme.
 - `app/globals.css` is one big hand-written stylesheet (~2000 lines): `.crt-screen` (4:3 frame), `.cover-<id>` covers drawn in pure CSS, `.av-bg` / `.av-noise`.
 
 ## Game pattern (fixed rules)
 
 - The platform owns HUD, pause, FIN and the save modal — all in `game-player.tsx`. The engine draws neither HUD nor GAME OVER; it only emits `onStats` and `onGameOver(finalScore)`.
-- `GameComponentProps` (`app/_components/games/types.ts`): `paused`, `runKey`, `inputRef`, `onStats`, `onGameOver`. Extend it, never break it.
-- Registration is by map in `REAL_GAMES` in `game-player.tsx` (`Component`, `Controls`, `TouchControls`, optional `initialLives`). Never a loose `if (game.id === ...)`.
+- `GameComponentProps` (`app/_components/games/types.ts`): `paused`, `runKey`, `inputRef`, `onStats`, `onGameOver`, optional `skin`. Extend it, never break it.
+- Registration is by map in `REAL_GAMES` in `app/_components/game-player.tsx` (`Component`, `Controls`, `pad`, optional `initialLives`, optional `skins`). Never a loose `if (game.id === ...)`.
 - No module touches `document` or `window` at top level. The engine is created inside `useEffect`; cleanup calls `stop()` (cancels `requestAnimationFrame`, removes listeners).
 - `dt` in seconds, capped at 0.05 s; `lastTime` resets on resume. Pause really stops `update` and `draw`.
 - `Math.random()` only inside the engine, after mount — never during render.
-- Each game ships keyboard controls, a keys hint and touch controls (mobile layout).
+- Each game ships keyboard controls, a keys hint and touch input through the shared Game Boy pad (`pad: PadMapping`, SPEC 10) with the split mobile HUD (SPEC 11).
+- Skins: each game has `app/_games/<id>/skins.ts` (`clasico` default, `neon`, `retro`); the engine exposes `setSkin(skin)` with no restart. `game-player.tsx` shows the selector only if `skins` is declared. Choice stored in `localStorage` under `av_skin_<id>`, read once after mount. Skin CSS uses the `.skin-` prefix.
 
 ## Leaderboard and anti-cheat
 
 - Scores only enter through `startGameSession` and `submitScore` in `app/_actions/scores.ts`. Never from the client directly, never via `localStorage`.
-- Flow: `startGameSession` inserts a row in `game_sessions`; `submitScore` validates the UUID, the name (`/^[\p{L}\p{N}_ ]{1,10}$/u`, uppercased), a positive safe integer score, a session TTL of 2 h, and the cap `score <= floor(elapsedSeconds * games.max_score_per_second)`. A conditional `UPDATE` on `consumed_at` makes the session single-use; a failed insert releases it again.
+- Flow: `startGameSession` inserts a row in `game_sessions`; `submitScore(sessionId, score)` first requires a signed-in user (`auth.getUser()`, not `getSession()`) with a `profiles.username`, **before** consuming the game session, and saves with that username uppercased (the client never sends a name). It then validates the UUID, a positive safe integer score, a session TTL of 2 h, and the cap `score <= floor(elapsedSeconds * games.max_score_per_second)`. A conditional `UPDATE` on `consumed_at` makes the session single-use; a failed insert releases it again.
 - Reads live in `app/_lib/leaderboard.ts` with `"use cache"` + `cacheTag("leaderboard")` + `cacheLife("hours")`, through a cookie-less client with the publishable key (RLS authorizes public reads; `cookies()` is unavailable inside `use cache`).
 - After a save, `submitScore` calls `updateTag("leaderboard")` **and** `revalidatePath` on `/hall`, `/games`, `/games/<id>` — without the paths the client router cache keeps serving the old list.
 - A new game needs a row in `games` with a justified `max_score_per_second`. It must never reject a legitimate run.
@@ -87,25 +95,31 @@ Una categoría nueva obtiene `green`. Una segunda categoría nueva requiere deci
 
 ## Session and contact
 
-- `SessionProvider` is a guest-only session: a name in `localStorage` under `av_user`, read once after mount to avoid a hydration mismatch. No Supabase Auth yet.
+- Auth is Supabase Auth (email + password with email confirmation, Google, GitHub). Table `profiles` (`id` → `auth.users`, unique `lower(username)`, ASCII `[A-Za-z0-9_ ]{1,10}`) is created by the `handle_new_user` trigger; the username is public. Only accounts with a username can save scores; guests can still play.
+- `SessionProvider` (Client Component) exposes `user: { name } | null`, `account`, `status: "loading" | "ready"`, `login` (guest only), async `logout` and `refresh`. First render has no user; after mount it reads the guest from `localStorage` (`av_user`) and the account with `getUser()` + `profiles`, and subscribes to `onAuthStateChange`. With an account the guest is ignored (not deleted). Reading cookies in pages (`/access`, `/access/reset`, `/access/username`, `/profile`) happens inside `Suspense`.
+- Dashboard setup (Site URL, Redirect URLs, Confirm email, Google/GitHub) is documented in `README.md`.
 - `/about` contact form posts to the `sendContactMessage` Server Action, which sends through Resend to `jmedinalba@gmail.com`, with a honeypot field and length/format validation.
 
 # Skills
 
-- `/add-game <carpeta de references/started-games | descripción>` — project skill (`.claude/skills/add-game/`) that turns a game into a real platform game: spec first, then engine, component, `REAL_GAMES` entry, Supabase migration and leaderboard. Support files: `integration-checklist.md`, `porting-guide.md`, `spec-template.md`, `migration-template.sql`.
-- `/spec` and `/spec-impl` — the spec-driven workflow. `specs/.spec-config.yml` has `AutoCreateBranch: true`, so `/spec-impl` creates `spec-NN-slug` on its own.
-- `/spec-impl-game <NN-juego-id>` — project skill (`.claude/skills/spec-impl-game/`). Reads and follows `/spec-impl` (phases 1–4, same rules, no auto-commit) for a game spec; when the last step is done, launches `skin-designer` and then `mobile-porter` on the game id, strictly one after the other (never parallel). Stops if the spec is not a game spec or `/spec-impl` stops.
-- Always use `/frontend-design` to design the user interface.
+Project (`.claude/skills/<name>/SKILL.md`):
+
+- `/add-game <carpeta de references/started-games | descripción>` — turns a game into a real platform game: spec, engine, component, `REAL_GAMES` entry, migration, leaderboard. Support files in the same folder.
+- `/spec-impl-game <NN-juego-id>` — runs `/spec-impl` on a game spec, then `skin-designer` and `mobile-porter` in series.
+
+User (`~/.claude/skills/<name>/SKILL.md`):
+
+- `/spec` — writes a spec section by section.
+- `/spec-impl` — implements an approved spec on branch `spec-NN-slug` (`AutoCreateBranch: true` in `specs/.spec-config.yml`).
+- `/frontend-design` — mandatory for any UI design.
+- `/find-skills` — finds and installs skills.
+- `/caveman` — terse reply mode.
 
 # Agents
 
-- `game-planner` — project subagent (`.claude/agents/game-planner.md`) that decides which game to add next and returns a brief for `/add-game`. Persistent memory (`memory: project`) in `.claude/agent-memory/game-planner/` (`MEMORY.md`, `decisions.md`, `criteria.md`), versioned; it logs every proposal, acceptance and rejection.
-- `game-jam` — project subagent (`.claude/agents/game-jam.md`). Input: a game name or short description. Writes 3 alternative specs (A faithful, B twist, C intense) in `specs/game-jam.agent/<game-id>/` for user review, modeled on SPEC 07/08/09. Autonomous (no questions), writes only there, never implements. The chosen variant is renumbered to `specs/NN-juego-<id>.md` and goes to `/spec-impl` or `/add-game`.
-- `skin-designer` — project subagent (`.claude/agents/skin-designer.md`). Input: id of an implemented game (`asteroides`, `tetris`, `arkanoid`, `snake`). Adds 3 visual skins: `clasico` (default, identical to current look), `neon`, `retro`. Autonomous (no questions). Stops if the id is not in `GAMES`/`REAL_GAMES` or `app/_games/<id>/skins.ts` already exists. What it does:
-  - Creates `app/_games/<id>/skins.ts` (`SkinId`, `SKIN_IDS`, `DEFAULT_SKIN`, `Skin`, `SKINS`); the engine reads colors from the active skin and exposes `setSkin(skin)` (no restart, no logic/`dt`/score changes).
-  - Extends `GameComponentProps` with optional `skin?: string`; unknown value falls back to `DEFAULT_SKIN`.
-  - Adds an optional `skins` field to the `REAL_GAMES` entry (e.g. `skins: SKIN_IDS`); `game-player.tsx` shows a CRT-style dropdown ("Clásico", "Neón", "Retro") only for games that declare it.
-  - Persists the choice in `localStorage` under `av_skin_<id>`, read once after mount. Never stores scores.
-  - New CSS only with `.skin-` prefix. Never touches `scores.ts`, `app/_lib/`, `supabase/`, the `games` row, or other games.
-  - Verifies with `npx tsc --noEmit` and `npm run lint`; no build/dev. Done without a spec — run `/spec` afterwards to document it.
-- `mobile-porter` — project subagent (`.claude/agents/mobile-porter.md`). Input: id of a game (`asteroides`, `tetris`, `arkanoid`, `snake` or a new one). Read-only audit of its touch/mobile version against SPEC 10 (Game Boy pad) and SPEC 11 (split HUD) and the already implemented games. Autonomous (no questions). Stops if the id is not in `GAMES`/`REAL_GAMES`. Never edits files, never runs dev/build/browser; code wins over specs when they differ. Reports in chat: verdict (`CUMPLE` / `CUMPLE CON AVISOS` / `NO CUMPLE`), checklist table with `file:line`, proposed fixes and pending manual checks. Apply fixes afterwards with `/spec` + `/spec-impl`.
+Project (`.claude/agents/<name>.md`):
+
+- `game-planner` — picks the next game and returns the brief for `/add-game`. Versioned memory in `.claude/agent-memory/game-planner/`.
+- `game-jam` — writes 3 spec variants (A faithful, B twist, C intense) in `specs/game-jam.agent/<game-id>/`; never implements.
+- `skin-designer` — adds the `clasico`/`neon`/`retro` skins to an implemented game; checks with `tsc` + `lint`.
+- `mobile-porter` — read-only mobile audit of a game against SPEC 10/11; reports a verdict and checklist in chat.

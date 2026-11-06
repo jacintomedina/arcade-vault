@@ -166,13 +166,13 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [x] `←` y `→` mueven el cañón a 300 px/s y no lo sacan de `[20, 736]` px lógicos.
 - [x] `Espacio` dispara; con una bala en pantalla no sale otra, y mantener `Espacio` dispara cada 0,25 s como mínimo.
 - [x] La formación se mueve 8 px por tick, baja 24 px y cambia de sentido al tocar el margen de 20 px, y alterna el frame de los sprites.
-- [ ] El intervalo de marcha es 0,63 s con 55 invasores y 0,03 s con 1 en la oleada 1, y baja más en oleadas superiores hasta la 9.
+- [x] El intervalo de marcha es 0,63 s con 55 invasores y 0,03 s con 1 en la oleada 1, y baja más en oleadas superiores hasta la 9.
 - [x] Destruir un calamar suma 30, un cangrejo 20 y un pulpo 10 puntos, exactamente.
 - [x] Nunca hay más de 3 balas enemigas a la vez, y salen solo de invasores sin otro invasor debajo en su columna.
 - [x] Una bala propia y una enemiga que se cruzan desaparecen sin sumar puntos.
 - [x] Cada impacto en un escudo, propio o enemigo, borra celdas en un radio de 2 y consume la bala; un escudo agotado deja pasar las balas.
 - [x] Un invasor que cruza un escudo borra las celdas que toca.
-- [ ] El platillo cruza en `y = 50` a 140 px/s, solo con 8 o más invasores vivos, y da 50, 100, 150 o 300 puntos.
+- [x] El platillo cruza en `y = 50` a 140 px/s, solo con 8 o más invasores vivos, y da 50, 100, 150 o 300 puntos.
 - [x] A la velocidad de bala de 600 px/s la bala no atraviesa invasores ni el platillo.
 - [x] Un impacto enemigo resta una vida, congela la partida 1,2 s, borra las balas y recoloca el cañón.
 - [x] Un invasor que llega a `y = 500` termina la partida aunque queden vidas.
@@ -180,7 +180,7 @@ Cada paso deja la app arrancando con `npm run dev`.
 - [x] El HUD de la plataforma refleja puntuación, vidas (3 a 0) y oleada como nivel en tiempo real.
 - [x] PAUSA y la tecla `P` congelan el juego, incluidos marcha y platillo; al reanudar no hay salto de movimiento.
 - [x] Al terminar se abre el modal "FIN DEL JUEGO" con la puntuación final.
-- [ ] GUARDAR PUNTUACIÓN inserta una fila en `scores` con `game_id = 'invasores'` y el modal muestra `#NN`.
+- [x] GUARDAR PUNTUACIÓN inserta una fila en `scores` con `game_id = 'invasores'` y el modal muestra `#NN`.
 - [x] "JUGAR DE NUEVO" reinicia con puntuación 0, 3 vidas y oleada 1, y abre una sesión nueva.
 - [x] `startGameSession('invasores')` devuelve `sessionId`.
 - [x] `execute_sql` muestra la fila `invasores` con `max_score_per_second = 1200`.

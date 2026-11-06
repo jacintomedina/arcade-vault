@@ -1,27 +1,121 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type FocusEvent, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  checkUsernameAvailable,
+  signIn,
+  signInWithProvider,
+  signUp,
+  type AuthResult,
+  type OAuthProvider,
+} from "../access/actions";
 import { useSession } from "./session-provider";
 
-export function AuthForm() {
+type Tab = "in" | "up";
+type FieldName = "email" | "password" | "username";
+
+const ERR_CALLBACK =
+  "No se pudo completar el acceso. Vuelve a intentarlo o usa otro método.";
+const ERR_NETWORK = "No se pudo conectar. Inténtalo de nuevo.";
+
+export function AuthForm({ callbackError = false }: { callbackError?: boolean }) {
   const router = useRouter();
-  const { login, logout } = useSession();
-  const [tab, setTab] = useState<"in" | "up">("in");
-  const [username, setUsername] = useState("");
-  const [pass, setPass] = useState("");
-  const [email, setEmail] = useState("");
+  const { logout, refresh } = useSession();
+  const [tab, setTab] = useState<Tab>("in");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(
+    callbackError ? ERR_CALLBACK : null,
+  );
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<FieldName, string>>
+  >({});
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
-  const submit = (e: FormEvent<HTMLFormElement>) => {
+  const switchTab = (next: Tab) => {
+    setTab(next);
+    setError(null);
+    setFieldErrors({});
+  };
+
+  const fail = (result: Extract<AuthResult, { ok: false }>) => {
+    if (result.field) {
+      setFieldErrors({ [result.field]: result.error });
+    } else {
+      setError(result.error);
+    }
+  };
+
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    login({ name: (username || "PLAYER1").toUpperCase().slice(0, 10) });
+    if (pending) return;
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    setPending(true);
+    setError(null);
+    setFieldErrors({});
+    try {
+      if (tab === "in") {
+        const result = await signIn(formData);
+        if (!result.ok) return fail(result);
+        // El login se hizo en servidor: se relee la cuenta antes de navegar.
+        await refresh();
+        router.push("/");
+        router.refresh();
+      } else {
+        const result = await signUp(formData);
+        if (!result.ok) return fail(result);
+        setSentTo(String(formData.get("email") ?? ""));
+      }
+    } catch {
+      setError(ERR_NETWORK);
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const checkUsername = async (e: FocusEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value.trim();
+    if (!value) return;
+    try {
+      const result = await checkUsernameAvailable(value);
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        if (result.ok) delete next.username;
+        else next.username = result.error;
+        return next;
+      });
+    } catch {
+      // Solo ayuda de UX: la garantía es el índice único.
+    }
+  };
+
+  const oauth = async (provider: OAuthProvider) => {
+    if (pending) return;
+    setPending(true);
+    setError(null);
+    setFieldErrors({});
+    try {
+      const result = await signInWithProvider(provider);
+      if (!result.ok) {
+        setError(result.error);
+        setPending(false);
+        return;
+      }
+      window.location.assign(result.url);
+    } catch {
+      setError(ERR_NETWORK);
+      setPending(false);
+    }
+  };
+
+  const playAsGuest = async () => {
+    await logout();
     router.push("/");
   };
 
-  const playAsGuest = () => {
-    logout();
-    router.push("/");
-  };
+  const err = (name: FieldName) => fieldErrors[name];
 
   return (
     <div className="av-auth-wrap fade-in">
@@ -42,79 +136,163 @@ export function AuthForm() {
           </div>
         </div>
 
-        <div className="auth-tabs">
-          <button
-            type="button"
-            className={tab === "in" ? "on" : ""}
-            onClick={() => setTab("in")}
-          >
-            INICIAR SESIÓN
-          </button>
-          <button
-            type="button"
-            className={tab === "up" ? "on" : ""}
-            onClick={() => setTab("up")}
-          >
-            CREAR CUENTA
-          </button>
-        </div>
-
-        <form onSubmit={submit}>
-          <div className="field">
-            <label htmlFor="auth-user">Usuario</label>
-            <input
-              id="auth-user"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="px_kai"
-            />
+        {sentTo !== null ? (
+          <div className="auth-notice" role="status">
+            <strong>Revisa tu correo para confirmar la cuenta.</strong>
+            <p>
+              Hemos enviado un enlace a <span className="mono">{sentTo}</span>.
+              Hasta que lo abras no podrás iniciar sesión.
+            </p>
+            <button
+              type="button"
+              className="btn ghost"
+              style={{ width: "100%" }}
+              onClick={() => {
+                setSentTo(null);
+                switchTab("in");
+              }}
+            >
+              VOLVER A INICIAR SESIÓN
+            </button>
           </div>
-          {tab === "up" && (
-            <div className="field slide-in">
-              <label htmlFor="auth-email">Correo electrónico</label>
-              <input
-                id="auth-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="jugador@vault.gg"
-              />
+        ) : (
+          <>
+            <div className="auth-tabs">
+              <button
+                type="button"
+                className={tab === "in" ? "on" : ""}
+                onClick={() => switchTab("in")}
+              >
+                INICIAR SESIÓN
+              </button>
+              <button
+                type="button"
+                className={tab === "up" ? "on" : ""}
+                onClick={() => switchTab("up")}
+              >
+                CREAR CUENTA
+              </button>
             </div>
-          )}
-          <div className="field">
-            <label htmlFor="auth-pass">Contraseña</label>
-            <input
-              id="auth-pass"
-              type="password"
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-              placeholder="••••••••"
-            />
-          </div>
 
-          <button
-            className="btn lg"
-            type="submit"
-            style={{ width: "100%", marginTop: 8 }}
-          >
-            {tab === "in" ? "ENTRAR AL VAULT" : "CREAR Y JUGAR"}
-          </button>
-        </form>
+            <form onSubmit={submit} noValidate>
+              {error && (
+                <p className="auth-error" role="alert">
+                  {error}
+                </p>
+              )}
+              {tab === "up" && (
+                <div className={`field slide-in${err("username") ? " invalid" : ""}`}>
+                  <label htmlFor="auth-user">Usuario</label>
+                  <input
+                    id="auth-user"
+                    name="username"
+                    autoComplete="username"
+                    maxLength={10}
+                    placeholder="px_kai"
+                    aria-invalid={err("username") ? true : undefined}
+                    aria-describedby={err("username") ? "auth-user-err" : undefined}
+                    onBlur={checkUsername}
+                    required
+                  />
+                  {err("username") && (
+                    <p className="field-error" id="auth-user-err">
+                      {err("username")}
+                    </p>
+                  )}
+                </div>
+              )}
+              <div className={`field${err("email") ? " invalid" : ""}`}>
+                <label htmlFor="auth-email">Correo electrónico</label>
+                <input
+                  id="auth-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="jugador@vault.gg"
+                  aria-invalid={err("email") ? true : undefined}
+                  aria-describedby={err("email") ? "auth-email-err" : undefined}
+                  required
+                />
+                {err("email") && (
+                  <p className="field-error" id="auth-email-err">
+                    {err("email")}
+                  </p>
+                )}
+              </div>
+              <div className={`field${err("password") ? " invalid" : ""}`}>
+                <label htmlFor="auth-pass">Contraseña</label>
+                <input
+                  id="auth-pass"
+                  name="password"
+                  type="password"
+                  autoComplete={tab === "in" ? "current-password" : "new-password"}
+                  placeholder="••••••••"
+                  minLength={tab === "up" ? 8 : undefined}
+                  aria-invalid={err("password") ? true : undefined}
+                  aria-describedby={err("password") ? "auth-pass-err" : undefined}
+                  required
+                />
+                {err("password") && (
+                  <p className="field-error" id="auth-pass-err">
+                    {err("password")}
+                  </p>
+                )}
+                {tab === "up" && !err("password") && (
+                  <p className="field-hint">Mínimo 8 caracteres.</p>
+                )}
+              </div>
 
-        <button
-          type="button"
-          className="btn ghost"
-          style={{ width: "100%", marginTop: 10 }}
-          onClick={playAsGuest}
-        >
-          JUGAR COMO INVITADO
-        </button>
+              {tab === "in" && (
+                <Link className="auth-link" href="/access/forgot">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              )}
 
-        <div className="auth-divider">O CONTINÚA CON</div>
-        <div className="social">
-          <button className="btn ghost" type="button">◆&nbsp; GOOGLE</button>
-          <button className="btn ghost" type="button">▣&nbsp; GITHUB</button>
-        </div>
+              <button
+                className="btn lg"
+                type="submit"
+                disabled={pending}
+                style={{ width: "100%", marginTop: 8 }}
+              >
+                {pending
+                  ? "ENVIANDO…"
+                  : tab === "in"
+                    ? "ENTRAR AL VAULT"
+                    : "CREAR CUENTA"}
+              </button>
+            </form>
+
+            <button
+              type="button"
+              className="btn ghost"
+              style={{ width: "100%", marginTop: 10 }}
+              onClick={playAsGuest}
+              disabled={pending}
+            >
+              JUGAR COMO INVITADO
+            </button>
+
+            <div className="auth-divider">O CONTINÚA CON</div>
+            <div className="social">
+              <button
+                className="btn ghost"
+                type="button"
+                disabled={pending}
+                onClick={() => oauth("google")}
+              >
+                ◆&nbsp; GOOGLE
+              </button>
+              <button
+                className="btn ghost"
+                type="button"
+                disabled={pending}
+                onClick={() => oauth("github")}
+              >
+                ▣&nbsp; GITHUB
+              </button>
+            </div>
+          </>
+        )}
 
         <div
           style={{
