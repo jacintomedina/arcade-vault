@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "./session-provider";
@@ -10,6 +10,30 @@ export function Nav() {
   const router = useRouter();
   const { user, account, status, logout } = useSession();
   const [openPath, setOpenPath] = useState<string | null>(null);
+  const [menuPath, setMenuPath] = useState<string | null>(null);
+  const menuOpen = menuPath === pathname;
+  const setMenuOpen = (v: boolean | ((p: boolean) => boolean)) => {
+    const next = typeof v === "function" ? v(menuOpen) : v;
+    setMenuPath(next ? pathname : null);
+  };
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Cierra el desplegable de cuenta al hacer clic fuera, con Escape o al cambiar de ruta.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setMenuPath(null);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuPath(null);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
 
   // El panel móvil se cierra solo al cambiar de ruta.
   const open = openPath === pathname;
@@ -28,6 +52,7 @@ export function Nav() {
 
   const handleLogout = async () => {
     closeMenu();
+    setMenuOpen(false);
     await logout();
     router.push("/");
     router.refresh();
@@ -64,14 +89,32 @@ export function Nav() {
         {account ? (
           <>
             <Link
-              className={"btn ghost auth-btn" + (isProfile ? " active" : "")}
+              className={"btn ghost auth-btn account-link-mobile" + (isProfile ? " active" : "")}
               href="/profile"
             >
               {accountName}
             </Link>
-            <button className="btn ghost nav-logout" onClick={handleLogout}>
-              Cerrar Sesión
-            </button>
+            <div className="account-menu" ref={menuRef}>
+              <button
+                type="button"
+                className={"btn ghost auth-btn" + (isProfile ? " active" : "")}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                onClick={() => setMenuOpen((v) => !v)}
+              >
+                {accountName} ▾
+              </button>
+              {menuOpen && (
+                <div className="account-dropdown" role="menu">
+                  <Link role="menuitem" href="/profile" onClick={() => setMenuOpen(false)}>
+                    Perfil
+                  </Link>
+                  <button type="button" role="menuitem" onClick={handleLogout}>
+                    Cerrar sesión
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         ) : user ? (
           <button className="btn ghost auth-btn" onClick={logout}>
