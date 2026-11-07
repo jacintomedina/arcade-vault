@@ -5,6 +5,7 @@ import {
   type HighlightIconKind,
 } from "../_components/about/highlight-icon";
 import { RevealObserver } from "../_components/home/reveal-observer";
+import { Icon } from "../_components/icon";
 
 export const metadata: Metadata = {
   title: "Acerca de",
@@ -24,7 +25,7 @@ export default function AboutPage() {
 
       {/* ABOUT */}
       <section className="about-hero">
-        <div className="kicker pixel neon-yellow">▸ ACERCA DE</div>
+        <div className="kicker pixel neon-yellow"><Icon name="caretRight" side="l" />ACERCA DE</div>
         <h1 className="about-title flicker">MÁS SOBRE ARCADE VAULT</h1>
         <p className="about-mission">
           ARCADE VAULT nació del amor por los videojuegos clásicos. Nuestra misión es preservar y celebrar
@@ -57,7 +58,7 @@ export default function AboutPage() {
       <section className="about-contact reveal">
         <div className="contact-grid">
           <div className="contact-intro">
-            <div className="kicker pixel neon-cyan">▸ CONTACTO</div>
+            <div className="kicker pixel neon-cyan"><Icon name="caretRight" side="l" />CONTACTO</div>
             <h2 className="contact-title">ENVÍANOS UN MENSAJE</h2>
             <p className="contact-sub">
               ¿Tienes alguna sugerencia, quieres proponer un juego, o simplemente quieres saludar?

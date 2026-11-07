@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "./session-provider";
+import { Icon } from "./icon";
 
 export function Nav() {
   const pathname = usePathname();
@@ -102,7 +103,16 @@ export function Nav() {
                 aria-expanded={menuOpen}
                 onClick={() => setMenuOpen((v) => !v)}
               >
-                {accountName} ▾
+                {accountName}
+                <svg
+                  className="account-caret"
+                  width="10"
+                  height="6"
+                  viewBox="0 0 10 6"
+                  aria-hidden="true"
+                >
+                  <path d="M0 0h10L5 6z" fill="currentColor" />
+                </svg>
               </button>
               {menuOpen && (
                 <div className="account-dropdown" role="menu">
@@ -118,7 +128,8 @@ export function Nav() {
           </>
         ) : user ? (
           <button className="btn ghost auth-btn" onClick={logout}>
-            {user.name} ▾
+            {user.name}
+            <svg className="account-caret" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M0 0h10L5 6z" fill="currentColor" /></svg>
           </button>
         ) : status === "loading" ? (
           // Reserva el hueco hasta leer la sesión: sin parpadeo de «Iniciar Sesión».
@@ -135,7 +146,7 @@ export function Nav() {
           onClick={() => setOpenPath(pathname)}
           aria-label="Menú"
         >
-          ≡
+          <Icon name="menu" />
         </button>
       </nav>
 

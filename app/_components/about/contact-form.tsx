@@ -2,6 +2,7 @@
 
 import { useActionState, useLayoutEffect, useState } from "react";
 import { sendContactMessage, type ContactState } from "../../about/actions";
+import { Icon } from "../icon";
 
 const EMPTY = { name: "", email: "", msg: "" };
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -112,7 +113,7 @@ function ContactFormInner({ onReset }: { onReset: () => void }) {
             </p>
           )}
           <button className="btn xl press" type="submit" disabled={pending} style={{ width: "100%" }}>
-            {pending ? "ENVIANDO…" : "▶  ENVIAR MENSAJE"}
+            {pending ? "ENVIANDO…" : <><Icon name="play" side="l" />ENVIAR MENSAJE</>}
           </button>
         </>
       ) : (
