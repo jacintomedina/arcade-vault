@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type KeyboardEvent, type MouseEvent } from "react";
+import { useEffect, useRef, type KeyboardEvent, type MouseEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Game } from "../data/games";
@@ -9,6 +9,10 @@ export function GameCard({ game, best }: { game: Game; best: number }) {
   const router = useRouter();
   const tiltRef = useRef<HTMLDivElement>(null);
   const href = `/games/${game.id}`;
+
+  useEffect(() => {
+    router.prefetch(href);
+  }, [router, href]);
 
   const onMove = (e: MouseEvent<HTMLDivElement>) => {
     const el = tiltRef.current;
