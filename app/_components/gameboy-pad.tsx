@@ -66,6 +66,8 @@ function HoldButton({
 			onPointerUp={() => press(false)}
 			onPointerCancel={() => press(false)}
 			onContextMenu={(e) => e.preventDefault()}
+			onSelectCapture={(e) => e.preventDefault()}
+			onDragStart={(e) => e.preventDefault()}
 		>
 			{isDir ? (
 				<svg
