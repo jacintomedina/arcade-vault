@@ -7,7 +7,7 @@ import { createClient } from "../_lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Acceso",
-  description: "Inicia sesión, crea tu cuenta o juega como invitado.",
+  description: "Inicia sesión o crea tu cuenta.",
 };
 
 async function hasSession(): Promise<boolean> {
