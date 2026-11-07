@@ -28,7 +28,7 @@ const ERR_NETWORK = "No se pudo conectar. Inténtalo de nuevo.";
 
 export function AuthForm({ callbackError = false }: { callbackError?: boolean }) {
   const router = useRouter();
-  const { logout, refresh } = useSession();
+  const { refresh } = useSession();
   const [tab, setTab] = useState<Tab>("in");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(
@@ -124,11 +124,6 @@ export function AuthForm({ callbackError = false }: { callbackError?: boolean })
       setError(ERR_NETWORK);
       setPending(false);
     }
-  };
-
-  const playAsGuest = async () => {
-    await logout();
-    router.push("/");
   };
 
   const err = (name: FieldName) => fieldErrors[name];
@@ -300,16 +295,6 @@ export function AuthForm({ callbackError = false }: { callbackError?: boolean })
                     : "CREAR CUENTA"}
               </button>
             </form>
-
-            <button
-              type="button"
-              className="btn ghost"
-              style={{ width: "100%", marginTop: 10 }}
-              onClick={playAsGuest}
-              disabled={pending}
-            >
-              JUGAR COMO INVITADO
-            </button>
 
             <div className="auth-divider">O CONTINÚA CON</div>
             <div className="social">
