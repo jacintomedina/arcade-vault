@@ -18,6 +18,7 @@ import {
   PASSWORD_ERROR,
   isStrongPassword,
 } from "../_lib/password";
+import { Icon } from "./icon";
 
 type Tab = "in" | "up";
 type FieldName = "email" | "password" | "username";
@@ -304,7 +305,7 @@ export function AuthForm({ callbackError = false }: { callbackError?: boolean })
                 disabled={pending}
                 onClick={() => oauth("google")}
               >
-                ◆&nbsp; GOOGLE
+                <Icon name="diamond" side="l" />GOOGLE
               </button>
               <button
                 className="btn ghost"
@@ -312,7 +313,7 @@ export function AuthForm({ callbackError = false }: { callbackError?: boolean })
                 disabled={pending}
                 onClick={() => oauth("github")}
               >
-                ▣&nbsp; GITHUB
+                <Icon name="squares" side="l" />GITHUB
               </button>
             </div>
           </>

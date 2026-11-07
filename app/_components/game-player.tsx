@@ -44,6 +44,7 @@ import { GameBoyPad, type PadMapping } from "./gameboy-pad";
 import { HighlightIcon } from "./about/highlight-icon";
 import { useSession } from "./session-provider";
 import { startGameSession, submitScore } from "../_actions/scores";
+import { Icon } from "./icon";
 
 const INITIAL_LIVES = 3;
 const SKIN_LABELS: Record<string, string> = {
@@ -397,7 +398,7 @@ export function GamePlayer({ game }: { game: Game }) {
 							)
 						) : (
 							<>
-								<div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+								<div className="toast-saved"><Icon name="caretRight" side="l" />PUNTUACIÓN GUARDADA_</div>
 								{rank !== null && (
 									<div className="save-rank">
 										RANGO #{String(rank).padStart(2, "0")}

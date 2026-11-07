@@ -1,6 +1,7 @@
 "use client";
 
 import { MIN_PASSWORD, passwordChecks } from "../_lib/password";
+import { Icon } from "./icon";
 
 const ITEMS = [
   { key: "length", label: `${MIN_PASSWORD} caracteres como mínimo` },
@@ -28,7 +29,7 @@ export function PasswordChecklist({
         const ok = checks[key];
         return (
           <li key={key} className={ok ? "ok" : undefined}>
-            <span aria-hidden="true">{ok ? "✓" : "○"}</span>
+            <span aria-hidden="true"><Icon name={ok ? "check" : "circle"} /></span>
             {label}
             <span className="sr-only">{ok ? ": cumplido" : ": pendiente"}</span>
           </li>

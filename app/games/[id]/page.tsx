@@ -7,6 +7,7 @@ import {
   getGameStats,
   getLeaderboard,
 } from "../../_lib/leaderboard";
+import { Icon } from "../../_components/icon";
 
 export function generateStaticParams() {
   return GAMES.map((g) => ({ id: g.id }));
@@ -75,13 +76,13 @@ export default async function GameDetailPage({
                   textShadow: "0 0 6px rgba(245,255,0,0.5)",
                 }}
               >
-                ★ ★ ★ ☆ ☆
+                <Icon name="star" /> <Icon name="star" /> <Icon name="star" /> <Icon name="starOutline" /> <Icon name="starOutline" />
               </div>
             </div>
           </div>
           <div className="detail-actions">
             <Link className="btn xl pulse" href={`/games/${game.id}/play`}>
-              ▶&nbsp; JUGAR AHORA
+              <Icon name="play" side="l" />JUGAR AHORA
             </Link>
             <Link className="btn ghost lg" href="/games">
               VOLVER AL VAULT

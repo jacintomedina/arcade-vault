@@ -13,6 +13,7 @@ import { FeatureIcon } from "./_components/home/feature-icon";
 import { FloatingSilhouettes } from "./_components/home/floating-silhouettes";
 import { MiniCard } from "./_components/home/mini-card";
 import { RevealObserver } from "./_components/home/reveal-observer";
+import { Icon } from "./_components/icon";
 
 export const metadata: Metadata = {
 	title: { absolute: "Arcade Vault · El arcade clásico está de vuelta" },
@@ -46,10 +47,10 @@ export default function Home() {
 					</p>
 					<div className="home-ctas">
 						<Link className="btn xl pulse" href="/games">
-							▶ EXPLORAR JUEGOS
+							<Icon name="play" side="l" />EXPLORAR JUEGOS
 						</Link>
 						<Link className="btn xl magenta" href="/access">
-							✦ CREAR CUENTA
+							<Icon name="spark" side="l" />CREAR CUENTA
 						</Link>
 					</div>
 					<div className="hero-scroll" aria-hidden="true">
@@ -99,7 +100,7 @@ export default function Home() {
 				</div>
 				<div style={{ textAlign: "center", marginTop: 24 }}>
 					<Link className="btn lg" href="/games">
-						VER TODOS LOS JUEGOS →
+						VER TODOS LOS JUEGOS<Icon name="arrowRight" side="r" />
 					</Link>
 				</div>
 			</section>
@@ -131,7 +132,7 @@ export default function Home() {
 				<div className="activity-grid">
 					<div className="activity-card">
 						<div className="ac-head">
-							<div className="ac-title pixel">▸ ÚLTIMAS PUNTUACIONES</div>
+							<div className="ac-title pixel"><Icon name="caretRight" side="l" />ÚLTIMAS PUNTUACIONES</div>
 						</div>
 						<div className="ticker">
 							{RECENT_SCORES.map((r, i) => (
@@ -141,7 +142,7 @@ export default function Home() {
 									style={{ animationDelay: i * 60 + "ms" }}
 								>
 									<span className={"tk-p neon-" + r.color}>{r.player}</span>
-									<span className="tk-mid">▸ {r.game}</span>
+									<span className="tk-mid"><Icon name="caretRight" side="l" />{r.game}</span>
 									<span className="tk-s">+{fmt(r.score)}</span>
 									<span className="tk-t">{r.ago}</span>
 								</div>
@@ -152,10 +153,10 @@ export default function Home() {
 					<div className="activity-card">
 						<div className="ac-head">
 							<div className="ac-title pixel neon-magenta">
-								▸ TOP JUGADORES · HOY
+								<Icon name="caretRight" side="l" />TOP JUGADORES · HOY
 							</div>
 							<Link className="lb-link" href="/hall">
-								VER SALÓN →
+								VER SALÓN<Icon name="arrowRight" side="r" />
 							</Link>
 						</div>
 						<div className="top-list">
@@ -209,7 +210,7 @@ export default function Home() {
 						<div className="pc-tag">SIN TRUCOS · SIN LETRA PEQUEÑA</div>
 						<ul className="pc-list">
 							{PRICING_FEATURES.map((p) => (
-								<li key={p}>✔ {p}</li>
+								<li key={p}><Icon name="check" side="l" />{p}</li>
 							))}
 						</ul>
 						<Link
@@ -217,7 +218,7 @@ export default function Home() {
 							style={{ width: "100%" }}
 							href="/access"
 						>
-							EMPEZAR GRATIS →
+							EMPEZAR GRATIS<Icon name="arrowRight" side="r" />
 						</Link>
 						<div className="pc-foot">No pedimos tarjeta. Nunca lo haremos.</div>
 						<div className="pc-stamp pixel">
@@ -242,7 +243,7 @@ export default function Home() {
 			<section className="home-final reveal">
 				<h2 className="final-title pixel">¿LISTO PARA JUGAR?</h2>
 				<Link className="btn xl pulse final-cta" href="/games">
-					INSERT COIN →
+					INSERT COIN<Icon name="arrowRight" side="r" />
 				</Link>
 				<div className="final-tag">
 					Gratis. Sin registro obligatorio. Empieza en segundos.
