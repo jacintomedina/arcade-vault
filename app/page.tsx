@@ -85,13 +85,17 @@ export default function Home() {
 			<section className="home-section reveal">
 				<div className="section-head">
 					<div className="kicker pixel neon-cyan">{"// 02"}</div>
-					<h2 className="section-title">JUEGOS DISPONIBLES AHORA</h2>
+					<h2 className="section-title">ÚLTIMOS JUEGOS AÑADIDOS</h2>
 					<div className="section-rule"></div>
 				</div>
 				<div className="mini-rail">
-					{GAMES.slice(0, 6).map((g) => (
-						<MiniCard key={g.id} game={g} />
-					))}
+					{GAMES.slice(-5)
+						.reverse()
+						.map((g, i) => (
+							<div key={g.id} className={i >= 2 ? "mini-extra" : undefined}>
+								<MiniCard game={g} />
+							</div>
+						))}
 				</div>
 				<div style={{ textAlign: "center", marginTop: 24 }}>
 					<Link className="btn lg" href="/games">
