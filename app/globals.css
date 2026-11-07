@@ -2127,6 +2127,13 @@ a { color: inherit; text-decoration: none; }
 
 /* ===== gamepad táctil estilo Game Boy (SPEC 10) ===== */
 .gb-pad { display: none; }
+.gb-pad, .gb-pad * {
+  user-select: none; -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.gb-pad *::selection { background: transparent; }
+.gb-pad svg, .gb-pad span { pointer-events: none; }
 @media (pointer: coarse) {
   .gb-pad {
     display: block;
