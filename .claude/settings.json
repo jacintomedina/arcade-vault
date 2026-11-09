@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(supabase link:*)",
+      "Bash(supabase db push:*)",
+      "Bash(supabase db reset:*)",
+      "Bash(supabase db dump:*)",
+      "Bash(supabase login:*)",
+      "Bash(npx supabase link:*)",
+      "Bash(npx supabase db push:*)",
+      "Bash(npx supabase db reset:*)",
+      "Bash(npx supabase db dump:*)",
+      "Bash(npx supabase login:*)",
+      "Bash(npx supabase@latest link:*)",
+      "Bash(npx supabase@latest db push:*)",
+      "Bash(vercel env:*)",
+      "Bash(npx vercel env:*)",
+      "Read(./.env.production)",
+      "Read(./.env.production.local)",
+      "Read(./.env.prod)",
+      "Read(./.env.prod.local)",
+      "Read(./.env.prod*)"
+    ]
+  }
+}
