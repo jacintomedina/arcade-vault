@@ -103,6 +103,10 @@ RLS está activo en `games`, `scores`, `profiles` y `game_sessions`.
 - `game_sessions` **no tiene políticas a propósito**: nadie accede con la clave pública, solo el service role (que ignora RLS). El aviso INFO `rls_enabled_no_policy` de `get_advisors` está aceptado.
 - `anon` y `authenticated` conservan los `GRANT` por defecto de Supabase sobre las tablas; RLS es la barrera. No desactives RLS en ninguna tabla.
 
+## Producción
+
+Hay dos proyectos Supabase: dev (el del MCP) y prod (sin acceso desde Claude). Guía completa de migración, configuración de Auth/SMTP/OAuth y variables de entorno en [`docs/migracion-produccion.md`](docs/migracion-produccion.md). Tras migrar, `supabase/verify-prod.sql` comprueba el esquema de prod. Las migraciones a prod se aplican a mano con `npx supabase db push --db-url ...`.
+
 ## Skills usadas
 
 ```bash
